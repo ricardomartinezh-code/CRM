@@ -61,7 +61,10 @@ function doGet(e){
 
 function doPost(e){
   const body = parseJsonBody_(e);
-  const action = String(body.action || '').trim();
+  let action = String(body.action || '').trim();
+  if(!action){
+    action = String(e?.parameter?.action || '').trim();
+  }
   if(action === 'login'){
     return handleLogin_(e, body);
   }
@@ -111,6 +114,12 @@ function doPost(e){
     if(auth.error) return auth.response;
     return handleSyncActivos_(e, body, auth.user);
   }
+  if(action === 'logAircallEvent'){
+    return handleLogAircallEvent_(e, body);
+  }
+  if(action === 'logGmailThread'){
+    return handleLogGmailThread_(e, body);
+  }
   if(action === 'repairSheetStructure'){
     const auth = requireAuth_(e, { body, requireActive: true, role: 'admin' });
     if(auth.error) return auth.response;
@@ -135,6 +144,8 @@ const TOKEN_EXP_MINUTES = 12 * 60;
 const ADMIN_ROLES = new Set(['admin']);
 const SPREADSHEET_ID_PROPERTY = 'APP_SPREADSHEET_ID';
 const SPREADSHEET_ERROR_MESSAGE = 'No se encontró la hoja de cálculo principal. Configura el ID del libro en la propiedad de script "APP_SPREADSHEET_ID".';
+const AIRCALL_WEBHOOK_TOKEN_PROPERTY = 'AIRCALL_WEBHOOK_TOKEN';
+const GMAIL_WEBHOOK_TOKEN_PROPERTY = 'GMAIL_WEBHOOK_TOKEN';
 let ACTIVE_USER = null;
 
 const COLUMNS = ['ID','Nombre','Matricula','Correo','Teléfono','Plantel','Modalidad','Programa','Etapa','Estado','Asesor','Comentario','Asignación','Toque 1','Toque 2','Toque 3','Toque 4','CRM','Resolución','Metadatos'];
@@ -701,6 +712,604 @@ function handleUpdateLead_(e, user){
     toques: idx.Toques.map(c => c !== undefined ? row[c] || '' : '')
   };
   return jsonResponse({ok:true, lead: responseLead}, e);
+}
+
+function handleLogAircallEvent_(e, body){
+  const verification = verifyIntegrationRequest_(e, body, AIRCALL_WEBHOOK_TOKEN_PROPERTY);
+  if(verification.error){
+    return jsonResponse({ ok:false, error: verification.message, code: verification.code || 'UNAUTHORIZED' }, e);
+  }
+  const normalized = normalizeAircallEvent_(body);
+  if(normalized.error){
+    return jsonResponse({ ok:false, error: normalized.error }, e);
+  }
+  return applyTouchUpdateFromIntegration_(normalized, e);
+}
+
+function handleLogGmailThread_(e, body){
+  const verification = verifyIntegrationRequest_(e, body, GMAIL_WEBHOOK_TOKEN_PROPERTY);
+  if(verification.error){
+    return jsonResponse({ ok:false, error: verification.message, code: verification.code || 'UNAUTHORIZED' }, e);
+  }
+  const normalized = normalizeGmailThread_(body);
+  if(normalized.error){
+    return jsonResponse({ ok:false, error: normalized.error }, e);
+  }
+  return applyTouchUpdateFromIntegration_(normalized, e);
+}
+
+function applyTouchUpdateFromIntegration_(normalized, e){
+  const ss = getSpreadsheet_();
+  if(!ss) return jsonResponse({ ok:false, error: SPREADSHEET_ERROR_MESSAGE }, e);
+  const sheets = collectCandidateSheets_(ss, normalized.sheet);
+  if(!sheets.length){
+    return jsonResponse({ ok:false, error: 'No se encontraron bases válidas para registrar el evento.' }, e);
+  }
+  if(!hasMatchKeys_(normalized.match)){
+    return jsonResponse({ ok:false, error: 'No se proporcionaron identificadores para localizar el lead.' }, e);
+  }
+  let lastError = '';
+  for(let i = 0; i < sheets.length; i++){
+    const sheet = sheets[i];
+    if(!sheet) continue;
+    const { headers, map } = getColumnMap_(sheet);
+    const dataRowCount = Math.max(0, sheet.getLastRow() - 1);
+    if(dataRowCount <= 0) continue;
+    const values = sheet.getRange(2, 1, dataRowCount, headers.length).getValues();
+    const indexes = buildSheetLeadIndex_(values, map);
+    const match = findLeadRefWithKeys_(indexes, normalized.match);
+    if(match.error){
+      return jsonResponse({ ok:false, error: match.reason }, e);
+    }
+    if(!match.ref) continue;
+    const rowValues = match.ref.row;
+    const metadataInfo = normalized.logEntry ? prepareIntegrationMetadata_(rowValues, map, normalized.logEntry) : null;
+    if(metadataInfo && metadataInfo.duplicate){
+      const toqueColumns = getToqueColumns_(map);
+      const toques = toqueColumns.map(idx => rowValues[idx] || '');
+      return jsonResponse({ ok:true, duplicate:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, toques }, e);
+    }
+    const toqueColumns = getToqueColumns_(map);
+    if(!toqueColumns.length){
+      lastError = 'La base no tiene columnas de toques configuradas.';
+      continue;
+    }
+    const toqueValue = buildToqueValue_(normalized.timestamp, normalized.state);
+    const updateInfo = updateTouchColumns_(rowValues, toqueColumns, toqueValue);
+    if(!updateInfo.updated){
+      lastError = updateInfo.reason || 'No se pudo registrar el toque.';
+      continue;
+    }
+    if(normalized.comment){
+      appendCommentIfMissing_(rowValues, map, normalized.comment);
+    }
+    if(metadataInfo){
+      metadataInfo.object.integrationLogs.push(normalized.logEntry);
+      rowValues[metadataInfo.index] = JSON.stringify(metadataInfo.object);
+    }
+    updateAsignacionIfNeeded_(rowValues, map, normalized.timestampText);
+    updateUpdatedAt_(rowValues, map, normalized.timestampText);
+    sheet.getRange(match.ref.rowNumber, 1, 1, headers.length).setValues([rowValues]);
+    const refreshedToques = toqueColumns.map(idx => rowValues[idx] || '');
+    return jsonResponse({
+      ok:true,
+      sheet: sheet.getName(),
+      rowNumber: match.ref.rowNumber,
+      toque: toqueValue,
+      toques: refreshedToques,
+      source: normalized.source || '',
+      via: match.via || ''
+    }, e);
+  }
+  const message = lastError || 'No se encontró el lead para registrar el evento.';
+  return jsonResponse({ ok:false, error: message }, e);
+}
+
+function collectCandidateSheets_(ss, targetSheet){
+  const leadSheets = ss.getSheets().filter(isLeadSheet_);
+  if(!targetSheet){
+    return leadSheets;
+  }
+  const trimmed = String(targetSheet || '').trim();
+  if(!trimmed){
+    return leadSheets;
+  }
+  const direct = ss.getSheetByName(trimmed);
+  if(direct && isLeadSheet_(direct)){
+    return [direct];
+  }
+  const sanitizedTarget = sanitizeSheetName_(trimmed).toLowerCase();
+  const matches = leadSheets.filter(sheet => sanitizeSheetName_(sheet.getName()).toLowerCase() === sanitizedTarget);
+  return matches.length ? matches : leadSheets;
+}
+
+function hasMatchKeys_(keys){
+  if(!keys || typeof keys !== 'object') return false;
+  const fields = ['id','matricula','phone','email'];
+  return fields.some(field => {
+    const list = keys[field];
+    if(!Array.isArray(list)) return false;
+    return list.some(value => String(value || '').trim());
+  });
+}
+
+function findLeadRefWithKeys_(indexes, keys){
+  if(!indexes || !keys) return { ref:null };
+  const attempts = [];
+  const pushAttempts = (list, map, label) => {
+    if(!list || !map) return;
+    for(let i = 0; i < list.length; i++){
+      const raw = String(list[i] || '').trim();
+      if(raw) attempts.push({ key: raw, map, label });
+    }
+  };
+  pushAttempts(keys.id, indexes.byId, 'ID');
+  pushAttempts(keys.matricula, indexes.byMatricula, 'Matrícula');
+  pushAttempts(keys.phone, indexes.byPhone, 'Teléfono');
+  pushAttempts(keys.email, indexes.byEmail, 'Correo');
+  const seen = new Set();
+  for(let i = 0; i < attempts.length; i++){
+    const attempt = attempts[i];
+    const key = attempt.key;
+    if(seen.has(`${attempt.label}:${key}`)) continue;
+    seen.add(`${attempt.label}:${key}`);
+    const candidates = attempt.map.get(key) || [];
+    if(!candidates.length) continue;
+    if(candidates.length > 1){
+      return { error:true, reason: attempt.label + ' coincide con múltiples registros.' };
+    }
+    return { ref: candidates[0], via: attempt.label, key };
+  }
+  return { ref:null };
+}
+
+function getToqueColumns_(map){
+  if(!map) return [];
+  const names = ['Toque 1','Toque 2','Toque 3','Toque 4'];
+  return names
+    .map(name => getColumnIndex_(map, name))
+    .filter(idx => idx !== undefined);
+}
+
+function updateTouchColumns_(row, columns, value){
+  const validColumns = Array.isArray(columns) ? columns.filter(idx => idx !== undefined) : [];
+  if(!row || !validColumns.length) return { updated:false };
+  const trimmedValue = String(value || '').trim();
+  if(!trimmedValue) return { updated:false };
+  for(let i = 0; i < validColumns.length; i++){
+    const idx = validColumns[i];
+    if(String(row[idx] || '').trim() === trimmedValue){
+      return { updated:false, duplicate:true, reason:'El toque ya estaba registrado.' };
+    }
+  }
+  for(let i = 0; i < validColumns.length; i++){
+    const idx = validColumns[i];
+    if(!row[idx]){
+      row[idx] = trimmedValue;
+      return { updated:true, column: idx, replaced:false };
+    }
+  }
+  for(let i = 0; i < validColumns.length - 1; i++){
+    const currentIdx = validColumns[i];
+    const nextIdx = validColumns[i + 1];
+    row[currentIdx] = row[nextIdx];
+  }
+  const lastIdx = validColumns[validColumns.length - 1];
+  row[lastIdx] = trimmedValue;
+  return { updated:true, column: lastIdx, replaced:true };
+}
+
+function appendCommentIfMissing_(row, map, comment){
+  if(!row || !map) return false;
+  const idx = getColumnIndex_(map, 'Comentario');
+  if(idx === undefined) return false;
+  const value = String(comment || '').trim();
+  if(!value) return false;
+  const current = String(row[idx] || '');
+  const lines = current ? current.split(/\r?\n/) : [];
+  if(lines.some(line => line.trim() === value)) return false;
+  row[idx] = current ? `${current}\n${value}` : value;
+  return true;
+}
+
+function updateAsignacionIfNeeded_(row, map, timestampText){
+  if(!row || !map) return;
+  const formatted = String(timestampText || '').trim();
+  const asignacionIdx = getColumnIndex_(map, 'Asignación');
+  if(asignacionIdx !== undefined && !row[asignacionIdx] && formatted){
+    row[asignacionIdx] = formatted;
+  }
+  const asignacionAltIdx = getColumnIndex_(map, 'Asignacion');
+  if(asignacionAltIdx !== undefined && !row[asignacionAltIdx] && formatted){
+    row[asignacionAltIdx] = formatted;
+  }
+}
+
+function updateUpdatedAt_(row, map, timestampText){
+  if(!row || !map) return;
+  const idx = getColumnIndex_(map, 'ActualizadoEl');
+  if(idx === undefined) return;
+  row[idx] = String(timestampText || '').trim();
+}
+
+function parseIntegrationMetadataValue_(value){
+  const raw = value === undefined || value === null ? '' : String(value);
+  let parsed = null;
+  if(raw){
+    try{
+      const candidate = JSON.parse(raw);
+      if(candidate && typeof candidate === 'object'){
+        parsed = candidate;
+      }
+    }catch(err){
+      parsed = null;
+    }
+  }
+  if(!parsed || typeof parsed !== 'object'){
+    parsed = raw ? { legacy: raw } : {};
+  }
+  if(!Array.isArray(parsed.integrationLogs)) parsed.integrationLogs = [];
+  return { raw, object: parsed };
+}
+
+function prepareIntegrationMetadata_(row, map, logEntry){
+  const idx = getColumnIndex_(map, 'Metadatos');
+  if(idx === undefined) return null;
+  const current = row[idx];
+  const parsed = parseIntegrationMetadataValue_(current);
+  let duplicate = false;
+  if(logEntry && logEntry.id){
+    duplicate = parsed.object.integrationLogs.some(entry => entry && entry.id === logEntry.id && entry.source === logEntry.source);
+  }
+  return { index: idx, object: parsed.object, duplicate };
+}
+
+function extractIntegrationToken_(e, body){
+  const candidateFields = ['integrationToken','webhookToken','sharedToken','token','secret','sharedSecret'];
+  for(let i = 0; i < candidateFields.length; i++){
+    const field = candidateFields[i];
+    const value = body && body[field];
+    if(value){
+      const trimmed = String(value || '').trim();
+      if(trimmed) return trimmed;
+    }
+  }
+  const paramToken = e?.parameter?.token;
+  if(paramToken){
+    const trimmed = String(paramToken || '').trim();
+    if(trimmed) return trimmed;
+  }
+  const headers = e?.headers || {};
+  const normalizedHeaders = {};
+  Object.keys(headers).forEach(key => {
+    if(!key) return;
+    normalizedHeaders[key.toLowerCase()] = headers[key];
+  });
+  const headerNames = ['x-integration-token','x-shared-token','x-webhook-token','x-api-token','x-aircall-token','x-shared-secret'];
+  for(let i = 0; i < headerNames.length; i++){
+    const name = headerNames[i];
+    const value = normalizedHeaders[name];
+    if(value){
+      const trimmed = String(value || '').trim();
+      if(trimmed) return trimmed;
+    }
+  }
+  return '';
+}
+
+function verifyIntegrationRequest_(e, body, propertyName){
+  const provided = extractIntegrationToken_(e, body);
+  if(!provided){
+    return { error:true, message:'Falta token de seguridad.', code: 'MISSING_TOKEN' };
+  }
+  const props = PropertiesService.getScriptProperties();
+  const expected = String(props.getProperty(propertyName) || '').trim();
+  if(!expected){
+    return { error:true, message:`Configura el token en la propiedad de script "${propertyName}".`, code: 'TOKEN_NOT_CONFIGURED' };
+  }
+  if(provided !== expected){
+    return { error:true, message:'Token de seguridad inválido.', code: 'INVALID_TOKEN' };
+  }
+  return { ok:true, token: provided };
+}
+
+function normalizeAircallEvent_(body){
+  if(!body || typeof body !== 'object'){
+    return { error:'Payload inválido para Aircall.' };
+  }
+  const providedSheet = body.sheet || body.base || body.sheetName || '';
+  const sheet = String(providedSheet || '').trim();
+  const payload = body.data && typeof body.data === 'object' ? body.data : (body.payload && typeof body.payload === 'object' ? body.payload : {});
+  const contact = payload.contact && typeof payload.contact === 'object' ? payload.contact : {};
+  const phoneSet = new Set();
+  const emailSet = new Set();
+  const idSet = new Set();
+
+  const addPhoneCandidate = value => {
+    if(!value) return;
+    if(Array.isArray(value)){
+      value.forEach(addPhoneCandidate);
+      return;
+    }
+    const normalized = normalizePhoneKey_(value);
+    if(normalized) phoneSet.add(normalized);
+  };
+
+  const addEmailCandidate = value => {
+    if(!value) return;
+    if(Array.isArray(value)){
+      value.forEach(addEmailCandidate);
+      return;
+    }
+    const str = String(value || '').trim();
+    if(!str) return;
+    const parts = str.split(/[<>,;]/).map(part => part.replace(/[<>]/g, '').trim()).filter(Boolean);
+    if(!parts.length){
+      const normalized = normalizeEmailKey_(str);
+      if(normalized) emailSet.add(normalized);
+      return;
+    }
+    parts.forEach(part => {
+      const normalized = normalizeEmailKey_(part);
+      if(normalized) emailSet.add(normalized);
+    });
+  };
+
+  const phoneCandidates = [
+    body.phone,
+    body.phoneNumber,
+    body.number,
+    body.telefono,
+    body.telefonoNormalizado,
+    body.telefono_normalizado,
+    body.phoneCandidates,
+    payload.number && payload.number.digits,
+    payload.number && payload.number.phone_number,
+    payload.numbers,
+    payload.phoneNumbers,
+    payload.raw_digits,
+    payload.raw_phone,
+    payload.from && payload.from.number,
+    payload.to && payload.to.number,
+    payload.destination_number,
+    payload.source_number
+  ];
+  phoneCandidates.forEach(addPhoneCandidate);
+  const contactPhones = Array.isArray(contact.phone_numbers) ? contact.phone_numbers : Array.isArray(contact.phoneNumbers) ? contact.phoneNumbers : [];
+  contactPhones.forEach(item => {
+    if(!item) return;
+    if(typeof item === 'string') addPhoneCandidate(item);
+    else addPhoneCandidate(item.value || item.number || item.digits);
+  });
+
+  const emailCandidates = [body.email, body.correo, payload.email, payload.contact_email];
+  emailCandidates.forEach(addEmailCandidate);
+  const contactEmails = Array.isArray(contact.emails) ? contact.emails : [];
+  contactEmails.forEach(item => {
+    if(!item) return;
+    if(typeof item === 'string') addEmailCandidate(item);
+    else addEmailCandidate(item.value || item.email || '');
+  });
+
+  const externalId = contact.external_id || contact.externalId || contact.custom_id || contact.crm_id || '';
+  if(externalId) idSet.add(normalizeIdentifierKey_(externalId));
+  const leadId = body.leadId || body.lead_id || body.idLead || '';
+  if(leadId) idSet.add(normalizeIdentifierKey_(leadId));
+
+  const timestampValue = body.timestamp || payload.ended_at || payload.updated_at || payload.finished_at || payload.started_at || payload.created_at || payload.createdAt || new Date().toISOString();
+  const timestamp = safeDate_(timestampValue);
+  const timestampText = formatDateTime_(timestamp);
+  const timestampIso = new Date(timestamp.getTime()).toISOString();
+
+  const directionRaw = String(payload.direction || body.direction || '').trim().toLowerCase();
+  const statusRaw = String(payload.status || payload.call_status || body.status || '').trim().toLowerCase();
+  const resultRaw = String(payload.result || payload.disposition || body.result || '').trim().toLowerCase();
+  const directionLabel = directionRaw === 'inbound' ? 'Entrante' : directionRaw === 'outbound' ? 'Saliente' : formatTitleCase_(directionRaw);
+  const statusLabel = formatTitleCase_(statusRaw);
+  const resultLabel = formatTitleCase_(resultRaw);
+  const stateParts = [];
+  if(directionLabel) stateParts.push(directionLabel);
+  if(statusLabel) stateParts.push(statusLabel);
+  if(resultLabel && resultLabel !== statusLabel) stateParts.push(resultLabel);
+  if(!stateParts.length) stateParts.push('Aircall');
+  const state = stateParts.join(' · ');
+
+  const duration = Number(payload.duration || payload.total_duration || payload.talk_time || 0) || 0;
+  const agentSet = new Set();
+  if(payload.user && payload.user.name) agentSet.add(String(payload.user.name).trim());
+  if(Array.isArray(payload.users)){
+    payload.users.forEach(user => {
+      if(user && user.name) agentSet.add(String(user.name).trim());
+    });
+  }
+  if(body.agent) agentSet.add(String(body.agent).trim());
+  const agent = Array.from(agentSet).filter(Boolean).join(', ');
+
+  const commentParts = [state];
+  if(agent) commentParts.push(`Agente: ${agent}`);
+  if(duration) commentParts.push(`Duración: ${duration} s`);
+  const comment = commentParts.join(' · ');
+
+  const callId = payload.id || payload.call_id || payload.resource_id || payload.callId || body.callId || body.call_id || '';
+  const logEntry = {
+    source: 'aircall',
+    id: callId ? String(callId) : `aircall-${Utilities.getUuid()}`,
+    timestamp: timestampIso,
+    event: String(body.event || payload.event || 'call').trim() || 'call',
+    direction: directionRaw,
+    status: statusRaw,
+    result: resultRaw,
+    agent,
+    duration,
+    summary: state,
+    number: phoneSet.size ? Array.from(phoneSet)[0] : '',
+    rawNumber: payload.raw_digits || '',
+    notes: payload.notes || ''
+  };
+  if(payload.user && payload.user.email) logEntry.agentEmail = String(payload.user.email);
+  if(payload.queue && payload.queue.name) logEntry.queue = String(payload.queue.name);
+  if(payload.number && payload.number.name) logEntry.lineName = String(payload.number.name);
+  if(payload.number && payload.number.digits) logEntry.lineNumber = String(payload.number.digits);
+  if(body.metadata && typeof body.metadata === 'object') logEntry.metadata = body.metadata;
+  const contactInfo = {};
+  if(contact && contact.name) contactInfo.name = String(contact.name);
+  if(contact && contact.id) contactInfo.id = String(contact.id);
+  if(externalId) contactInfo.externalId = String(externalId);
+  if(Object.keys(contactInfo).length) logEntry.contact = contactInfo;
+
+  const match = {
+    id: Array.from(idSet).filter(Boolean),
+    matricula: [],
+    phone: Array.from(phoneSet),
+    email: Array.from(emailSet)
+  };
+  if(!match.phone.length && !match.email.length && !match.id.length){
+    return { error:'No se encontró un teléfono, correo o identificador en el evento de Aircall.' };
+  }
+
+  return {
+    source: 'aircall',
+    sheet,
+    timestamp,
+    timestampText,
+    state,
+    comment,
+    match,
+    logEntry
+  };
+}
+
+function normalizeGmailThread_(body){
+  if(!body || typeof body !== 'object'){
+    return { error:'Payload inválido para Gmail.' };
+  }
+  const providedSheet = body.sheet || body.base || body.sheetName || '';
+  const sheet = String(providedSheet || '').trim();
+  const thread = body.thread && typeof body.thread === 'object' ? body.thread : {};
+  const messages = Array.isArray(body.messages) ? body.messages : (Array.isArray(thread.messages) ? thread.messages : []);
+  const lastMessage = messages.length ? messages[messages.length - 1] : null;
+
+  const timestampValue = body.timestamp || thread.timestamp || thread.lastUpdated || thread.updated || (lastMessage && (lastMessage.date || lastMessage.internalDate || lastMessage.timestamp)) || new Date().toISOString();
+  const timestamp = safeDate_(timestampValue);
+  const timestampText = formatDateTime_(timestamp);
+  const timestampIso = new Date(timestamp.getTime()).toISOString();
+
+  const directionRaw = String(body.direction || thread.direction || (lastMessage && lastMessage.direction) || '').trim().toLowerCase();
+  let state;
+  if(directionRaw === 'outgoing' || directionRaw === 'sent') state = 'Correo enviado';
+  else if(directionRaw === 'incoming' || directionRaw === 'received') state = 'Correo recibido';
+  else state = 'Correo registrado';
+
+  const subject = String(body.subject || thread.subject || (lastMessage && lastMessage.subject) || '').trim();
+  const comment = subject ? `${state} · ${subject}` : state;
+  const snippet = String(body.snippet || thread.snippet || (lastMessage && lastMessage.snippet) || '').trim();
+  const threadId = String(thread.id || body.threadId || '').trim();
+  const historyId = String(thread.historyId || thread.history_id || body.historyId || '').trim();
+  const messageId = lastMessage && lastMessage.id ? String(lastMessage.id).trim() : '';
+  const threadUrl = String(body.threadUrl || thread.url || thread.link || '').trim();
+
+  const extractEmails = value => {
+    const list = [];
+    if(!value) return list;
+    if(Array.isArray(value)){
+      value.forEach(item => {
+        list.push(...extractEmails(item));
+      });
+      return list;
+    }
+    const str = String(value || '').trim();
+    if(!str) return list;
+    const parts = str.split(/[<>,;]/).map(part => part.replace(/[<>]/g, '').trim()).filter(Boolean);
+    if(!parts.length){
+      const normalized = normalizeEmailKey_(str);
+      if(normalized) list.push(normalized);
+      return list;
+    }
+    parts.forEach(part => {
+      const normalized = normalizeEmailKey_(part);
+      if(normalized) list.push(normalized);
+    });
+    return list;
+  };
+
+  const emailSet = new Set();
+  ['from','to','cc','bcc','replyTo'].forEach(field => {
+    extractEmails(body[field]).forEach(email => emailSet.add(email));
+  });
+  if(thread.participants && typeof thread.participants === 'object'){
+    ['from','to','cc','bcc'].forEach(field => {
+      extractEmails(thread.participants[field]).forEach(email => emailSet.add(email));
+    });
+  }
+  messages.forEach(message => {
+    if(!message || typeof message !== 'object') return;
+    ['from','sender','replyTo'].forEach(field => {
+      extractEmails(message[field]).forEach(email => emailSet.add(email));
+    });
+    ['to','cc','bcc'].forEach(field => {
+      extractEmails(message[field]).forEach(email => emailSet.add(email));
+    });
+  });
+
+  if(!emailSet.size){
+    return { error:'No se encontraron correos en el hilo proporcionado.' };
+  }
+
+  const match = {
+    id: [],
+    matricula: [],
+    phone: [],
+    email: Array.from(emailSet)
+  };
+
+  const participants = {
+    from: new Set(),
+    to: new Set(),
+    cc: new Set(),
+    bcc: new Set()
+  };
+  messages.forEach(message => {
+    if(!message || typeof message !== 'object') return;
+    extractEmails(message.from).forEach(email => participants.from.add(email));
+    extractEmails(message.sender).forEach(email => participants.from.add(email));
+    extractEmails(message.to).forEach(email => participants.to.add(email));
+    extractEmails(message.cc).forEach(email => participants.cc.add(email));
+    extractEmails(message.bcc).forEach(email => participants.bcc.add(email));
+  });
+
+  const logEntry = {
+    source: 'gmail',
+    id: threadId ? `gmail:${threadId}${messageId ? ':' + messageId : ''}` : `gmail:${Utilities.getUuid()}`,
+    threadId,
+    historyId,
+    messageId,
+    timestamp: timestampIso,
+    direction: directionRaw,
+    subject,
+    snippet,
+    summary: comment,
+    link: threadUrl,
+    totalMessages: messages.length,
+    participants: {
+      from: Array.from(participants.from),
+      to: Array.from(participants.to),
+      cc: Array.from(participants.cc),
+      bcc: Array.from(participants.bcc)
+    }
+  };
+  if(thread.labelIds) logEntry.labels = thread.labelIds;
+  else if(thread.labels) logEntry.labels = thread.labels;
+
+  return {
+    source: 'gmail',
+    sheet,
+    timestamp,
+    timestampText,
+    state,
+    comment,
+    match,
+    logEntry
+  };
 }
 
 function handleDiagnostics_(e, user){
