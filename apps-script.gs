@@ -56,6 +56,11 @@ function doGet(e){
     if(auth.error) return auth.response;
     return handleReport_(e, auth.user);
   }
+  if(action === 'operationalMetrics'){
+    const auth = requireAuth_(e, { requireActive: true });
+    if(auth.error) return auth.response;
+    return handleOperationalMetrics_(e, auth.user);
+  }
   return jsonResponse({error:'accion no soportada'}, e);
 }
 
@@ -147,7 +152,6 @@ const SPREADSHEET_ERROR_MESSAGE = 'No se encontró la hoja de cálculo principal
 const AIRCALL_WEBHOOK_TOKEN_PROPERTY = 'AIRCALL_WEBHOOK_TOKEN';
 const GMAIL_WEBHOOK_TOKEN_PROPERTY = 'GMAIL_WEBHOOK_TOKEN';
 let ACTIVE_USER = null;
-
 const COLUMNS = ['ID','Nombre','Matricula','Correo','Teléfono','Plantel','Modalidad','Programa','Etapa','Estado','Asesor','Comentario','Asignación','Toque 1','Toque 2','Toque 3','Toque 4','CRM','Resolución','Metadatos'];
 const REQUIRED_HEADERS = ['id','nombre','telefono','etapa'];
 const REQUIRED_HEADER_LABELS = {
@@ -156,7 +160,7 @@ const REQUIRED_HEADER_LABELS = {
   telefono: 'Teléfono',
   etapa: 'Etapa'
 };
-const NEGATIVE_STATES = ['no contesta whatsapp','cuelga','buzon de voz'];
+const NEGATIVE_STATES = ['no contesta','mensaje no respondido','pendiente de reintento'];
 const OPTIONAL_HEADER_NAMES = [
   'Telefono','Telefonos','Telefono 1','Telefono 2','Telefono fijo','Telefono celular','Celular','Movil','Whatsapp','Tel',
   'Telefono normalizado','Telefono aircall','Telefono whatsapp','Whatsapp link','Link whatsapp','Resolucion','Resolución',
@@ -167,11 +171,11 @@ const KNOWN_HEADER_NAMES = Array.from(new Set([...COLUMNS, ...OPTIONAL_HEADER_NA
 const KNOWN_HEADER_SET = new Set(KNOWN_HEADER_NAMES.map(normalizeHeader_));
 const VALID_ETAPAS = ['nuevo','contactado','no contactado','inscrito','descartado'];
 const ETAPA_ESTADO_MAP = {
-  'nuevo': ['nuevo'],
-  'contactado': ['interesado','no interesado','en labor de venta'],
-  'no contactado': ['no contesta whatsapp','mensaje no contestado','buzon de voz','cuelga'],
-  'inscrito': ['inscrito'],
-  'descartado': ['spam','no desea informacion','inscrito en otra escuela','limite intentos de contacto']
+  'nuevo': ['sin contactar','nuevo'],
+  'contactado': ['interesado','seguimiento activo','en labor de venta','cita agendada'],
+  'no contactado': ['no contesta','mensaje no respondido','mensaje no contestado','pendiente de reintento','buzon de voz','cuelga'],
+  'inscrito': ['inscrito confirmado','inscrito'],
+  'descartado': ['sin interes','no desea informacion','no interesado','inscrito en otra escuela','datos incorrectos','duplicado','spam','limite intentos de contacto']
 };
 const VALID_ESTADOS_SET = new Set([].concat(...Object.values(ETAPA_ESTADO_MAP)));
 const CANONICAL_ETAPA_LABELS = {
@@ -190,10 +194,23 @@ const CANONICAL_ESTADO_LABELS = (() => {
       map[normalized] = formatTitleCase_(normalized);
     });
   });
+  map['sin interes'] = 'Sin interés';
+  map['no desea informacion'] = 'Sin interés';
+  map['inscrito en otra escuela'] = 'Sin interés';
+  map['datos incorrectos'] = 'Datos incorrectos';
+  map['pendiente de reintento'] = 'Pendiente de reintento';
+  map['no contesta'] = 'No contesta';
+  map['mensaje no respondido'] = 'Mensaje no respondido';
+  map['mensaje no contestado'] = 'Mensaje no respondido';
+  map['seguimiento activo'] = 'Seguimiento activo';
+  map['en labor de venta'] = 'En labor de venta';
+  map['inscrito confirmado'] = 'Inscrito confirmado';
   return map;
 })();
 
 const ROUND_ROBIN_PROPERTY_PREFIX = 'ROUND_ROBIN_INDEX_';
+const OPERATIONAL_METRICS_SHEET_NAME = 'Operational Metrics';
+const OPERATIONAL_METRICS_HEADERS = ['Timestamp','Base','Asesor','Nivel','Metric','Valor','Total'];
 
 function getSpreadsheet_(){
   let ss = null;
@@ -639,6 +656,255 @@ function handleReport_(e, user){
   return jsonResponse({data:out}, e);
 }
 
+function handleOperationalMetrics_(e, user){
+  e = e || { parameter: {} };
+  const params = e.parameter || {};
+  const type = params.type || 'estado';
+  const etapaFilter = String(params.etapa || '').trim().toLowerCase();
+  const fi = params.fi || '';
+  const ff = params.ff || '';
+  const requestedBases = uniqueList_(parseList_(params.bases || params.base || params.sheet));
+  const requestedAsesores = uniqueList_(parseList_(params.asesores || params.asesor));
+  const ss = getSpreadsheet_();
+  if(!ss) return jsonResponse({ error: SPREADSHEET_ERROR_MESSAGE }, e);
+  const leadSheets = ss.getSheets().filter(isLeadSheet_);
+  const accessibleNames = filterSheetsForUser_(leadSheets.map(sheet => sheet.getName()), user);
+  const accessibleLookup = new Map();
+  accessibleNames.forEach(name => {
+    const key = name.toLowerCase();
+    if(!accessibleLookup.has(key)) accessibleLookup.set(key, name);
+  });
+  const baseCandidates = requestedBases.length ? requestedBases : accessibleNames;
+  const selectedBases = [];
+  const seenBases = new Set();
+  baseCandidates.forEach(name => {
+    const trimmed = String(name || '').trim();
+    if(!trimmed) return;
+    const key = trimmed.toLowerCase();
+    if(seenBases.has(key)) return;
+    if(!accessibleLookup.has(key)) return;
+    selectedBases.push(accessibleLookup.get(key));
+    seenBases.add(key);
+  });
+  const dataset = {
+    generatedAt: new Date().toISOString(),
+    type,
+    filters: {
+      etapa: etapaFilter,
+      fi,
+      ff,
+      bases: selectedBases,
+      asesores: requestedAsesores
+    },
+    bases: []
+  };
+  const requestedAsesorLookup = new Map();
+  requestedAsesores.forEach(name => {
+    const key = name.toLowerCase();
+    if(!requestedAsesorLookup.has(key)) requestedAsesorLookup.set(key, name);
+  });
+  selectedBases.forEach(baseName => {
+    const baseParams = {
+      base: baseName,
+      sheet: baseName,
+      type,
+      etapa: etapaFilter,
+      fi,
+      ff
+    };
+    const baseReport = parseJsonOutput_(handleReport_({ parameter: baseParams }, user));
+    const baseMetrics = baseReport && typeof baseReport === 'object' ? baseReport.data || {} : {};
+    const baseTotal = sumMetricValues_(baseMetrics);
+    const sheet = ss.getSheetByName(baseName);
+    const availableAsesores = collectAsesoresForSheet_(sheet);
+    const asesores = requestedAsesores.length
+      ? requestedAsesores
+          .map(name => {
+            const key = String(name || '').trim().toLowerCase();
+            if(!key) return '';
+            const direct = availableAsesores.find(item => item.toLowerCase() === key);
+            return direct || requestedAsesorLookup.get(key) || name;
+          })
+          .filter(Boolean)
+      : availableAsesores;
+    const uniqueAsesores = uniqueList_(asesores);
+    const asesoresData = uniqueAsesores.map(name => {
+      const advisorReport = parseJsonOutput_(
+        handleReport_({ parameter: Object.assign({}, baseParams, { asesor: name }) }, user)
+      );
+      const advisorMetrics = advisorReport && typeof advisorReport === 'object' ? advisorReport.data || {} : {};
+      return {
+        name,
+        metrics: advisorMetrics,
+        total: sumMetricValues_(advisorMetrics)
+      };
+    });
+    dataset.bases.push({
+      name: baseName,
+      metrics: baseMetrics,
+      total: baseTotal,
+      asesores: asesoresData
+    });
+  });
+  dataset.summary = computeOperationalMetricsSummary_(dataset);
+  return jsonResponse({ data: dataset }, e);
+}
+
+function parseJsonOutput_(response){
+  if(!response) return {};
+  try{
+    if(typeof response.getContent === 'function'){
+      const content = response.getContent();
+      if(!content) return {};
+      return JSON.parse(content);
+    }
+    if(typeof response === 'string'){
+      const trimmed = String(response || '').trim();
+      return trimmed ? JSON.parse(trimmed) : {};
+    }
+  }catch(err){
+    return {};
+  }
+  return {};
+}
+
+function sumMetricValues_(metrics){
+  if(!metrics || typeof metrics !== 'object') return 0;
+  return Object.keys(metrics).reduce((total, key) => {
+    const value = Number(metrics[key] || 0);
+    if(isNaN(value)) return total;
+    return total + value;
+  }, 0);
+}
+
+function collectAsesoresForSheet_(sheet){
+  if(!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if(lastRow <= 1) return [];
+  const { headers, map } = getColumnMap_(sheet);
+  const asesorIndex = getColumnIndex_(map, 'Asesor');
+  if(asesorIndex === undefined) return [];
+  const values = sheet.getRange(2, 1, Math.max(0, lastRow - 1), headers.length).getValues();
+  const lookup = new Map();
+  values.forEach(row => {
+    const raw = row[asesorIndex];
+    const name = String(raw || '').trim();
+    if(!name) return;
+    if(name.toLowerCase() === 'sistema') return;
+    const key = name.toLowerCase();
+    if(!lookup.has(key)) lookup.set(key, name);
+  });
+  const asesores = Array.from(lookup.values());
+  asesores.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  return asesores;
+}
+
+function computeOperationalMetricsSummary_(dataset){
+  const summary = { totalBases: 0, totalLeads: 0, metrics: {} };
+  if(!dataset || !Array.isArray(dataset.bases)) return summary;
+  summary.totalBases = dataset.bases.length;
+  dataset.bases.forEach(base => {
+    const metrics = base && base.metrics ? base.metrics : {};
+    Object.keys(metrics).forEach(key => {
+      const value = Number(metrics[key] || 0);
+      if(isNaN(value)) return;
+      summary.metrics[key] = (summary.metrics[key] || 0) + value;
+      summary.totalLeads += value;
+    });
+  });
+  return summary;
+}
+
+function buildOperationalMetricRows_(dataset){
+  const rows = [];
+  if(!dataset || !Array.isArray(dataset.bases)) return rows;
+  const timestamp = dataset.generatedAt || new Date().toISOString();
+  dataset.bases.forEach(base => {
+    if(!base) return;
+    const baseName = base.name || '';
+    const baseTotal = Number(base.total || 0) || 0;
+    const metrics = base.metrics || {};
+    Object.keys(metrics).forEach(metricKey => {
+      const value = Number(metrics[metricKey] || 0) || 0;
+      rows.push([timestamp, baseName, '', 'base', metricKey, value, baseTotal]);
+    });
+    (base.asesores || []).forEach(asesor => {
+      if(!asesor) return;
+      const asesorName = asesor.name || asesor.asesor || '';
+      const asesorTotal = Number(asesor.total || 0) || 0;
+      const asesorMetrics = asesor.metrics || {};
+      Object.keys(asesorMetrics).forEach(metricKey => {
+        const value = Number(asesorMetrics[metricKey] || 0) || 0;
+        rows.push([timestamp, baseName, asesorName, 'asesor', metricKey, value, asesorTotal]);
+      });
+    });
+  });
+  return rows;
+}
+
+function ensureOperationalMetricsSheet_(){
+  const ss = getSpreadsheet_();
+  if(!ss) throw new Error(SPREADSHEET_ERROR_MESSAGE);
+  let sheet = ss.getSheetByName(OPERATIONAL_METRICS_SHEET_NAME);
+  if(!sheet){
+    sheet = ss.insertSheet(OPERATIONAL_METRICS_SHEET_NAME);
+  }
+  const headerRange = sheet.getRange(1, 1, 1, OPERATIONAL_METRICS_HEADERS.length);
+  let currentHeaders = [];
+  try{
+    currentHeaders = headerRange.getValues()[0] || [];
+  }catch(err){
+    currentHeaders = [];
+  }
+  const needsHeader = OPERATIONAL_METRICS_HEADERS.some((header, idx) => {
+    return String(currentHeaders[idx] || '').trim() !== header;
+  });
+  if(needsHeader){
+    headerRange.setValues([OPERATIONAL_METRICS_HEADERS]);
+    sheet.getRange(1, 1, 1, OPERATIONAL_METRICS_HEADERS.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function syncOperationalMetricsJob(){
+  const response = parseJsonOutput_(handleOperationalMetrics_({ parameter: {} }, null));
+  const dataset = response && typeof response === 'object' ? response.data : null;
+  const rows = buildOperationalMetricRows_(dataset);
+  if(!rows.length) return;
+  let sheet;
+  try{
+    sheet = ensureOperationalMetricsSheet_();
+  }catch(err){
+    return;
+  }
+  const startRow = Math.max(2, sheet.getLastRow() + 1);
+  sheet.getRange(startRow, 1, rows.length, OPERATIONAL_METRICS_HEADERS.length).setValues(rows);
+}
+
+function ensureOperationalMetricsTrigger(){
+  const handler = 'syncOperationalMetricsJob';
+  let triggers = [];
+  try{
+    triggers = ScriptApp.getProjectTriggers();
+  }catch(err){
+    triggers = [];
+  }
+  const exists = triggers.some(trigger => {
+    try{
+      return trigger.getHandlerFunction && trigger.getHandlerFunction() === handler;
+    }catch(err){
+      return false;
+    }
+  });
+  if(exists) return;
+  try{
+    ScriptApp.newTrigger(handler).timeBased().everyHours(1).create();
+  }catch(err){
+    // Swallow trigger creation errors to avoid breaking manual executions.
+  }
+}
+
 function handleUpdateLead_(e, user){
   e = e || { parameter: {} };
   const sheetName = e.parameter.sheet || 'Lead Recuperados';
@@ -674,6 +940,18 @@ function handleUpdateLead_(e, user){
   const rowIndex = values.findIndex(r => idx.ID !== undefined && String(r[idx.ID]) === String(id));
   if(rowIndex < 0) return jsonResponse({error:'id no encontrado'}, e);
   const row = values[rowIndex];
+  const prevEtapa = idx.Etapa !== undefined ? row[idx.Etapa] : '';
+  const prevEstado = idx.Estado !== undefined ? row[idx.Estado] : '';
+  const etapaProvided = Object.prototype.hasOwnProperty.call(e.parameter || {}, 'etapa');
+  const estadoProvided = Object.prototype.hasOwnProperty.call(e.parameter || {}, 'estado');
+  const normalize = value => String(value === undefined || value === null ? '' : value).trim().toLowerCase();
+  const etapaChanged = idx.Etapa !== undefined && etapaProvided && normalize(etapa) !== normalize(prevEtapa);
+  const estadoChanged = idx.Estado !== undefined && estadoProvided && normalize(estado) !== normalize(prevEstado);
+  if((etapaChanged || estadoChanged) && !String(comentario || '').trim()){
+    return jsonResponse({
+      error: 'Agrega un comentario con la nota del contacto y la próxima acción antes de actualizar la etapa o el estado.'
+    }, e);
+  }
   if(idx.Etapa !== undefined) row[idx.Etapa] = etapa;
   if(idx.Estado !== undefined) row[idx.Estado] = estado;
   if(idx.Comentario !== undefined) row[idx.Comentario] = comentario;
@@ -1318,7 +1596,7 @@ function handleDiagnostics_(e, user){
   const timezone = Session.getScriptTimeZone() || '';
   const result = {
     timestamp: new Date().toISOString(),
-    sheet: requestedSheet,
+    sheet: requested,
     connection: false,
     read: false,
     write: false,
@@ -1333,7 +1611,7 @@ function handleDiagnostics_(e, user){
     sheets: [],
     aggregate: { duplicateIds: [], duplicatePhones: [] },
     login: getAuthDiagnostics_(),
-    status: { spreadsheet: '', totalSheets: 0, requestedSheet },
+    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested },
     summary: { sheetsWithErrors: 0, sheetsWithWarnings: 0, invalidRows: 0 },
     system: { status: 'En espera', timezone }
   };
@@ -1342,7 +1620,7 @@ function handleDiagnostics_(e, user){
     result.errors.push(SPREADSHEET_ERROR_MESSAGE);
     result.checks.connection.message = SPREADSHEET_ERROR_MESSAGE;
     result.system.status = 'Con incidencias';
-    return jsonResponse(result, e);
+    return result;
   }
   try{
     result.status.spreadsheet = ss.getName();
@@ -1352,9 +1630,9 @@ function handleDiagnostics_(e, user){
   const leadSheets = ss.getSheets().filter(isLeadSheet_);
   result.status.totalSheets = leadSheets.length;
   result.status.sheetNames = leadSheets.map(s => s.getName());
-  let targetSheet = requestedSheet ? ss.getSheetByName(requestedSheet) : null;
-  if(requestedSheet && !targetSheet){
-    result.warnings.push('La hoja solicitada "' + requestedSheet + '" no existe. Se utilizará la primera hoja disponible.');
+  let targetSheet = requested ? ss.getSheetByName(requested) : null;
+  if(requested && !targetSheet){
+    result.warnings.push('La hoja solicitada "' + requested + '" no existe. Se utilizará la primera hoja disponible.');
   }
   if(targetSheet && !isLeadSheet_(targetSheet)){
     result.warnings.push('La hoja "' + targetSheet.getName() + '" no coincide con el formato esperado de leads.');
@@ -1366,7 +1644,7 @@ function handleDiagnostics_(e, user){
     result.checks.connection.message = 'Sin hojas válidas para auditar.';
     result.errors.push('No se encontró ninguna hoja válida para analizar.');
     result.system.status = 'Con incidencias';
-    return jsonResponse(result, e);
+    return result;
   }
   result.sheet = targetSheet.getName();
   result.connection = true;
@@ -1418,7 +1696,228 @@ function handleDiagnostics_(e, user){
   result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + s.invalidCount, 0);
   result.system.status = result.summary.sheetsWithErrors ? 'Con incidencias' : 'Operativo';
 
-  return jsonResponse(result, e);
+  return result;
+}
+
+function handleDiagnostics_(e, user){
+  e = e || { parameter: {} };
+  const requestedSheet = e.parameter.sheet || '';
+  const report = computeDiagnosticsReport_(requestedSheet);
+  return jsonResponse(report, e);
+}
+
+function runDailyDiagnosticsAudit(){
+  const requestedSheet = getPriorityDiagnosticsBase_();
+  const report = computeDiagnosticsReport_(requestedSheet);
+  const processed = processDiagnosticsReport_(report, requestedSheet);
+  return { requestedSheet, report, processed };
+}
+
+function ensureDailyDiagnosticsTrigger(){
+  const handlerName = 'runDailyDiagnosticsAudit';
+  const triggers = ScriptApp.getProjectTriggers();
+  const exists = triggers.some(trigger => trigger.getHandlerFunction && trigger.getHandlerFunction() === handlerName);
+  if(exists) return false;
+  ScriptApp.newTrigger(handlerName)
+    .timeBased()
+    .atHour(7)
+    .everyDays(1)
+    .create();
+  return true;
+}
+
+function processDiagnosticsReport_(report, requestedSheet){
+  const summary = { logged: false, notified: false };
+  try{
+    summary.logged = logDiagnosticsAudit_(report, requestedSheet);
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al registrar el resultado: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  try{
+    const sheetsWithErrors = Number(report?.summary?.sheetsWithErrors || 0);
+    if(sheetsWithErrors > 0){
+      summary.notified = notifyDiagnosticsIncident_(report);
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al enviar la notificación: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  return summary;
+}
+
+function logDiagnosticsAudit_(report, requestedSheet){
+  const sheet = getDiagnosticsControlSheet_();
+  if(!sheet) return false;
+  const requested = String(requestedSheet || '').trim() || String(report?.status?.requestedSheet || '').trim();
+  const analyzed = String(report?.sheet || '').trim();
+  const errors = Number(report?.summary?.sheetsWithErrors || 0);
+  const warnings = Number(report?.summary?.sheetsWithWarnings || 0);
+  const invalidRows = Number(report?.summary?.invalidRows || 0);
+  const status = String(report?.system?.status || '').trim();
+  const errorMessages = Array.isArray(report?.errors) ? report.errors.filter(Boolean) : [];
+  const warningMessages = Array.isArray(report?.warnings) ? report.warnings.filter(Boolean) : [];
+  const messageParts = [];
+  if(errorMessages.length){
+    messageParts.push('Errores: ' + errorMessages.join(' | '));
+  }
+  if(warningMessages.length){
+    messageParts.push('Advertencias: ' + warningMessages.join(' | '));
+  }
+  if(!messageParts.length){
+    if(status){
+      messageParts.push('Estado: ' + status);
+    }else{
+      messageParts.push('Sin incidencias registradas.');
+    }
+  }
+  const summaryText = messageParts.join(' · ');
+  const timestamp = formatDateTime_(new Date());
+  sheet.appendRow([
+    timestamp,
+    requested,
+    analyzed,
+    errors,
+    warnings,
+    invalidRows,
+    status,
+    summaryText
+  ]);
+  return true;
+}
+
+function notifyDiagnosticsIncident_(report){
+  const recipients = getDiagnosticsAlertRecipients_();
+  const webhookUrl = getDiagnosticsWebhookUrl_();
+  const sheet = String(report?.sheet || '').trim() || 'bases';
+  const errors = Number(report?.summary?.sheetsWithErrors || 0);
+  const warnings = Number(report?.summary?.sheetsWithWarnings || 0);
+  const invalidRows = Number(report?.summary?.invalidRows || 0);
+  const status = String(report?.system?.status || '').trim();
+  const errorMessages = Array.isArray(report?.errors) ? report.errors.filter(Boolean) : [];
+  const warningMessages = Array.isArray(report?.warnings) ? report.warnings.filter(Boolean) : [];
+  const header = 'Diagnóstico diario · Incidencias detectadas en ' + sheet;
+  const bodyLines = [
+    header,
+    '',
+    'Estado: ' + (status || 'Desconocido'),
+    'Hojas con errores: ' + errors,
+    'Hojas con advertencias: ' + warnings,
+    'Filas inválidas: ' + invalidRows,
+    ''
+  ];
+  if(errorMessages.length){
+    bodyLines.push('Errores:');
+    errorMessages.forEach(message => bodyLines.push('• ' + message));
+    bodyLines.push('');
+  }
+  if(warningMessages.length){
+    bodyLines.push('Advertencias:');
+    warningMessages.forEach(message => bodyLines.push('• ' + message));
+    bodyLines.push('');
+  }
+  const body = bodyLines.join('\n');
+  let notified = false;
+  if(recipients.length){
+    MailApp.sendEmail({
+      to: recipients.join(','),
+      subject: header,
+      body
+    });
+    notified = true;
+  }
+  if(webhookUrl){
+    const payload = {
+      text: header,
+      status,
+      summary: report?.summary || {},
+      errors: errorMessages,
+      warnings: warningMessages,
+      timestamp: report?.timestamp || new Date().toISOString()
+    };
+    UrlFetchApp.fetch(webhookUrl, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+    notified = true;
+  }
+  return notified;
+}
+
+function getPriorityDiagnosticsBase_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(props){
+      const configured = String(props.getProperty(DIAGNOSTICS_PRIORITY_BASE_PROPERTY) || '').trim();
+      if(configured) return configured;
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al leer la base prioritaria: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  try{
+    const ss = getSpreadsheet_();
+    if(!ss) return '';
+    const leadSheets = ss.getSheets().filter(isLeadSheet_);
+    if(leadSheets.length){
+      return leadSheets[0].getName();
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] No fue posible determinar la base prioritaria: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  return '';
+}
+
+function getDiagnosticsControlSheet_(){
+  const ss = getSpreadsheet_();
+  if(!ss){
+    throw new Error(SPREADSHEET_ERROR_MESSAGE);
+  }
+  let sheet = ss.getSheetByName(DIAGNOSTICS_CONTROL_SHEET_NAME);
+  if(sheet) return sheet;
+  sheet = ss.insertSheet(DIAGNOSTICS_CONTROL_SHEET_NAME);
+  sheet.getRange(1, 1, 1, DIAGNOSTICS_CONTROL_HEADERS.length).setValues([DIAGNOSTICS_CONTROL_HEADERS]);
+  return sheet;
+}
+
+function getDiagnosticsAlertRecipients_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return [];
+    const raw = props.getProperty(DIAGNOSTICS_ALERT_RECIPIENTS_PROPERTY);
+    if(!raw) return [];
+    return String(raw)
+      .split(/[,;\n]/)
+      .map(item => String(item || '').trim())
+      .filter(Boolean);
+  }catch(err){
+    return [];
+  }
+}
+
+function getDiagnosticsWebhookUrl_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return '';
+    return String(props.getProperty(DIAGNOSTICS_ALERT_WEBHOOK_PROPERTY) || '').trim();
+  }catch(err){
+    return '';
+  }
 }
 
 function handleResolveDuplicates_(e, user){
@@ -2154,6 +2653,21 @@ function parseList_(value){
     .split(/[;,\n]/)
     .map(v => v.trim())
     .filter(Boolean);
+}
+
+function uniqueList_(values){
+  if(!Array.isArray(values)) return [];
+  const seen = new Set();
+  const list = [];
+  values.forEach(value => {
+    const normalized = String(value || '').trim();
+    if(!normalized) return;
+    const key = normalized.toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    list.push(normalized);
+  });
+  return list;
 }
 
 function joinList_(value){
@@ -3305,6 +3819,20 @@ function handleImportLeads_(e, body, user){
   const preparedRows = [];
   const needsAssignment = [];
   const skipped = [];
+  const summaryCounters = {
+    errors: new Map(),
+    warnings: new Map()
+  };
+  const CRITICAL_IDENTIFIER_MESSAGE = 'Sin identificadores críticos (ID, matrícula, correo o teléfono)';
+  let criticalIdentifierErrors = 0;
+  const registerValidation = (type, message) => {
+    if(!message) return;
+    const store = type === 'error' ? summaryCounters.errors : summaryCounters.warnings;
+    store.set(message, (store.get(message) || 0) + 1);
+    if(type === 'error' && message === CRITICAL_IDENTIFIER_MESSAGE){
+      criticalIdentifierErrors++;
+    }
+  };
   rows.forEach((rawRow, idx) => {
     const data = rawRow && typeof rawRow === 'object' ? rawRow : {};
     const idValue = String(data.id || '').trim();
@@ -3342,9 +3870,14 @@ function handleImportLeads_(e, body, user){
       if(indexes.byPhone.has(phoneKey)) reasons.push('Teléfono existente en la base');
       if(seen.phone.has(phoneKey)) reasons.push('Teléfono duplicado en la importación');
     }
+    if(!idKey && !matriculaKey && !emailKey && !phoneKey){
+      reasons.push(CRITICAL_IDENTIFIER_MESSAGE);
+    }
+    reasons.forEach(reason => registerValidation('error', reason));
     if(reasons.length){
       skipped.push({
         row: idx + 1,
+        nombre,
         id: idValue,
         matricula: matriculaValue,
         telefono: telefonoValue,
@@ -3383,13 +3916,37 @@ function handleImportLeads_(e, body, user){
       updatedAt: timestamp
     };
     if(!asesorValue){
+      registerValidation('warning', 'Registros sin asesor asignado. Se asignará automáticamente.');
       needsAssignment.push(prepared);
     }
     preparedRows.push(prepared);
   });
+  const buildSummaryPayload = () => ({
+    errors: Array.from(summaryCounters.errors.entries()).map(([message, count]) => ({ message, count })),
+    warnings: Array.from(summaryCounters.warnings.entries()).map(([message, count]) => ({ message, count }))
+  });
   if(!preparedRows.length){
     const message = skipped.length ? 'No se importó ningún registro por incidencias detectadas.' : 'No hay registros válidos para importar.';
-    return jsonResponse({ ok:false, error: message, skipped }, e);
+    return jsonResponse({ ok:false, error: message, skipped, summary: buildSummaryPayload(), insertable: 0 }, e);
+  }
+  if(criticalIdentifierErrors > 0){
+    return jsonResponse({
+      ok: false,
+      error: 'Se detectaron registros sin identificadores críticos. Corrige el archivo e intenta nuevamente.',
+      skipped,
+      summary: buildSummaryPayload(),
+      insertable: preparedRows.length
+    }, e);
+  }
+  const confirmImport = body && (body.confirm === true || body.confirm === 'true' || body.confirm === 1);
+  if(!confirmImport){
+    return jsonResponse({
+      ok: true,
+      requiresConfirmation: true,
+      insertable: preparedRows.length,
+      skipped,
+      summary: buildSummaryPayload()
+    }, e);
   }
   if(needsAssignment.length){
     assignAsesoresRoundRobin_(needsAssignment, sheetName);
@@ -3435,6 +3992,12 @@ function handleImportLeads_(e, body, user){
   if(skipped.length){
     messageParts.push(`Omitidos: ${skipped.length}`);
   }
-  const response = { ok:true, inserted: toInsert.length, skipped, message: messageParts.join(' · ') };
+  const response = {
+    ok: true,
+    inserted: toInsert.length,
+    skipped,
+    summary: buildSummaryPayload(),
+    message: messageParts.join(' · ')
+  };
   return jsonResponse(response, e);
 }
