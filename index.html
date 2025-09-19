@@ -544,6 +544,181 @@
     .chip { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); background: var(--card); border-radius:999px; cursor:pointer; user-select:none }
     .chip input { appearance:none; width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,.25); display:inline-block; position:relative }
     .chip input:checked { background: var(--accent); border-color: var(--accent) }
+    .daily-shortcuts{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .daily-shortcuts__header{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      color:rgba(248,252,255,0.78);
+    }
+    .daily-shortcuts__group{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .daily-shortcuts__label{
+      font-size:12px;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .daily-shortcuts__btn{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(var(--panel-base-rgb),0.35);
+      background:rgba(var(--panel-base-rgb),0.18);
+      color:var(--text);
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+    .daily-shortcuts__btn span{ font-size:12px; font-weight:500; color:var(--muted); }
+    .daily-shortcuts__btn:hover,
+    .daily-shortcuts__btn:focus{
+      outline:none;
+      transform:translateY(-1px);
+      border-color:rgba(148,193,255,0.65);
+      background:rgba(var(--panel-base-rgb),0.28);
+    }
+    .daily-shortcuts__btn.is-active{
+      border-color:rgba(34,197,94,0.55);
+      background:rgba(34,197,94,0.2);
+      color:var(--text);
+    }
+    .daily-shortcuts__btn.is-active span{ color:rgba(34,197,94,0.85); }
+    .daily-shortcuts__empty{
+      font-size:12px;
+      color:var(--muted);
+      font-style:italic;
+    }
+    html[data-theme="light"] .daily-shortcuts__header{ color:#334155; }
+    html[data-theme="light"] .daily-shortcuts__btn{
+      background:rgba(var(--panel-base-rgb),0.12);
+      border-color:rgba(var(--panel-base-rgb),0.28);
+      color:#0f172a;
+    }
+    html[data-theme="light"] .daily-shortcuts__btn span{ color:#475569; }
+    html[data-theme="light"] .daily-shortcuts__btn.is-active{
+      background:rgba(34,197,94,0.16);
+      border-color:rgba(34,197,94,0.5);
+      color:#065f46;
+    }
+    .contact-scripts{
+      margin-top:12px;
+      padding:var(--space-sm);
+      border-radius:var(--radius);
+      border:1px solid rgba(var(--panel-base-rgb),0.28);
+      background:rgba(var(--panel-base-rgb),0.12);
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+    }
+    .contact-scripts__header{
+      font-size:14px;
+      font-weight:700;
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .contact-scripts__grid{
+      display:grid;
+      gap:var(--space-sm);
+      grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    }
+    .contact-script{
+      background:var(--card);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.08);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .contact-script header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .contact-script textarea{
+      width:100%;
+      min-height:96px;
+      resize:vertical;
+      border-radius:10px;
+      border:1px solid rgba(var(--panel-base-rgb),0.3);
+      background:var(--card-2);
+      color:var(--text);
+      padding:10px;
+      font-family:var(--font);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .contact-script textarea:focus{
+      outline:none;
+      border-color:rgba(var(--panel-base-rgb),0.55);
+      box-shadow:var(--ring);
+    }
+    .contact-script__actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .contact-scripts__status{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .contact-scripts__status.hidden{ display:none; }
+    html[data-theme="light"] .contact-scripts{
+      border-color:rgba(var(--panel-base-rgb),0.22);
+      background:rgba(var(--panel-base-rgb),0.08);
+    }
+    html[data-theme="light"] .contact-script{
+      border-color:rgba(148,163,184,0.28);
+      box-shadow:none;
+    }
+    html[data-theme="light"] .contact-script textarea{
+      background:#f8fafc;
+      border-color:rgba(148,163,184,0.35);
+      color:#0f172a;
+    }
+    .pill { padding:8px 12px; border:1px solid color-mix(in srgb, var(--panel-tone-bright) 36%, #1e293b 64%); border-radius:12px }
+    .pill.priority-pill{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.3px;
+    }
+    .pill.priority-alta{
+      background:rgba(34,197,94,0.2);
+      border-color:rgba(34,197,94,0.45);
+      color:var(--ok);
+    }
+    .pill.priority-media{
+      background:rgba(234,179,8,0.18);
+      border-color:rgba(234,179,8,0.45);
+      color:var(--warn);
+    }
+    .pill.priority-baja{
+      background:rgba(96,165,250,0.18);
+      border-color:rgba(96,165,250,0.45);
+      color:var(--info);
+    }
+    html[data-theme="light"] .contact-script header{ color:#0f172a; }
+    html[data-theme="light"] .pill.priority-alta{ color:#15803d; }
+    html[data-theme="light"] .pill.priority-media{ color:#b45309; }
+    html[data-theme="light"] .pill.priority-baja{ color:#1d4ed8; }
 
     /* KPIs */
     .kpi-groups{ display:flex; flex-direction:column; gap:calc(var(--space) * 0.75); padding:0 var(--space) var(--space-sm); }
@@ -613,6 +788,9 @@
     html[data-board-density="compact"] .card-lead{ padding:6px; }
     html[data-board-density="expanded"] .card-lead{ padding:12px; }
     .card-lead:hover { transform: translateY(-2px) scale(1.01); border-color: rgba(0,58,95,.35); box-shadow: 0 4px 14px rgba(0,0,0,.12) }
+    .card-lead[data-priority="alta"]{ box-shadow: 0 6px 18px rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.55); }
+    .card-lead[data-priority="media"]{ border-color: rgba(234,179,8,0.45); }
+    .card-lead[data-priority="baja"]{ border-color: rgba(96,165,250,0.45); }
     .tag { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.15); color: var(--muted) }
     .tag.ok{ color: #065f46; background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.25) }
     .tag.bad{ color: #7f1d1d; background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.25) }
@@ -1347,6 +1525,7 @@
                 </select>
               </label>
             </div>
+            <div class="daily-shortcuts" id="dailyShortcuts" aria-label="Listas diarias sugeridas"></div>
           </div>
         </div>
         <div class="panel-section">
@@ -1390,6 +1569,33 @@
           <label style="display:block;margin-top:10px">Comentario
             <textarea id="txtComentario" class="w100" rows="3"></textarea>
           </label>
+          <div class="contact-scripts" id="contactScripts">
+            <div class="contact-scripts__header"><i class="bi bi-journal-text"></i> Guiones comerciales</div>
+            <div class="contact-scripts__grid">
+              <article class="contact-script" data-channel="call">
+                <header><i class="bi bi-telephone"></i> Llamada</header>
+                <textarea readonly data-script-text="call" aria-label="Guion de llamada"></textarea>
+                <div class="contact-script__actions">
+                  <button class="btn outline" type="button" data-script-apply="call"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+                </div>
+              </article>
+              <article class="contact-script" data-channel="whatsapp">
+                <header><i class="bi bi-whatsapp"></i> WhatsApp</header>
+                <textarea readonly data-script-text="whatsapp" aria-label="Guion de WhatsApp"></textarea>
+                <div class="contact-script__actions">
+                  <button class="btn outline" type="button" data-script-apply="whatsapp"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+                </div>
+              </article>
+              <article class="contact-script" data-channel="email">
+                <header><i class="bi bi-envelope"></i> Correo</header>
+                <textarea readonly data-script-text="email" aria-label="Guion de correo"></textarea>
+                <div class="contact-script__actions">
+                  <button class="btn outline" type="button" data-script-apply="email"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+                </div>
+              </article>
+            </div>
+            <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
+          </div>
           <div class="actions" style="margin-top:10px">
             <button class="btn primary" id="updateBtn">Guardar</button>
           </div>
@@ -2041,16 +2247,28 @@
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
-    'Nuevo':['Nuevo'],
-    'Contactado':['Interesado','No interesado','En labor de venta'],
-    'No Contactado':['No contesta WhatsApp','Mensaje no contestado','Buzón de voz','Cuelga'],
-    'Descartado':['SPAM','No desea información','Inscrito en otra escuela','Límite intentos de contacto'],
-    'Inscrito':['Inscrito']
+    'Nuevo':['Sin contactar'],
+    'Contactado':['Interesado','Seguimiento activo','En labor de venta','Cita agendada'],
+    'No Contactado':['No contesta','Mensaje no respondido','Pendiente de reintento'],
+    'Descartado':['Sin interés','Datos incorrectos','Duplicado','SPAM'],
+    'Inscrito':['Inscrito confirmado']
   };
 
   const columns = ['id','nombre','matricula','correo','telefono','campus','modalidad','programa','etapa','estado','asesor','comentario','asignacion'];
 
-  const KPI_INTEREST_STATES = new Set(['interesado','en labor de venta']);
+  const CONTACT_SCRIPT_TYPES = ['call','whatsapp','email'];
+  const CONTACT_CHANNEL_LABELS = { call: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo' };
+  const DAILY_SHORTCUT_LIMIT = 3;
+  const LEAD_PRIORITY_THRESHOLDS = { high: 6, medium: 3 };
+  const CONTACT_TIMESTAMP_FORMAT = (() => {
+    try{
+      return new Intl.DateTimeFormat('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+    }catch(err){
+      return null;
+    }
+  })();
+
+  const KPI_INTEREST_STATES = new Set(['interesado','seguimiento activo','cita agendada','en labor de venta']);
   const KPI_NUMBER_FORMAT = new Intl.NumberFormat('es-MX');
   const KPI_PERCENT_FORMAT = new Intl.NumberFormat('es-MX', { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 1 });
   const KPI_GROUPS = {
@@ -6145,6 +6363,181 @@
     return raw;
   }
 
+  function formatContactTimestamp(date = new Date()){
+    const target = date instanceof Date ? date : new Date(date);
+    if(CONTACT_TIMESTAMP_FORMAT){
+      try{
+        return CONTACT_TIMESTAMP_FORMAT.format(target);
+      }catch(err){
+        /* fallback */
+      }
+    }
+    return target.toLocaleString('es-MX');
+  }
+
+  function computeLeadPriorityScore(row){
+    if(!row) return 0;
+    let score = 0;
+    const stage = etapaGroup(row.etapa);
+    if(stage === 'Nuevo') score += 3;
+    else if(stage === 'No Contactado') score += 2;
+    else if(stage === 'Contactado') score += 1;
+    const estadoNorm = String(row.estado || '').trim().toLowerCase();
+    if(KPI_INTEREST_STATES.has(estadoNorm)) score += 4;
+    if(row.campus) score += 0.5;
+    if(row.modalidad) score += 0.5;
+    return score;
+  }
+
+  function resolveLeadPriorityLevel(score){
+    if(score >= LEAD_PRIORITY_THRESHOLDS.high) return 'alta';
+    if(score >= LEAD_PRIORITY_THRESHOLDS.medium) return 'media';
+    if(score > 0) return 'baja';
+    return '';
+  }
+
+  function formatLeadPriorityLabel(level){
+    if(level === 'alta') return 'Alta prioridad';
+    if(level === 'media') return 'Seguimiento';
+    if(level === 'baja') return 'Primer contacto';
+    return '';
+  }
+
+  function buildContactScripts(lead){
+    const firstName = String(lead?.nombre || '').trim().split(/\s+/)[0] || '';
+    const asesorName = currentUser && currentUser.name ? String(currentUser.name).trim() : 'tu asesor de UNIDEP';
+    const campusText = lead?.campus ? ` de UNIDEP ${lead.campus}` : ' de UNIDEP';
+    const programaText = lead?.programa ? ` ${lead.programa}` : ' tu interés';
+    const modalidadText = lead?.modalidad ? ` (${lead.modalidad})` : '';
+    const saludo = firstName ? `Hola ${firstName},` : 'Hola,';
+    const greeting = firstName ? `Hola ${firstName}!` : 'Hola!';
+    const callScript = `${saludo} te habla ${asesorName}${campusText}. Me gustaría acompañarte${programaText}${modalidadText} y revisar contigo los siguientes pasos. ¿Tienes unos minutos hoy para que lo revisemos?`;
+    const whatsappScript = `${greeting} Soy ${asesorName}${campusText}. Te escribo${programaText}${modalidadText} para ayudarte con los siguientes pasos. ¿Agendamos una llamada breve hoy para revisar becas y asegurar tu lugar?`;
+    const subject = `Asunto: Seguimiento UNIDEP ${lead?.programa || 'tu inscripción'}`;
+    const emailGreeting = firstName ? `Hola ${firstName},` : 'Hola,';
+    const emailBody = `${subject}\n\n${emailGreeting}\n\nSoy ${asesorName}${campusText}. Gracias por tu interés${programaText}${modalidadText}. Te comparto los pasos para asegurar tu inscripción y las becas disponibles. ¿Qué día te gustaría que confirmemos juntos tu registro?\n\nQuedo al pendiente,\n${asesorName}\nUNIDEP`;
+    return { call: callScript, whatsapp: whatsappScript, email: emailBody };
+  }
+
+  function createContactNote(type, lead){
+    const timestamp = formatContactTimestamp();
+    const channel = CONTACT_CHANNEL_LABELS[type] || 'Contacto';
+    const programa = lead?.programa ? ` ${lead.programa}` : '';
+    const modalidad = lead?.modalidad ? ` (${lead.modalidad})` : '';
+    const campus = lead?.campus ? ` - ${lead.campus}` : '';
+    if(type === 'call'){
+      return `${timestamp} · ${channel}: llamada de seguimiento${programa}${modalidad}${campus}.`;
+    }
+    if(type === 'whatsapp'){
+      return `${timestamp} · ${channel}: mensaje inicial enviado, pendiente de respuesta.`;
+    }
+    if(type === 'email'){
+      return `${timestamp} · ${channel}: correo con información y próximos pasos enviado.`;
+    }
+    return `${timestamp} · ${channel}: contacto registrado.`;
+  }
+
+  async function copyToClipboard(text){
+    if(!text) return false;
+    try{
+      if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    }catch(err){
+      /* fallback below */
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly','');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    let success = false;
+    try{
+      success = document.execCommand('copy');
+    }catch(err){
+      success = false;
+    }
+    document.body.removeChild(textarea);
+    return success;
+  }
+
+  function aggregateDailyShortcuts(rows, type){
+    if(!Array.isArray(rows) || !rows.length) return [];
+    const map = new Map();
+    if(type === 'campus'){
+      rows.forEach(row => {
+        const campus = String(row.campus || '').trim();
+        if(!campus) return;
+        const score = computeLeadPriorityScore(row);
+        if(score <= 0) return;
+        const entry = map.get(campus) || { key: campus, label: campus, value: campus, count: 0, score: 0 };
+        entry.count += 1;
+        entry.score += score;
+        map.set(campus, entry);
+      });
+    }else if(type === 'asesor'){
+      rows.forEach(row => {
+        const raw = String(row.asesor || '').trim();
+        const normalized = normalizeAsesorName(raw);
+        if(!normalized) return;
+        const score = computeLeadPriorityScore(row);
+        if(score <= 0) return;
+        const label = displayAsesorName(raw);
+        const entry = map.get(normalized) || { key: normalized, label, value: raw, count: 0, score: 0 };
+        entry.count += 1;
+        entry.score += score;
+        if(!entry.value && raw) entry.value = raw;
+        if(!entry.label && label) entry.label = label;
+        map.set(normalized, entry);
+      });
+    }
+    return Array.from(map.values())
+      .sort((a,b) => {
+        if(b.score !== a.score) return b.score - a.score;
+        if(b.count !== a.count) return b.count - a.count;
+        return (a.label || '').localeCompare(b.label || '', 'es', { sensitivity: 'base' });
+      })
+      .slice(0, DAILY_SHORTCUT_LIMIT);
+  }
+
+  function renderShortcutButton(type, entry){
+    const classes = ['daily-shortcuts__btn'];
+    let isActive = false;
+    if(type === 'campus'){
+      isActive = Boolean(state.campus) && state.campus === entry.value;
+    }else if(type === 'asesor'){
+      const selected = getAsesorFilter();
+      isActive = selected.length === 1 && normalizeAsesorName(selected[0]) === entry.key;
+    }
+    if(isActive) classes.push('is-active');
+    const countLabel = `${entry.count} ${entry.count === 1 ? 'lead' : 'leads'}`;
+    const title = `Prioridad combinada: ${Math.round(entry.score || 0)} pts`;
+    return `<button type="button" class="${classes.join(' ')}" data-type="${type}" data-value="${escapeHtml(entry.value || '')}" aria-pressed="${isActive ? 'true' : 'false'}" title="${escapeHtml(title)}"><span>${escapeHtml(entry.label || '')}</span><span>${escapeHtml(countLabel)}</span></button>`;
+  }
+
+  function renderDailyShortcuts(rows){
+    const container = el('#dailyShortcuts');
+    if(!container) return;
+    const list = Array.isArray(rows) ? rows : [];
+    const viable = list.filter(row => computeLeadPriorityScore(row) > 0);
+    const campusEntries = aggregateDailyShortcuts(viable, 'campus');
+    const asesorEntries = aggregateDailyShortcuts(viable, 'asesor');
+    const parts = ['<div class="daily-shortcuts__header">Listas diarias sugeridas</div>'];
+    if(campusEntries.length){
+      parts.push(`<div class="daily-shortcuts__group" data-group="campus"><span class="daily-shortcuts__label">Por campus</span>${campusEntries.map(entry => renderShortcutButton('campus', entry)).join('')}</div>`);
+    }
+    if(asesorEntries.length){
+      parts.push(`<div class="daily-shortcuts__group" data-group="asesor"><span class="daily-shortcuts__label">Por asesor</span>${asesorEntries.map(entry => renderShortcutButton('asesor', entry)).join('')}</div>`);
+    }
+    if(!campusEntries.length && !asesorEntries.length){
+      parts.push('<div class="daily-shortcuts__empty">Sin recomendaciones con los filtros actuales.</div>');
+    }
+    container.innerHTML = parts.join('');
+  }
+
   // —— Filtro base ——
   function applyFilters(){
     const q = state.query.toLowerCase();
@@ -6325,18 +6718,37 @@
     d.setAttribute('role','button');
     d.dataset.id = r.id;
     d.dataset.step = etapaGroup(r.etapa);
-    const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${r.id}</span>` : '';
+    const priorityScore = computeLeadPriorityScore(r);
+    const priorityLevel = resolveLeadPriorityLevel(priorityScore);
+    if(priorityLevel){
+      d.dataset.priority = priorityLevel;
+    }else{
+      delete d.dataset.priority;
+    }
+    const priorityLabel = formatLeadPriorityLabel(priorityLevel);
+    const priorityPill = priorityLabel ? `<span class="pill priority-pill priority-${priorityLevel}">${priorityLabel}</span>` : '';
+    const campusLabel = [r.campus, r.modalidad].filter(Boolean).join(' · ');
+    const campusTag = campusLabel ? `<span class="tag">${escapeHtml(campusLabel)}</span>` : '';
+    const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${escapeHtml(String(r.id))}</span>` : '';
+    const phoneValue = fmtPhone(r.telefono || r.telefonoNormalizado);
+    const phonePill = phoneValue ? `<span class="pill">${escapeHtml(phoneValue)}</span>` : '';
+    const mailPill = r.correo ? `<span class="pill">${escapeHtml(r.correo)}</span>` : '';
+    const programLine = r.programa ? `<div class="muted">${escapeHtml(r.programa)}</div>` : '';
+    const estadoLine = `<div class="muted">${escapeHtml(r.estado || '—')} · ${escapeHtml(displayAsesorName(r.asesor))}</div>`;
     d.innerHTML = `
-      <div class="row between">
-        <strong>${r.nombre}</strong>
-        <span class="tag">${r.campus} · ${r.modalidad}</span>
+      <div class="row between align-start">
+        <strong>${escapeHtml(r.nombre || 'Sin nombre')}</strong>
+        <div class="row gap6 align-center">
+          ${priorityPill}
+          ${campusTag}
+        </div>
       </div>
-      <div class="muted">${r.programa}</div>
-      <div class="muted">${r.estado} · ${displayAsesorName(r.asesor)}</div>
+      ${programLine}
+      ${estadoLine}
       <div class="row gap8" style="margin-top:8px">
         ${idPill}
-        <span class="pill">${fmtPhone(r.telefono || r.telefonoNormalizado)}</span>
-        <span class="pill">${r.correo}</span>
+        ${phonePill}
+        ${mailPill}
       </div>
     `;
     d.addEventListener('click', ()=>openDetails(r));
@@ -6432,6 +6844,68 @@
 
     const formSets = [];
     const canEditLead = canPerform('updateLead');
+    let lastLoggedType = '';
+    let lastLoggedAt = 0;
+
+    const syncSaveAvailability = () => {
+      if(!canEditLead) return;
+      const hasComment = Boolean((r.comentario || '').trim());
+      formSets.forEach(set => {
+        if(set.updateBtn){
+          set.updateBtn.disabled = !hasComment;
+          if(!hasComment){
+            set.updateBtn.title = 'Agrega un comentario antes de guardar.';
+          }else{
+            set.updateBtn.removeAttribute('title');
+          }
+        }
+      });
+    };
+
+    const updateCommentValue = (value, sourceInput = null) => {
+      const text = value || '';
+      r.comentario = text;
+      formSets.forEach(set => {
+        if(set.comentarioInput && set.comentarioInput !== sourceInput){
+          set.comentarioInput.value = text;
+        }
+      });
+      syncSaveAvailability();
+    };
+
+    const appendCommentNote = note => {
+      if(!note) return;
+      const current = r.comentario || '';
+      const trimmed = current.trim();
+      const nextValue = trimmed ? `${trimmed}\n${note}` : note;
+      updateCommentValue(nextValue);
+    };
+
+    const broadcastScriptStatus = message => {
+      ['contactScriptStatus','drawerContactScriptStatus'].forEach(id => {
+        const target = document.getElementById(id);
+        if(!target) return;
+        target.textContent = message || '';
+        target.classList.toggle('hidden', !message);
+      });
+    };
+
+    const registerContactNote = type => {
+      const note = createContactNote(type, r);
+      appendCommentNote(note);
+      lastLoggedType = type || '';
+      lastLoggedAt = Date.now();
+      broadcastScriptStatus(`${CONTACT_CHANNEL_LABELS[type] || 'Contacto'} registrado. Completa los detalles y guarda el lead.`);
+    };
+
+    const maybeRegisterContactNote = type => {
+      if(!type) return;
+      const now = Date.now();
+      if(type === lastLoggedType && now - lastLoggedAt < 1000){
+        return;
+      }
+      registerContactNote(type);
+    };
 
     const applyFormState = controls => {
       if(!controls) return;
@@ -6440,7 +6914,7 @@
       }
       if(controls.estadoSelect){
         fillEstadoOptions(r.etapa, controls.estadoSelect);
-        const hasOption = Array.from(controls.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+        const hasOption = Array.from(controls.estadoSelect.options || []).some(opt => opt.value === r.estado);
         controls.estadoSelect.value = hasOption ? r.estado : (controls.estadoSelect.options[0]?.value || '');
         if(!hasOption){
           r.estado = controls.estadoSelect.value || r.estado;
@@ -6452,7 +6926,10 @@
       }
     };
 
-    const refreshForms = () => { formSets.forEach(applyFormState); };
+    const refreshForms = () => {
+      formSets.forEach(applyFormState);
+      syncSaveAvailability();
+    };
 
     let isSaving = false;
     const handleUpdate = async button => {
@@ -6468,6 +6945,16 @@
         alert('No hay cambios para guardar');
         return;
       }
+      const commentText = (r.comentario || '').trim();
+      if(!commentText){
+        broadcastScriptStatus('Agrega una nota en el comentario antes de guardar.');
+        const commentControl = formSets.find(set => set.comentarioInput)?.comentarioInput;
+        if(commentControl){
+          commentControl.focus();
+        }
+        alert('Agrega un comentario antes de guardar.');
+        return;
+      }
       const registrarToque = etapaChanged || estadoChanged;
       const params = new URLSearchParams({
         action: 'updateLead',
@@ -6481,10 +6968,10 @@
       if(registrarToque){
         params.set('fecha', new Date().toISOString());
       }
-      const buttons = formSets.map(set=>set.updateBtn).filter(Boolean);
+      const buttons = formSets.map(set => set.updateBtn).filter(Boolean);
       try{
         isSaving = true;
-        buttons.forEach(btn=>{ btn.disabled = true; });
+        buttons.forEach(btn => { btn.disabled = true; });
         const res = await apiFetch(`${API_URL}?${params.toString()}`);
         if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -6496,7 +6983,7 @@
         if(updated.asignacion !== undefined) r.asignacion = updated.asignacion;
         if(updated.resolucion !== undefined) r.resolucion = updated.resolucion;
         if(Array.isArray(updated.toques)){
-          ['toque1','toque2','toque3','toque4'].forEach((k,idx)=>{
+          ['toque1','toque2','toque3','toque4'].forEach((k,idx) => {
             if(updated.toques[idx] !== undefined) r[k] = updated.toques[idx];
           });
         }
@@ -6511,7 +6998,7 @@
         console.error('Error al actualizar', err);
         alert('Error al actualizar');
       }finally{
-        buttons.forEach(btn=>{ btn.disabled = false; });
+        buttons.forEach(btn => { btn.disabled = false; });
         isSaving = false;
       }
     };
@@ -6520,12 +7007,7 @@
       if(!controls) return;
       if(controls.comentarioInput){
         controls.comentarioInput.oninput = () => {
-          r.comentario = controls.comentarioInput.value;
-          formSets.forEach(set=>{
-            if(set !== controls && set.comentarioInput){
-              set.comentarioInput.value = r.comentario || '';
-            }
-          });
+          updateCommentValue(controls.comentarioInput.value, controls.comentarioInput);
         };
       }
       if(controls.etapaSelect){
@@ -6534,13 +7016,13 @@
           const nextEstado = (estadosByEtapa[r.etapa] || [''])[0] || '';
           r.estado = nextEstado;
           updateDetailState();
-          formSets.forEach(set=>{
+          formSets.forEach(set => {
             if(set.etapaSelect){
               set.etapaSelect.value = r.etapa;
             }
             if(set.estadoSelect){
               fillEstadoOptions(r.etapa, set.estadoSelect);
-              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt => opt.value === r.estado);
               set.estadoSelect.value = hasOpt ? r.estado : (set.estadoSelect.options[0]?.value || '');
               if(!hasOpt){
                 r.estado = set.estadoSelect.value || '';
@@ -6555,9 +7037,9 @@
         controls.estadoSelect.onchange = () => {
           r.estado = controls.estadoSelect.value;
           updateDetailState();
-          formSets.forEach(set=>{
+          formSets.forEach(set => {
             if(set !== controls && set.estadoSelect){
-              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt => opt.value === r.estado);
               if(hasOpt){
                 set.estadoSelect.value = r.estado;
               }
@@ -6593,6 +7075,33 @@
         return;
       }
       attachListeners(controls);
+      syncSaveAvailability();
+    };
+
+    const applyContactScripts = () => {
+      const scripts = buildContactScripts(r);
+      broadcastScriptStatus('');
+      ['contactScripts','drawerContactScripts'].forEach(id => {
+        const container = document.getElementById(id);
+        if(!container) return;
+        CONTACT_SCRIPT_TYPES.forEach(type => {
+          const textEl = container.querySelector(`[data-script-text="${type}"]`);
+          if(textEl){
+            textEl.value = scripts[type] || 'No hay guion disponible para este lead.';
+          }
+          const actionBtn = container.querySelector(`[data-script-apply="${type}"]`);
+          if(actionBtn){
+            actionBtn.disabled = !scripts[type];
+            actionBtn.onclick = async event => {
+              event.preventDefault();
+              if(!scripts[type]) return;
+              const copied = await copyToClipboard(scripts[type]);
+              registerContactNote(type);
+              broadcastScriptStatus(copied ? `${CONTACT_CHANNEL_LABELS[type]} copiado. Completa la nota y guarda el lead.` : `${CONTACT_CHANNEL_LABELS[type]} registrado. Copia el guion manualmente si lo necesitas.`);
+            };
+          }
+        });
+      });
     };
 
     registerForm({
@@ -6620,18 +7129,27 @@
       actCall.classList.toggle('hidden', !hasCallLink);
       if(hasCallLink){
         actCall.href = callHref;
+        actCall.onclick = () => { maybeRegisterContactNote('call'); };
+      }else{
+        actCall.onclick = null;
       }
     }
     if(actWa){
       actWa.classList.toggle('hidden', !hasWaLink);
       if(hasWaLink){
         actWa.href = waHref;
+        actWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
+      }else{
+        actWa.onclick = null;
       }
     }
     if(actMail){
       actMail.classList.toggle('hidden', !hasMailLink);
       if(hasMailLink){
         actMail.href = mailHref;
+        actMail.onclick = () => { maybeRegisterContactNote('email'); };
+      }else{
+        actMail.onclick = null;
       }
     }
 
@@ -6658,9 +7176,9 @@
           <div class="muted">Estado</div><div id="drawerEstadoVal">${r.estado || '—'}</div>
         </div>
         <div class="actions">
-          ${hasCallLink?`<a class="btn" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
-          ${hasWaLink?`<a class="btn" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
-          ${hasMailLink?`<a class="btn" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
+          ${hasCallLink?`<a class="btn" id="drawerActCall" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
+          ${hasWaLink?`<a class="btn" id="drawerActWa" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
+          ${hasMailLink?`<a class="btn" id="drawerActMail" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
         </div>
         <label style="display:block;margin-top:12px">Etapa
           <select id="drawerEtapa" class="w100"></select>
@@ -6671,6 +7189,33 @@
         <label style="display:block;margin-top:12px">Comentario
           <textarea id="drawerComentario" class="w100" rows="3"></textarea>
         </label>
+        <div class="contact-scripts" id="drawerContactScripts">
+          <div class="contact-scripts__header"><i class="bi bi-journal-text"></i> Guiones comerciales</div>
+          <div class="contact-scripts__grid">
+            <article class="contact-script" data-channel="call">
+              <header><i class="bi bi-telephone"></i> Llamada</header>
+              <textarea readonly data-script-text="call" aria-label="Guion de llamada en móvil"></textarea>
+              <div class="contact-script__actions">
+                <button class="btn outline" type="button" data-script-apply="call"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+              </div>
+            </article>
+            <article class="contact-script" data-channel="whatsapp">
+              <header><i class="bi bi-whatsapp"></i> WhatsApp</header>
+              <textarea readonly data-script-text="whatsapp" aria-label="Guion de WhatsApp en móvil"></textarea>
+              <div class="contact-script__actions">
+                <button class="btn outline" type="button" data-script-apply="whatsapp"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+              </div>
+            </article>
+            <article class="contact-script" data-channel="email">
+              <header><i class="bi bi-envelope"></i> Correo</header>
+              <textarea readonly data-script-text="email" aria-label="Guion de correo en móvil"></textarea>
+              <div class="contact-script__actions">
+                <button class="btn outline" type="button" data-script-apply="email"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
+              </div>
+            </article>
+          </div>
+          <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
+        </div>
         <div class="actions" style="margin-top:12px">
           <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar</button>
         </div>`;
@@ -6680,7 +7225,21 @@
         comentarioInput: el('#drawerComentario'),
         updateBtn: el('#drawerUpdateBtn')
       });
+      const drawerCall = document.getElementById('drawerActCall');
+      if(drawerCall){
+        drawerCall.onclick = () => { maybeRegisterContactNote('call'); };
+      }
+      const drawerWa = document.getElementById('drawerActWa');
+      if(drawerWa){
+        drawerWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
+      }
+      const drawerMail = document.getElementById('drawerActMail');
+      if(drawerMail){
+        drawerMail.onclick = () => { maybeRegisterContactNote('email'); };
+      }
     }
+    applyContactScripts();
+    syncSaveAvailability();
   }
 
 
@@ -7699,6 +8258,35 @@
       campusSel.addEventListener('change', ()=>{ state.campus = campusSel.value; state.page=0; refresh(); });
     }
 
+    const dailyShortcuts = el('#dailyShortcuts');
+    if(dailyShortcuts){
+      dailyShortcuts.addEventListener('click', event => {
+        const button = event.target.closest('button[data-type]');
+        if(!button) return;
+        const type = button.dataset.type;
+        const value = button.dataset.value || '';
+        state.query = '';
+        const qInput = el('#q');
+        if(qInput) qInput.value = '';
+        if(type === 'campus'){
+          state.campus = state.campus === value ? '' : value;
+          populateCampuses();
+        }else if(type === 'asesor'){
+          const normalizedValue = normalizeAsesorName(value);
+          const selected = getAsesorFilter();
+          const isActive = selected.length === 1 && normalizeAsesorName(selected[0]) === normalizedValue;
+          if(isActive){
+            setAsesorFilter([]);
+          }else{
+            setAsesorFilter(value ? [value] : []);
+          }
+          populateAsesores();
+        }
+        state.page = 0;
+        refresh();
+      });
+    }
+
     // Filtros por columna
     els('input[data-col]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
@@ -7760,6 +8348,7 @@
 
   function refresh(){
     const rows = applyFilters();
+    renderDailyShortcuts(rows);
     const {key, dir} = state.sort;
     if(key){ rows.sort((a,b)=> (a[key]||'').localeCompare(b[key]||'') * dir ); }
     const totals = etapasUI.reduce((acc, step)=>{ acc[step] = 0; return acc; }, {});
@@ -8562,9 +9151,17 @@
   Object.entries(estadosByEtapa).forEach(([etapa, estados]) => {
     estados.forEach(estado => registerEstadoAlias(etapa, estado));
   });
-  registerEstadoAlias('No Contactado','Mensaje no contestado',['mensaje sin responder','mensaje no respondido']);
-  registerEstadoAlias('Descartado','Límite intentos de contacto',['limite intentos contacto','limite de intentos de contacto']);
+  registerEstadoAlias('Nuevo','Sin contactar',['nuevo']);
+  registerEstadoAlias('No Contactado','No contesta',['sin respuesta','no responde','buzon de voz','buzón de voz','cuelga','no contesta whatsapp']);
+  registerEstadoAlias('No Contactado','Mensaje no respondido',['mensaje sin responder','mensaje no contestado']);
+  registerEstadoAlias('No Contactado','Pendiente de reintento',['volver a marcar','reintentar','limite intentos contacto','limite de intentos de contacto']);
+  registerEstadoAlias('Contactado','Seguimiento activo',['seguimiento']);
+  registerEstadoAlias('Contactado','En labor de venta',['labor de venta']);
+  registerEstadoAlias('Descartado','Sin interés',['no interesado','no interesada','no desea informacion','no desea información','inscrito en otra escuela']);
+  registerEstadoAlias('Descartado','Datos incorrectos',['datos falsos','telefono incorrecto','correo incorrecto']);
+  registerEstadoAlias('Descartado','Duplicado',['duplicado','duplicada']);
   registerEstadoAlias('Descartado','SPAM',['spam']);
+  registerEstadoAlias('Inscrito','Inscrito confirmado',['inscrito']);
 
   function resolveHeaderKey(header){
     const norm = normalizeAliasKey(header);
