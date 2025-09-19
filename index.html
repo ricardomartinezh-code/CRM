@@ -1719,7 +1719,20 @@
     .security-timeline__label{ font-weight:600; color:var(--text); }
     .security-timeline__meta{ font-size:11px; color:var(--muted); }
     .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-    .settings-preferences{ display:grid; gap:var(--space); }
+    .settings-preferences{ display:flex; flex-direction:column; gap:var(--space); }
+    .pref-layout{ display:grid; gap:var(--space); }
+    .pref-column{ display:grid; gap:var(--space-sm); }
+    .pref-select-grid{ display:grid; gap:var(--space-sm); }
+    .pref-toggles{ border:1px solid rgba(var(--panel-base-rgb),0.28); border-radius:var(--radius); padding:var(--space-sm); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:var(--space-sm); }
+    html[data-theme="light"] .pref-toggles{ background:rgba(var(--panel-base-rgb),0.12); border-color:rgba(var(--panel-base-rgb),0.22); }
+    .pref-toggles legend{ margin:0; padding:0 var(--space-xs); font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--text); }
+    .pref-toggle-grid{ display:grid; gap:var(--space-sm); }
+    .pref-column--toggles .settings-group.switch{ justify-content:space-between; }
+    @media (min-width: 920px){
+      .pref-layout{ grid-template-columns: minmax(0,1fr) minmax(0,420px); align-items:start; }
+      .pref-select-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .pref-toggle-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
     .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
     .pref-presets[hidden]{ display:none; }
     .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
@@ -1752,7 +1765,6 @@
     .settings-summary[data-state="error"]{ border-color:rgba(239,68,68,0.45); color:#ef4444; background:rgba(239,68,68,0.12); }
     .settings-summary[data-state="warning"]{ border-color:rgba(245,158,11,0.45); color:#f59e0b; background:rgba(245,158,11,0.12); }
     .settings-summary.fade{ opacity:0.45; }
-    .settings-preferences > *:not(.pref-actions){ max-width:420px; }
     .profile-avatar .muted{ max-width:240px; }
     .permissions-grid{ display:grid; grid-template-columns: minmax(220px, 320px) minmax(0,1fr); gap:var(--space); align-items:flex-start; }
     .permissions-panel{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space); background: var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
@@ -2754,6 +2766,10 @@
             </div>
           </div>
           <div class="panel-section">
+            <h3><span aria-hidden="true">📝</span> Estado</h3>
+            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
+          </div>
+          <div class="panel-section">
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
@@ -2789,76 +2805,89 @@
           <div class="panel-section">
             <h3><span aria-hidden="true">🎨</span> Preferencias</h3>
             <div class="settings-preferences">
-              <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
-                <legend id="themeOptionsLabel">Tema</legend>
-                <div class="segmented" role="radiogroup" aria-label="Tema">
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="light" />
-                    <span>Claro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="dark" />
-                    <span>Oscuro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="system" />
-                    <span>Sistema</span>
-                  </label>
+              <div class="pref-layout">
+                <div class="pref-column pref-column--controls">
+                  <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
+                    <legend id="themeOptionsLabel">Tema</legend>
+                    <div class="segmented" role="radiogroup" aria-label="Tema">
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="light" />
+                        <span>Claro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="dark" />
+                        <span>Oscuro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="system" />
+                        <span>Sistema</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                  <div class="pref-select-grid">
+                    <label class="settings-group">
+                      <span>Idioma</span>
+                      <select id="prefLanguage">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Densidad</span>
+                      <select id="prefDensity">
+                        <option value="comfortable">Cómoda</option>
+                        <option value="compact">Compacta</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Diseño del tablero</span>
+                      <select id="prefBoardDensity">
+                        <option value="standard">Estándar</option>
+                        <option value="compact">Compacto</option>
+                        <option value="expanded">Amplio</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Color de acento</span>
+                      <select id="prefAccent">
+                        <option value="blue">Azul institucional</option>
+                        <option value="green">Verde</option>
+                        <option value="purple">Morado</option>
+                        <option value="orange">Ámbar</option>
+                        <option value="teal">Turquesa</option>
+                        <option value="pink">Magenta</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
-              </fieldset>
-              <label class="settings-group">
-                <span>Idioma</span>
-                <select id="prefLanguage">
-                  <option value="es">Español</option>
-                  <option value="en">English</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Densidad</span>
-                <select id="prefDensity">
-                  <option value="comfortable">Cómoda</option>
-                  <option value="compact">Compacta</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Diseño del tablero</span>
-                <select id="prefBoardDensity">
-                  <option value="standard">Estándar</option>
-                  <option value="compact">Compacto</option>
-                  <option value="expanded">Amplio</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Color de acento</span>
-                <select id="prefAccent">
-                  <option value="blue">Azul institucional</option>
-                  <option value="green">Verde</option>
-                  <option value="purple">Morado</option>
-                  <option value="orange">Ámbar</option>
-                  <option value="teal">Turquesa</option>
-                  <option value="pink">Magenta</option>
-                </select>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefEco" />
-                <span>Modo eco</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefMotion" />
-                <span>Reducir animaciones</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefLargeText" />
-                <span>Texto amplio</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefHighContrast" />
-                <span>Contraste alto</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefShowLeadId" />
-                <span>Mostrar ID en tarjetas del tablero</span>
-              </label>
+                <div class="pref-column pref-column--toggles">
+                  <fieldset class="pref-toggles" aria-labelledby="prefToggleLegend">
+                    <legend id="prefToggleLegend">Ajustes rápidos</legend>
+                    <div class="pref-toggle-grid">
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefEco" />
+                        <span>Modo eco</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefMotion" />
+                        <span>Reducir animaciones</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefLargeText" />
+                        <span>Texto amplio</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefHighContrast" />
+                        <span>Contraste alto</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefShowLeadId" />
+                        <span>Mostrar ID en tarjetas del tablero</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
               <div class="pref-presets" id="prefPresetRecommendations" hidden>
                 <p class="pref-presets__title">Recomendaciones institucionales</p>
                 <div class="pref-presets__list" id="prefPresetList"></div>
@@ -2867,10 +2896,6 @@
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
             </div>
-          </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">📝</span> Estado</h3>
-            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
           </div>
         </div>
       </section>
