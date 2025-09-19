@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Static site deployment for ReLead-EDU",
   "scripts": {
+    "build": "echo 'Skipping build step'",
     "start": "serve -s . -l ${PORT:-3000}"
   },
   "keywords": [],
