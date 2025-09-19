@@ -389,6 +389,8 @@
 
     .actions { display:flex; align-items:center; gap:10px; flex:0 0 auto }
     .btn { display:inline-flex; align-items:center; gap:var(--space-sm); border:1px solid var(--accent-2); background: var(--card); color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,.2); transition:transform .1s ease, box-shadow .1s ease }
+    .btn.micro{ padding:6px 10px; font-size:12px; border-radius:10px; box-shadow:0 1px 2px rgba(0,0,0,0.18); }
+    .btn.micro i{ font-size:13px; }
     .btn:hover { border-color: var(--accent) }
     .btn:active { transform:translateY(1px); box-shadow:0 1px 2px rgba(0,0,0,.2) }
     .btn.primary { background: linear-gradient(135deg, var(--accent), var(--color-primary)); border-color: transparent; color:#fff; box-shadow: var(--shadow) }
@@ -626,6 +628,181 @@
     .chip { display:inline-flex; align-items:center; gap:8px; padding:8px 10px; border:1px solid rgba(255,255,255,.12); background: var(--card); border-radius:999px; cursor:pointer; user-select:none }
     .chip input { appearance:none; width:12px; height:12px; border-radius:3px; border:1px solid rgba(255,255,255,.25); display:inline-block; position:relative }
     .chip input:checked { background: var(--accent); border-color: var(--accent) }
+    .daily-shortcuts{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .daily-shortcuts__header{
+      font-size:11px;
+      font-weight:700;
+      letter-spacing:.5px;
+      text-transform:uppercase;
+      color:rgba(248,252,255,0.78);
+    }
+    .daily-shortcuts__group{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .daily-shortcuts__label{
+      font-size:12px;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .daily-shortcuts__btn{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(var(--panel-base-rgb),0.35);
+      background:rgba(var(--panel-base-rgb),0.18);
+      color:var(--text);
+      font-weight:600;
+      font-size:13px;
+      cursor:pointer;
+      transition: border-color .2s ease, background .2s ease, transform .2s ease;
+    }
+    .daily-shortcuts__btn span{ font-size:12px; font-weight:500; color:var(--muted); }
+    .daily-shortcuts__btn:hover,
+    .daily-shortcuts__btn:focus{
+      outline:none;
+      transform:translateY(-1px);
+      border-color:rgba(148,193,255,0.65);
+      background:rgba(var(--panel-base-rgb),0.28);
+    }
+    .daily-shortcuts__btn.is-active{
+      border-color:rgba(34,197,94,0.55);
+      background:rgba(34,197,94,0.2);
+      color:var(--text);
+    }
+    .daily-shortcuts__btn.is-active span{ color:rgba(34,197,94,0.85); }
+    .daily-shortcuts__empty{
+      font-size:12px;
+      color:var(--muted);
+      font-style:italic;
+    }
+    html[data-theme="light"] .daily-shortcuts__header{ color:#334155; }
+    html[data-theme="light"] .daily-shortcuts__btn{
+      background:rgba(var(--panel-base-rgb),0.12);
+      border-color:rgba(var(--panel-base-rgb),0.28);
+      color:#0f172a;
+    }
+    html[data-theme="light"] .daily-shortcuts__btn span{ color:#475569; }
+    html[data-theme="light"] .daily-shortcuts__btn.is-active{
+      background:rgba(34,197,94,0.16);
+      border-color:rgba(34,197,94,0.5);
+      color:#065f46;
+    }
+    .contact-scripts{
+      margin-top:12px;
+      padding:var(--space-sm);
+      border-radius:var(--radius);
+      border:1px solid rgba(var(--panel-base-rgb),0.28);
+      background:rgba(var(--panel-base-rgb),0.12);
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+    }
+    .contact-scripts__header{
+      font-size:14px;
+      font-weight:700;
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .contact-scripts__grid{
+      display:grid;
+      gap:var(--space-sm);
+      grid-template-columns:repeat(auto-fit, minmax(220px,1fr));
+    }
+    .contact-script{
+      background:var(--card);
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,0.08);
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+    }
+    .contact-script header{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:700;
+      color:var(--text);
+    }
+    .contact-script textarea{
+      width:100%;
+      min-height:96px;
+      resize:vertical;
+      border-radius:10px;
+      border:1px solid rgba(var(--panel-base-rgb),0.3);
+      background:var(--card-2);
+      color:var(--text);
+      padding:10px;
+      font-family:var(--font);
+      font-size:13px;
+      line-height:1.5;
+    }
+    .contact-script textarea:focus{
+      outline:none;
+      border-color:rgba(var(--panel-base-rgb),0.55);
+      box-shadow:var(--ring);
+    }
+    .contact-script__actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+    .contact-scripts__status{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .contact-scripts__status.hidden{ display:none; }
+    html[data-theme="light"] .contact-scripts{
+      border-color:rgba(var(--panel-base-rgb),0.22);
+      background:rgba(var(--panel-base-rgb),0.08);
+    }
+    html[data-theme="light"] .contact-script{
+      border-color:rgba(148,163,184,0.28);
+      box-shadow:none;
+    }
+    html[data-theme="light"] .contact-script textarea{
+      background:#f8fafc;
+      border-color:rgba(148,163,184,0.35);
+      color:#0f172a;
+    }
+    .pill { padding:8px 12px; border:1px solid color-mix(in srgb, var(--panel-tone-bright) 36%, #1e293b 64%); border-radius:12px }
+    .pill.priority-pill{
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.3px;
+    }
+    .pill.priority-alta{
+      background:rgba(34,197,94,0.2);
+      border-color:rgba(34,197,94,0.45);
+      color:var(--ok);
+    }
+    .pill.priority-media{
+      background:rgba(234,179,8,0.18);
+      border-color:rgba(234,179,8,0.45);
+      color:var(--warn);
+    }
+    .pill.priority-baja{
+      background:rgba(96,165,250,0.18);
+      border-color:rgba(96,165,250,0.45);
+      color:var(--info);
+    }
+    html[data-theme="light"] .contact-script header{ color:#0f172a; }
+    html[data-theme="light"] .pill.priority-alta{ color:#15803d; }
+    html[data-theme="light"] .pill.priority-media{ color:#b45309; }
+    html[data-theme="light"] .pill.priority-baja{ color:#1d4ed8; }
 
     /* KPIs */
     .kpi-groups{ display:flex; flex-direction:column; gap:calc(var(--space) * 0.75); padding:0 var(--space) var(--space-sm); }
@@ -695,24 +872,9 @@
     html[data-board-density="compact"] .card-lead{ padding:6px; }
     html[data-board-density="expanded"] .card-lead{ padding:12px; }
     .card-lead:hover { transform: translateY(-2px) scale(1.01); border-color: rgba(0,58,95,.35); box-shadow: 0 4px 14px rgba(0,0,0,.12) }
-    .card-lead__header{ display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-sm); }
-    .card-lead__header strong{ font-size:1rem; line-height:1.35; }
-    .card-lead__contact{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
-    .contact-label{ font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:color-mix(in srgb, var(--accent) 70%, var(--muted) 30%); }
-    .card-lead__contact-row{ display:flex; flex-wrap:wrap; gap:8px; }
-    .contact-chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; font-weight:600; font-size:13px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
-    .contact-chip i{ font-size:14px; }
-    .contact-chip--primary{ background: rgba(var(--panel-base-rgb),0.25); color:var(--text); border:1px solid rgba(var(--panel-base-rgb),0.5); }
-    .contact-chip--secondary{ background: rgba(148,163,184,0.18); color:var(--muted); border:1px solid rgba(148,163,184,0.28); }
-    .contact-chip--phone.contact-chip--primary i{ color:#22c55e; }
-    .contact-chip--mail.contact-chip--primary i{ color:#2563eb; }
-    .contact-chip--phone.contact-chip--secondary i{ color:#22c55e; }
-    .contact-chip--mail.contact-chip--secondary i{ color:#2563eb; }
-    html[data-theme="light"] .contact-chip--primary{ background: rgba(var(--panel-base-rgb),0.14); color:#0f172a; border-color: rgba(var(--panel-base-rgb),0.32); }
-    html[data-theme="light"] .contact-chip--secondary{ background:#e2e8f0; color:#1e293b; border-color: rgba(148,163,184,0.45); }
-    html[data-theme="light"] .contact-label{ color:var(--accent); }
-    .card-lead__meta{ margin-top:10px; display:flex; flex-direction:column; gap:4px; }
-    .card-lead__footer{ margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
+    .card-lead[data-priority="alta"]{ box-shadow: 0 6px 18px rgba(34,197,94,0.25); border-color: rgba(34,197,94,0.55); }
+    .card-lead[data-priority="media"]{ border-color: rgba(234,179,8,0.45); }
+    .card-lead[data-priority="baja"]{ border-color: rgba(96,165,250,0.45); }
     .tag { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.15); color: var(--muted) }
     .tag.ok{ color: #065f46; background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.25) }
     .tag.bad{ color: #7f1d1d; background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.25) }
@@ -1215,6 +1377,12 @@
     .profile-summary{ display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:var(--space-sm); padding:var(--space); border-radius:var(--radius); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
     html[data-theme="light"] .profile-summary{ background:rgba(15,23,42,0.04); border-color:rgba(15,23,42,0.08); }
     .profile-summary div{ display:flex; flex-direction:column; gap:4px; }
+    .profile-sync-alert{ padding:10px 12px; border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:rgba(148,163,184,0.12); display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .profile-sync-alert strong{ font-weight:700; color:var(--text); }
+    .profile-sync-alert[data-state="stale"]{ border-color:rgba(239,68,68,0.45); background:rgba(239,68,68,0.12); color:var(--bad); }
+    .profile-sync-alert[data-state="stale"] strong{ color:var(--bad); }
+    .profile-sync-alert[data-state="unknown"]{ border-color:rgba(245,158,11,0.45); background:rgba(245,158,11,0.12); color:var(--warn); }
+    .profile-sync-alert button{ align-self:flex-start; }
     .summary-label{ font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
     .summary-value{ font-size:14px; font-weight:600; color:var(--text); word-break:break-word; }
     .security-form{ gap:var(--space-sm); align-items:flex-end; }
@@ -1226,7 +1394,25 @@
     .security-status[data-tone="success"] .summary-value{ color:var(--ok); }
     .security-status[data-tone="warning"] .summary-value{ color:var(--warn); }
     .security-status[data-tone="error"] .summary-value{ color:var(--bad); }
+    .security-status__header{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .security-timeline{ margin:4px 0 0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--muted); }
+    .security-timeline__item{ display:flex; align-items:flex-start; gap:8px; }
+    .security-timeline__badge{ width:10px; height:10px; border-radius:50%; margin-top:5px; background:rgba(var(--panel-base-rgb),0.4); flex:0 0 auto; }
+    .security-timeline__item[data-state="done"] .security-timeline__badge{ background:var(--ok); }
+    .security-timeline__item[data-state="active"] .security-timeline__badge{ background:var(--warn); box-shadow:0 0 0 3px rgba(245,158,11,0.25); }
+    .security-timeline__item[data-state="future"] .security-timeline__badge{ background:rgba(148,163,184,0.4); }
+    .security-timeline__content{ display:flex; flex-direction:column; gap:2px; }
+    .security-timeline__label{ font-weight:600; color:var(--text); }
+    .security-timeline__meta{ font-size:11px; color:var(--muted); }
+    .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
     .settings-preferences{ display:grid; gap:var(--space); }
+    .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
+    .pref-presets[hidden]{ display:none; }
+    .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .pref-presets__list{ display:flex; flex-wrap:wrap; gap:10px; }
+    .pref-preset-card{ padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:var(--card); display:flex; flex-direction:column; gap:6px; max-width:320px; }
+    .pref-preset-card strong{ font-size:14px; color:var(--text); }
+    .pref-preset-card p{ margin:0; font-size:12px; color:var(--muted); }
     .settings-group{ display:flex; flex-direction:column; gap:var(--space-sm); font-size:13px; font-weight:600; color:var(--muted); }
     .settings-group legend{ font-size:13px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); margin-bottom:var(--space-sm); }
     .settings-group select{ width:100%; font-weight:600; color:var(--text); }
@@ -1290,6 +1476,20 @@
     .permissions-form input[type="password"],
     .permissions-form select{ background:var(--card); }
     .permissions-form input[readonly]{ opacity:0.8; cursor:not-allowed; }
+    .role-scope-suggestion{ margin-top:6px; padding:10px 12px; border-radius:12px; border:1px dashed rgba(255,255,255,0.18); background:rgba(255,255,255,0.04); display:flex; flex-direction:column; gap:8px; }
+    .role-scope-suggestion[hidden]{ display:none; }
+    .role-scope-suggestion__text{ margin:0; font-size:13px; color:var(--muted); line-height:1.45; }
+    .role-scope-suggestion__chips{ display:flex; flex-wrap:wrap; gap:6px; }
+    .role-scope-suggestion__chips .scope-chip{ display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:999px; background:rgba(var(--panel-base-rgb),0.18); border:1px solid rgba(var(--panel-base-rgb),0.35); font-size:12px; font-weight:600; color:var(--text); letter-spacing:.2px; text-transform:uppercase; }
+    .role-scope-suggestion__chips .scope-chip i{ font-size:12px; opacity:0.85; }
+    html[data-theme="light"] .role-scope-suggestion{ background:rgba(15,23,42,0.04); border-color:rgba(15,23,42,0.16); }
+    html[data-theme="light"] .role-scope-suggestion__chips .scope-chip{ background:rgba(var(--panel-base-rgb),0.12); color:#0f172a; }
+    .multi-select[data-dirty="true"] .multi-select__button{ border-color:rgba(239,68,68,0.55); box-shadow:0 0 0 2px rgba(239,68,68,0.18); }
+    .multi-select[data-dirty="true"]::after{ content:"Personalizado"; align-self:flex-start; font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:rgba(239,68,68,0.85); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:999px; padding:2px 8px; margin-top:-4px; }
+    .scope-template-toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+    .scope-template-btn{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:4px; padding:8px 12px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.1); color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:border-color .2s ease, background .2s ease, transform .12s ease; }
+    .scope-template-btn:hover{ border-color:var(--accent); background:rgba(var(--panel-base-rgb),0.18); transform:translateY(-1px); }
+    .scope-template-btn span{ font-weight:500; opacity:0.8; }
     .field-with-hint{ display:flex; flex-direction:column; }
     .field-with-hint .field-hint{ display:block; margin-top:6px; font-size:12px; color:var(--muted); line-height:1.45; }
     .multi-select{ position:relative; display:flex; flex-direction:column; gap:6px; }
@@ -1570,11 +1770,7 @@
                 </select>
               </label>
             </div>
-            <aside class="preferences-callout" id="preferencesCallout" role="note">
-              <div class="preferences-callout__heading">Ajusta tu experiencia</div>
-              <p>Configura la densidad del tablero o muestra el ID en cada tarjeta para adaptarte al volumen de contactos diarios.</p>
-              <button type="button" class="preferences-callout__action" id="preferencesShortcut">Abrir preferencias personales</button>
-            </aside>
+            <div class="daily-shortcuts" id="dailyShortcuts" aria-label="Listas diarias sugeridas"></div>
           </div>
         </div>
         <div class="panel-section">
@@ -1635,7 +1831,16 @@
                 <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
               </div>
             </div>
-          </section>
+            <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
+          </div>
+          <div class="actions" style="margin-top:10px">
+            <button class="btn primary" id="updateBtn">Guardar</button>
+          </div>
+          <div class="actions" style="margin-top:10px">
+              <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
+              <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+              <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
+          </div>
         </aside>
       </div>
       <!-- Drawer for mobile details -->
@@ -1835,6 +2040,11 @@
                       <option value="viewer">Consulta</option>
                     </select>
                     <span class="field-hint" id="permRoleHint"></span>
+                    <div class="role-scope-suggestion" id="permRoleSuggestion" hidden>
+                      <p class="role-scope-suggestion__text" id="permRoleDescription"></p>
+                      <div class="role-scope-suggestion__chips" id="permRoleScopeChips" aria-live="polite"></div>
+                      <button type="button" class="btn micro" id="permApplyRolePreset"><i class="bi bi-magic"></i> Aplicar sugerencia</button>
+                    </div>
                   </label>
                   <label class="field-with-hint">
                     <span>Planteles autorizados</span>
@@ -1898,6 +2108,7 @@
               </div>
               <form class="permissions-form" id="teamForm" autocomplete="off" novalidate>
                 <h4 class="perm-form-title" id="teamFormTitle">Nuevo equipo</h4>
+                <div class="scope-template-toolbar" id="teamTemplateToolbar" aria-label="Plantillas sugeridas"></div>
                 <div class="form-grid">
                   <label>
                     <span>ID del equipo</span>
@@ -1959,6 +2170,7 @@
                 <div class="row gap10 panel-actions">
                   <button type="submit" class="btn primary" id="teamSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
                   <button type="button" class="btn" id="teamResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
+                  <button type="button" class="btn" id="teamCloneBtn"><i class="bi bi-copy"></i> Clonar configuración</button>
                   <button type="button" class="btn danger" id="teamDeleteBtn"><i class="bi bi-x-circle"></i> Desactivar</button>
                 </div>
               </form>
@@ -2008,6 +2220,7 @@
                     <span class="summary-value" id="profileSummaryCampus">Sin definir</span>
                   </div>
                 </div>
+                <div class="profile-sync-alert" id="profileSyncAlert" hidden></div>
               </div>
             </div>
           </div>
@@ -2015,8 +2228,15 @@
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
-                <span class="summary-label">Solicitud de cambio de contraseña</span>
-                <span class="summary-value" id="passwordRequestStatus">Sin solicitudes registradas.</span>
+                <div class="security-status__header">
+                  <span class="summary-label">Solicitud de cambio de contraseña</span>
+                  <span class="summary-value" id="passwordRequestStatus">Sin solicitudes registradas.</span>
+                </div>
+                <div class="security-timeline" id="passwordRequestTimeline" aria-live="polite"></div>
+                <div class="security-status__actions" id="passwordStatusActions">
+                  <button type="button" class="btn micro" id="passwordApproveBtn" hidden><i class="bi bi-check2-circle"></i> Registrar aprobación</button>
+                  <button type="button" class="btn micro" id="passwordCompleteBtn" hidden><i class="bi bi-send-check"></i> Confirmar entrega</button>
+                </div>
               </div>
               <label>
                 <span>Contraseña actual</span>
@@ -2110,6 +2330,10 @@
                 <input type="checkbox" id="prefShowLeadId" />
                 <span>Mostrar ID en tarjetas del tablero</span>
               </label>
+              <div class="pref-presets" id="prefPresetRecommendations" hidden>
+                <p class="pref-presets__title">Recomendaciones institucionales</p>
+                <div class="pref-presets__list" id="prefPresetList"></div>
+              </div>
               <div class="row gap10 pref-actions">
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
@@ -2301,16 +2525,28 @@
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
-    'Nuevo':['Nuevo'],
-    'Contactado':['Interesado','No interesado','En labor de venta'],
-    'No Contactado':['No contesta WhatsApp','Mensaje no contestado','Buzón de voz','Cuelga'],
-    'Descartado':['SPAM','No desea información','Inscrito en otra escuela','Límite intentos de contacto'],
-    'Inscrito':['Inscrito']
+    'Nuevo':['Sin contactar'],
+    'Contactado':['Interesado','Seguimiento activo','En labor de venta','Cita agendada'],
+    'No Contactado':['No contesta','Mensaje no respondido','Pendiente de reintento'],
+    'Descartado':['Sin interés','Datos incorrectos','Duplicado','SPAM'],
+    'Inscrito':['Inscrito confirmado']
   };
 
   const columns = ['id','nombre','matricula','correo','telefono','campus','modalidad','programa','etapa','estado','asesor','comentario','asignacion'];
 
-  const KPI_INTEREST_STATES = new Set(['interesado','en labor de venta']);
+  const CONTACT_SCRIPT_TYPES = ['call','whatsapp','email'];
+  const CONTACT_CHANNEL_LABELS = { call: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo' };
+  const DAILY_SHORTCUT_LIMIT = 3;
+  const LEAD_PRIORITY_THRESHOLDS = { high: 6, medium: 3 };
+  const CONTACT_TIMESTAMP_FORMAT = (() => {
+    try{
+      return new Intl.DateTimeFormat('es-MX', { dateStyle: 'short', timeStyle: 'short' });
+    }catch(err){
+      return null;
+    }
+  })();
+
+  const KPI_INTEREST_STATES = new Set(['interesado','seguimiento activo','cita agendada','en labor de venta']);
   const KPI_NUMBER_FORMAT = new Intl.NumberFormat('es-MX');
   const KPI_PERCENT_FORMAT = new Intl.NumberFormat('es-MX', { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 1 });
   const KPI_GROUPS = {
@@ -2596,15 +2832,27 @@
     preferences: 'pulsePreferences',
     password: 'pulsePasswordRequest'
   };
-  const DEFAULT_LOGIN_HINT = '¿Es tu primer ingreso o olvidaste tu contraseña?';
-  const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración > Seguridad después de entrar.';
+  const DEFAULT_PASSWORD_REQUEST = {
+    status: 'idle',
+    requestedAt: 0,
+    requestedBy: '',
+    approvedAt: 0,
+    approvedBy: '',
+    completedAt: 0,
+    completedBy: ''
+  };
+  const DEFAULT_LOGIN_HINT = '¿Olvidaste tu contraseña?';
+  const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Cámbiala desde Configuración después de entrar.';
   const DEFAULT_PROFILE = {
     userId: '',
     name: '',
     email: '',
     role: '',
     campus: '',
-    avatar: ''
+    avatar: '',
+    syncedAt: 0,
+    sourceUpdatedAt: 0,
+    sourceLabel: 'Directorio maestro'
   };
   const DEFAULT_PREFERENCES = {
     theme: 'system',
@@ -2616,7 +2864,8 @@
     largeText: false,
     boardDensity: 'standard',
     highContrast: false,
-    showLeadId: false
+    showLeadId: false,
+    appliedPreset: ''
   };
   const ACCENT_PALETTES = {
     blue: { primary: '#003a5f', secondary: '#8a9ca3', panel: '37,99,235' },
@@ -2740,15 +2989,88 @@
       summaryPlural: 'integrantes'
     }
   };
+  const ROLE_TEMPLATES = buildRoleTemplates();
+  const TEAM_TEMPLATES = [
+    {
+      id: 'comercial-noroeste',
+      name: 'Comercial Noroeste',
+      description: 'Planteles frontera y bases de seguimiento activo.',
+      planteles: ['HERMOSILLO', 'NOGALES', 'OBREGÓN'],
+      bases: ['Planteles', 'Rescatados', 'Regresos'],
+      members: ['coord.noroeste', 'asesor.nogales']
+    },
+    {
+      id: 'fuerza-online',
+      name: 'Fuerza Online',
+      description: 'Operación digital con foco en reciclados y rescates.',
+      planteles: ['ONLINE'],
+      bases: ['Reciclados', 'Rescatados'],
+      members: ['coord.online']
+    }
+  ];
+  const INSTITUTIONAL_PRESETS = [
+    {
+      id: 'institucional-diurno',
+      name: 'Institucional Diurno',
+      description: 'Tema claro, densidad cómoda, modo eco activo y contraste alto para pisos comerciales.',
+      values: { theme: 'light', density: 'comfortable', eco: true, highContrast: true }
+    },
+    {
+      id: 'institucional-nocturno',
+      name: 'Institucional Nocturno',
+      description: 'Tema oscuro, densidad compacta y contraste normal para guardias vespertinas.',
+      values: { theme: 'dark', density: 'compact', eco: false, highContrast: false }
+    }
+  ];
   let permissionMultiSelectsInitialized = false;
   const permissionMultiSelects = {};
+  const permissionScopeDirty = {};
+
+  function buildRoleTemplates(){
+    const plantelOptions = Array.isArray(PERMISSION_REFERENCE?.planteles?.values) ? PERMISSION_REFERENCE.planteles.values.slice() : [];
+    const baseOptions = Array.isArray(PERMISSION_REFERENCE?.bases?.values) ? PERMISSION_REFERENCE.bases.values.slice() : [];
+    const normalize = value => (value || '').toString().trim().toLowerCase();
+    const globalPlantel = PERMISSION_SCOPE_CONFIG?.planteles?.globalValue || 'Todos';
+    const globalBase = PERMISSION_SCOPE_CONFIG?.bases?.globalValue || 'Todas';
+    const localPlanteles = plantelOptions.filter(value => normalize(value) && normalize(value) !== normalize(globalPlantel));
+    const localBases = baseOptions.filter(value => normalize(value) && normalize(value) !== normalize(globalBase));
+    const ensureValues = (values, fallback = []) => {
+      const list = Array.from(new Set((values || []).filter(Boolean)));
+      if(list.length) return list;
+      return Array.from(new Set((fallback || []).filter(Boolean)));
+    };
+    const defaultPlanteles = ensureValues(localPlanteles.slice(0, 3), plantelOptions.slice(0, 3));
+    const defaultBases = ensureValues(localBases.slice(0, 3), baseOptions.slice(0, 3));
+    return {
+      admin: {
+        description: 'Aplica acceso total para supervisar equipos, reportes y catálogos sin restricciones.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      },
+      coordinador: {
+        description: 'Agrupa planteles y bases de su región para liderar la operación y monitorear a su equipo.',
+        planteles: ensureValues(['HERMOSILLO', 'NOGALES', 'OBREGÓN'].filter(value => plantelOptions.includes(value)), defaultPlanteles),
+        bases: ensureValues(['Planteles', 'Regresos', 'Rescatados'].filter(value => baseOptions.includes(value)), defaultBases)
+      },
+      asesor: {
+        description: 'Limita el alcance al plantel principal y a bases activas de seguimiento diario.',
+        planteles: ensureValues(localPlanteles.slice(0, 1), defaultPlanteles.slice(0, 1)),
+        bases: ensureValues(['Planteles', 'Reciclados'].filter(value => baseOptions.includes(value)), defaultBases.slice(0, 1))
+      },
+      viewer: {
+        description: 'Monitorea resultados institucionales sin exponer datos personales ni modificar información.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      }
+    };
+  }
   const AUTH_STORAGE_KEY = 'pulseAuthState';
   let authToken = '';
   let currentUser = null;
   let hasBound = false;
   let userProfile = loadStoredProfile();
   let userPreferences = loadStoredPreferences();
-  let lastPasswordRequest = loadStoredPasswordRequest();
+  let passwordRequestState = loadStoredPasswordRequest();
   let pendingResetCredentials = null;
   let lastLoginEmail = '';
   let settingsReady = false;
@@ -3272,7 +3594,7 @@
     control.selected = finalValues;
   }
 
-  function setPermissionScopeSelection(field, values){
+  function setPermissionScopeSelection(field, values, options = {}){
     if(!permissionMultiSelectsInitialized){
       initPermissionScopeSelectors();
     }
@@ -3285,6 +3607,9 @@
         if(hidden){
           hidden.value = normalized.join(', ');
         }
+      }
+      if(!options.preserveDirty){
+        markScopeDirty(field, Boolean(options.markDirty));
       }
       return;
     }
@@ -3317,6 +3642,9 @@
       }
     });
     updatePermissionMultiSelect(field, finalValues);
+    if(!options.preserveDirty){
+      markScopeDirty(field, Boolean(options.markDirty));
+    }
   }
 
   function togglePermissionMultiSelect(field){
@@ -3370,6 +3698,22 @@
     updatePermissionMultiSelect(field, control.selected || []);
   }
 
+  function markScopeDirty(field, dirty){
+    permissionScopeDirty[field] = Boolean(dirty);
+    const control = permissionMultiSelects[field];
+    if(control && control.container){
+      if(dirty){
+        control.container.dataset.dirty = 'true';
+      }else{
+        delete control.container.dataset.dirty;
+      }
+    }
+  }
+
+  function isScopeDirty(field){
+    return Boolean(permissionScopeDirty[field]);
+  }
+
   function initPermissionScopeSelectors(){
     if(permissionMultiSelectsInitialized) return;
     permissionMultiSelectsInitialized = true;
@@ -3394,6 +3738,7 @@
         menu.appendChild(optionLabel);
       });
       permissionMultiSelects[field] = { container, button, menu, chips, hidden, config, selected: [], options: resolvedOptions };
+      markScopeDirty(field, Boolean(permissionScopeDirty[field]));
       button.addEventListener('click', () => togglePermissionMultiSelect(field));
       menu.addEventListener('change', event => {
         const target = event.target;
@@ -3413,6 +3758,7 @@
         }
         const selected = Array.from(menu.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value).filter(Boolean);
         updatePermissionMultiSelect(field, selected);
+        markScopeDirty(field, true);
       });
     });
     document.addEventListener('click', event => {
@@ -3534,10 +3880,91 @@
   }
 
   function updatePermissionRoleHint(role){
-    const hint = el('#permRoleHint');
-    if(!hint) return;
     const key = String(role || '').trim().toLowerCase();
-    hint.textContent = ROLE_SCOPE_HINTS[key] || 'Selecciona el alcance que tendrá esta cuenta.';
+    const hint = el('#permRoleHint');
+    if(hint){
+      hint.textContent = ROLE_SCOPE_HINTS[key] || 'Selecciona el alcance que tendrá esta cuenta.';
+    }
+    const suggestion = el('#permRoleSuggestion');
+    const descriptionEl = el('#permRoleDescription');
+    const chipsEl = el('#permRoleScopeChips');
+    const applyBtn = el('#permApplyRolePreset');
+    if(!suggestion || !descriptionEl || !chipsEl || !applyBtn){
+      return;
+    }
+    const template = ROLE_TEMPLATES[key];
+    if(template){
+      suggestion.hidden = false;
+      descriptionEl.textContent = template.description || (hint ? hint.textContent : '');
+      chipsEl.innerHTML = '';
+      const chips = [];
+      chips.push(renderScopeChip(chipsEl, template.planteles, 'Planteles sugeridos', 'bi-diagram-3'));
+      chips.push(renderScopeChip(chipsEl, template.bases, 'Bases sugeridas', 'bi-hdd-stack'));
+      if(!chips.some(Boolean)){
+        const placeholder = document.createElement('span');
+        placeholder.className = 'scope-chip';
+        placeholder.textContent = 'Define manualmente el alcance.';
+        chipsEl.appendChild(placeholder);
+      }
+      applyBtn.disabled = false;
+    }else{
+      suggestion.hidden = true;
+      chipsEl.innerHTML = '';
+      applyBtn.disabled = true;
+    }
+  }
+
+  function summarizeScopeValues(values){
+    const list = Array.isArray(values) ? values.filter(Boolean) : [];
+    if(!list.length) return '';
+    if(list.length <= 3) return list.join(', ');
+    return `${list.slice(0, 2).join(', ')} +${list.length - 2}`;
+  }
+
+  function renderScopeChip(container, values, label, icon){
+    if(!container) return false;
+    const list = Array.isArray(values) ? values.filter(Boolean) : [];
+    if(!list.length) return false;
+    const chip = document.createElement('span');
+    chip.className = 'scope-chip';
+    const summary = summarizeScopeValues(list);
+    chip.innerHTML = `<i class="bi ${icon}"></i> ${label}: ${escapeHtml(summary)}`;
+    chip.title = `${label}: ${list.join(', ')}`;
+    container.appendChild(chip);
+    return true;
+  }
+
+  function applyRoleScopeTemplate(role, options = {}){
+    const key = String(role || '').trim().toLowerCase();
+    const template = ROLE_TEMPLATES[key];
+    if(!template) return false;
+    const { force = false, silent = false } = options;
+    const blockedFields = [];
+    if(!force){
+      if(isScopeDirty('planteles')) blockedFields.push('planteles');
+      if(isScopeDirty('bases')) blockedFields.push('bases');
+    }
+    let applied = false;
+    if(Array.isArray(template.planteles) && template.planteles.length && !blockedFields.includes('planteles')){
+      setPermissionScopeSelection('planteles', template.planteles, { markDirty: false });
+      applied = true;
+    }
+    if(Array.isArray(template.bases) && template.bases.length && !blockedFields.includes('bases')){
+      setPermissionScopeSelection('bases', template.bases, { markDirty: false });
+      applied = true;
+    }
+    if(!applied && blockedFields.length && !silent){
+      const labels = blockedFields.map(field => field === 'planteles' ? 'planteles' : 'bases');
+      const message = labels.length === 2
+        ? 'Mantuvimos tus planteles y bases personalizados. Usa “Aplicar sugerencia” para reemplazarlos.'
+        : `Mantuvimos tus ${labels[0]} personalizados. Usa “Aplicar sugerencia” para reemplazarlos.`;
+      setPermissionStatus(message, 'info');
+    }else if(!applied && !silent){
+      setPermissionStatus('No hay sugerencias definidas para este rol todavía.', 'warning');
+    }else if(applied && !silent){
+      setPermissionStatus('Se aplicó la sugerencia de alcance del rol seleccionado.', 'success');
+    }
+    return applied;
   }
 
   function comparePermissionUsers(a, b){
@@ -3645,9 +4072,11 @@
     if(roleSelect){
       roleSelect.value = 'asesor';
     }
-    updatePermissionRoleHint(roleSelect ? roleSelect.value : 'asesor');
+    const currentRole = roleSelect ? roleSelect.value : 'asesor';
+    updatePermissionRoleHint(currentRole);
     setPermissionScopeSelection('planteles', []);
     setPermissionScopeSelection('bases', []);
+    applyRoleScopeTemplate(currentRole, { force: true, silent: true });
     const passwordInput = el('#permPassword');
     if(passwordInput){
       passwordInput.value = '';
@@ -3716,8 +4145,8 @@
       roleSelect.value = user.role || 'asesor';
     }
     updatePermissionRoleHint(roleSelect ? roleSelect.value : user.role);
-    setPermissionScopeSelection('planteles', user.planteles || []);
-    setPermissionScopeSelection('bases', user.bases || []);
+    setPermissionScopeSelection('planteles', user.planteles || [], { markDirty: true });
+    setPermissionScopeSelection('bases', user.bases || [], { markDirty: true });
     const passwordInput = el('#permPassword');
     if(passwordInput){
       passwordInput.value = '';
@@ -4051,6 +4480,111 @@
       fragment.appendChild(item);
     });
     listEl.appendChild(fragment);
+  }
+
+  function renderTeamTemplateToolbar(){
+    const toolbar = el('#teamTemplateToolbar');
+    if(!toolbar) return;
+    toolbar.innerHTML = '';
+    const canUseTemplates = canPerform('manageTeams');
+    const templates = Array.isArray(TEAM_TEMPLATES) ? TEAM_TEMPLATES.filter(Boolean) : [];
+    if(!canUseTemplates || !templates.length){
+      toolbar.hidden = true;
+      toolbar.setAttribute('hidden', 'hidden');
+      return;
+    }
+    toolbar.hidden = false;
+    toolbar.removeAttribute('hidden');
+    templates.forEach(template => {
+      if(!template || !template.name) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scope-template-btn';
+      btn.dataset.templateId = template.id || '';
+      const title = document.createElement('strong');
+      title.textContent = template.name;
+      btn.appendChild(title);
+      if(template.description){
+        const desc = document.createElement('span');
+        desc.textContent = template.description;
+        btn.appendChild(desc);
+      }
+      const scopeSummary = document.createElement('span');
+      const plantelSummary = summarizeScopeValues(template.planteles || []);
+      const baseSummary = summarizeScopeValues(template.bases || []);
+      scopeSummary.textContent = `Planteles: ${plantelSummary || '—'} · Bases: ${baseSummary || '—'}`;
+      btn.appendChild(scopeSummary);
+      btn.addEventListener('click', () => applyTeamTemplate(template));
+      toolbar.appendChild(btn);
+    });
+  }
+
+  function applyTeamTemplate(template, options = {}){
+    if(!template) return false;
+    const form = el('#teamForm');
+    const isEdit = form && form.dataset.mode === 'edit';
+    if(isEdit && !options.force){
+      const confirmed = confirm('Aplicar la plantilla reemplazará la configuración actual del equipo. ¿Deseas continuar?');
+      if(!confirmed) return false;
+    }
+    const idInput = el('#teamId');
+    if(idInput && !idInput.value && template.id){
+      idInput.value = template.id;
+    }
+    const nameInput = el('#teamName');
+    if(nameInput && template.name && (!nameInput.value || options.overwrite !== false)){
+      nameInput.value = template.name;
+    }
+    const descriptionInput = el('#teamDescription');
+    if(descriptionInput && template.description && (!descriptionInput.value || options.overwrite !== false)){
+      descriptionInput.value = template.description;
+    }
+    setPermissionScopeSelection('teamPlanteles', template.planteles || [], { markDirty: false });
+    setPermissionScopeSelection('teamBases', template.bases || [], { markDirty: false });
+    const members = Array.isArray(template.members) ? template.members.filter(Boolean) : [];
+    const memberOptions = new Set((permissionMultiSelects.teamMembers?.options || []).map(option => option.value));
+    const availableMembers = members.filter(memberId => memberOptions.has(memberId));
+    const missingMembers = members.filter(memberId => !memberOptions.has(memberId));
+    setPermissionScopeSelection('teamMembers', availableMembers, { markDirty: false });
+    if(!options.silent){
+      let message = `Se aplicó la plantilla “${template.name}”.`;
+      if(missingMembers.length){
+        message += ` Integrantes no disponibles: ${missingMembers.join(', ')}.`;
+      }
+      setTeamStatus(message, 'info');
+    }
+    return true;
+  }
+
+  function cloneSelectedTeam(){
+    if(!selectedTeamId){
+      setTeamStatus('Selecciona un equipo para clonar su configuración.', 'warning');
+      return;
+    }
+    const team = teams.find(t => t.teamId === selectedTeamId);
+    if(!team){
+      setTeamStatus('No se encontró el equipo seleccionado para clonar.', 'error');
+      return;
+    }
+    startTeamCreation({ focus: false, renderList: true });
+    const idInput = el('#teamId');
+    if(idInput){
+      idInput.value = '';
+      idInput.focus();
+    }
+    const nameInput = el('#teamName');
+    if(nameInput){
+      const sourceName = team.name || team.teamId || 'Equipo';
+      nameInput.value = `${sourceName} (copia)`;
+    }
+    const descriptionInput = el('#teamDescription');
+    if(descriptionInput){
+      descriptionInput.value = team.description || '';
+    }
+    setPermissionScopeSelection('teamPlanteles', team.planteles || [], { markDirty: false });
+    setPermissionScopeSelection('teamBases', team.bases || [], { markDirty: false });
+    setPermissionScopeSelection('teamMembers', team.members || [], { markDirty: false });
+    setTeamStatus(`Se clonó la configuración de ${team.name || team.teamId}. Define un nuevo ID para guardarla.`, 'info');
   }
 
   function startTeamCreation(options = {}){
@@ -4916,6 +5450,19 @@
         updates.campus = planteles[0];
       }
     }
+    const sourceTimestamp = Number(currentUser.directoryUpdatedAt || currentUser.sourceUpdatedAt || currentUser.updatedAt || 0);
+    if(sourceTimestamp && (!userProfile.sourceUpdatedAt || userProfile.sourceUpdatedAt !== sourceTimestamp)){
+      updates.sourceUpdatedAt = sourceTimestamp;
+    }
+    if(currentUser.sourceLabel || currentUser.directorySource){
+      const label = currentUser.sourceLabel || currentUser.directorySource;
+      if(label && label !== userProfile.sourceLabel){
+        updates.sourceLabel = label;
+      }
+    }
+    if(Number.isFinite(currentUser.profileSyncedAt) && currentUser.profileSyncedAt > 0){
+      updates.syncedAt = Number(currentUser.profileSyncedAt);
+    }
     if(Object.keys(updates).length){
       updateProfileData(updates);
     }else if(settingsReady){
@@ -5074,7 +5621,9 @@
     ['#btnExportData','#btnExportReport','#btnExportResolution'].forEach(sel => setDisabled(sel, exportAllowed, 'No tienes permisos para exportar información.'));
     setDisabled('#diagBtn', canPerform('runDiagnostics'), 'No tienes permisos para ejecutar el diagnóstico.');
     const manageTeamsAllowed = canPerform('manageTeams');
-    ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn','#teamCloneBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    renderTeamTemplateToolbar();
+    renderPreferencePresets();
   }
 
   async function apiFetch(url, options = {}){
@@ -5692,13 +6241,29 @@
   }
   function loadStoredPasswordRequest(){
     const stored = readStorageJSON(STORAGE_KEYS.password);
-    if(stored && typeof stored === 'object' && typeof stored.timestamp === 'number'){
-      return stored.timestamp;
+    if(stored && typeof stored === 'object'){
+      const normalized = { ...DEFAULT_PASSWORD_REQUEST };
+      if(typeof stored.status === 'string') normalized.status = stored.status;
+      if(typeof stored.requestedAt === 'number') normalized.requestedAt = stored.requestedAt;
+      if(typeof stored.requestedBy === 'string') normalized.requestedBy = stored.requestedBy;
+      if(typeof stored.approvedAt === 'number') normalized.approvedAt = stored.approvedAt;
+      if(typeof stored.approvedBy === 'string') normalized.approvedBy = stored.approvedBy;
+      if(typeof stored.completedAt === 'number') normalized.completedAt = stored.completedAt;
+      if(typeof stored.completedBy === 'string') normalized.completedBy = stored.completedBy;
+      if(!normalized.requestedAt && typeof stored.timestamp === 'number'){
+        normalized.requestedAt = stored.timestamp;
+      }
+      if(!normalized.status){
+        if(normalized.completedAt) normalized.status = 'completed';
+        else if(normalized.approvedAt) normalized.status = 'approved';
+        else if(normalized.requestedAt) normalized.status = 'requested';
+      }
+      return normalized;
     }
-    if(typeof stored === 'number'){
-      return stored;
+    if(typeof stored === 'number' && stored > 0){
+      return { ...DEFAULT_PASSWORD_REQUEST, status: 'requested', requestedAt: stored };
     }
-    return 0;
+    return { ...DEFAULT_PASSWORD_REQUEST };
   }
   function handleSystemThemeChange(event){
     if((userPreferences.theme || 'system') === 'system'){
@@ -5762,6 +6327,50 @@
   function applyLeadIdPreference(){
     document.documentElement.setAttribute('data-show-lead-id', userPreferences.showLeadId ? 'true' : 'false');
   }
+  function renderPreferencePresets(){
+    const container = el('#prefPresetRecommendations');
+    const list = el('#prefPresetList');
+    if(!container || !list) return;
+    const presets = Array.isArray(INSTITUTIONAL_PRESETS) ? INSTITUTIONAL_PRESETS.filter(Boolean) : [];
+    if(getUserRole() !== 'admin' || !presets.length){
+      container.hidden = true;
+      list.innerHTML = '';
+      return;
+    }
+    list.innerHTML = '';
+    presets.forEach(preset => {
+      const card = document.createElement('div');
+      card.className = 'pref-preset-card';
+      const title = document.createElement('strong');
+      title.textContent = preset.name || 'Preset';
+      card.appendChild(title);
+      if(preset.description){
+        const desc = document.createElement('p');
+        desc.textContent = preset.description;
+        card.appendChild(desc);
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn micro';
+      if(userPreferences.appliedPreset === preset.id){
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Aplicado';
+        button.disabled = true;
+      }else{
+        button.innerHTML = '<i class="bi bi-lightning-charge"></i> Aplicar';
+        button.addEventListener('click', () => applyInstitutionalPreset(preset));
+      }
+      card.appendChild(button);
+      list.appendChild(card);
+    });
+    container.hidden = false;
+    container.removeAttribute('hidden');
+  }
+  function applyInstitutionalPreset(preset){
+    if(!preset || !preset.values) return;
+    const updates = { ...preset.values, appliedPreset: preset.id || '' };
+    updatePreferences(updates);
+    showSettingsMessage(`Se aplicó el preset ${preset.name || 'institucional'}.`, 'success');
+  }
   function updatePreferences(partial){
     userPreferences = { ...userPreferences, ...partial };
     writeStorageJSON(STORAGE_KEYS.preferences, userPreferences);
@@ -5769,6 +6378,7 @@
     applyPreferences();
     if(settingsReady){
       syncPreferencesForm();
+      renderPreferencePresets();
     }
     if(typeof refresh === 'function'){
       try{
@@ -5859,7 +6469,74 @@
     if(summaryRole) summaryRole.textContent = userProfile.role || 'Sin definir';
     const summaryCampus = el('#profileSummaryCampus');
     if(summaryCampus) summaryCampus.textContent = userProfile.campus || 'Sin definir';
+    updateProfileSyncAlert();
   }
+
+  function updateProfileSyncAlert(){
+    const alert = el('#profileSyncAlert');
+    if(!alert) return;
+    if(getUserRole() !== 'admin'){
+      alert.hidden = true;
+      return;
+    }
+    const sourceLabel = userProfile.sourceLabel || 'Directorio maestro';
+    const syncedAt = Number(userProfile.syncedAt) || 0;
+    const sourceAt = Number(userProfile.sourceUpdatedAt) || 0;
+    alert.innerHTML = '';
+    let state = '';
+    const title = document.createElement('strong');
+    const description = document.createElement('span');
+    if(!sourceAt && !syncedAt){
+      state = 'unknown';
+      title.textContent = 'Sin referencia de sincronización';
+      description.textContent = `Vincula este perfil con ${sourceLabel} para garantizar datos vigentes.`;
+    }else if(sourceAt && (!syncedAt || sourceAt > syncedAt)){
+      state = 'stale';
+      title.textContent = 'Datos desactualizados';
+      description.textContent = `Última actualización en ${sourceLabel}: ${formatDateTime(sourceAt)}.`;
+    }else{
+      title.textContent = 'Información sincronizada';
+      description.textContent = `Última verificación local: ${formatDateTime(syncedAt)}.`;
+    }
+    alert.appendChild(title);
+    alert.appendChild(description);
+    if(state === 'stale'){
+      const hint = document.createElement('span');
+      hint.textContent = 'Sincroniza la ficha y alinea los datos críticos con la fuente maestra.';
+      alert.appendChild(hint);
+    }else if(state === 'unknown'){
+      const hint = document.createElement('span');
+      hint.textContent = 'Registra una sincronización cuando valides la información desde la fuente maestra.';
+      alert.appendChild(hint);
+    }
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn micro';
+    if(state === ''){
+      button.innerHTML = '<i class="bi bi-clock-history"></i> Registrar nueva sincronización';
+    }else{
+      button.innerHTML = '<i class="bi bi-arrow-repeat"></i> Sincronizar ahora';
+    }
+    button.addEventListener('click', handleProfileSyncNow);
+    alert.appendChild(button);
+    if(state){
+      alert.dataset.state = state;
+    }else{
+      delete alert.dataset.state;
+    }
+    alert.hidden = false;
+  }
+
+  function handleProfileSyncNow(){
+    const now = Date.now();
+    const updates = { syncedAt: now };
+    if(!userProfile.sourceUpdatedAt){
+      updates.sourceUpdatedAt = now;
+    }
+    updateProfileData(updates);
+    showSettingsMessage('Se marcó la información del perfil como sincronizada.', 'success');
+  }
+
   function syncPreferencesForm(){
     const themePref = userPreferences.theme || 'system';
     els('input[name="pref-theme"]').forEach(radio => {
@@ -5893,11 +6570,28 @@
     }
   }
   function updatePasswordInfo(){
-    if(lastPasswordRequest){
-      setPasswordStatus(`Registrada el ${formatDateTime(lastPasswordRequest)}`, 'success');
-    }else{
-      setPasswordStatus('Sin solicitudes registradas.', 'info');
+    const state = passwordRequestState || { ...DEFAULT_PASSWORD_REQUEST };
+    let message = 'Sin solicitudes registradas.';
+    let tone = 'info';
+    if(state.status === 'requested' && state.requestedAt){
+      const parts = [`Pendiente de aprobación desde ${formatDateTime(state.requestedAt)}`];
+      if(state.requestedBy) parts.push(`Responsable: ${state.requestedBy}`);
+      message = parts.join(' · ');
+      tone = 'warning';
+    }else if(state.status === 'approved' && state.approvedAt){
+      const parts = [`Aprobada el ${formatDateTime(state.approvedAt)}`];
+      if(state.approvedBy) parts.push(`Responsable: ${state.approvedBy}`);
+      message = parts.join(' · ');
+      tone = 'info';
+    }else if(state.status === 'completed' && state.completedAt){
+      const parts = [`Completada el ${formatDateTime(state.completedAt)}`];
+      if(state.completedBy) parts.push(`Responsable: ${state.completedBy}`);
+      message = parts.join(' · ');
+      tone = 'success';
     }
+    setPasswordStatus(message, tone);
+    renderPasswordTimeline(state);
+    updatePasswordActionVisibility(state);
   }
   function clearPasswordForm(){
     const current = el('#passwordCurrent');
@@ -5920,6 +6614,93 @@
         statusWrap.removeAttribute('data-tone');
       }
     }
+  }
+  function renderPasswordTimeline(state){
+    const timeline = el('#passwordRequestTimeline');
+    if(!timeline) return;
+    timeline.innerHTML = '';
+    const currentState = state || { ...DEFAULT_PASSWORD_REQUEST };
+    if(!currentState.requestedAt && !currentState.approvedAt && !currentState.completedAt){
+      const empty = document.createElement('span');
+      empty.className = 'security-timeline__meta';
+      empty.textContent = 'Registra una solicitud para iniciar el flujo de aprobación.';
+      timeline.appendChild(empty);
+      return;
+    }
+    const steps = [
+      { key: 'requestedAt', label: 'Solicitud registrada', timestamp: currentState.requestedAt, by: currentState.requestedBy },
+      { key: 'approvedAt', label: 'Aprobación', timestamp: currentState.approvedAt, by: currentState.approvedBy },
+      { key: 'completedAt', label: 'Entrega confirmada', timestamp: currentState.completedAt, by: currentState.completedBy }
+    ];
+    steps.forEach((step, index) => {
+      const item = document.createElement('div');
+      item.className = 'security-timeline__item';
+      let stateTag = 'future';
+      if(step.timestamp){
+        stateTag = 'done';
+      }else if(index === 0){
+        stateTag = 'active';
+      }else if(index === 1 && currentState.requestedAt){
+        stateTag = 'active';
+      }else if(index === 2 && currentState.approvedAt){
+        stateTag = 'active';
+      }
+      item.dataset.state = stateTag;
+      const badge = document.createElement('span');
+      badge.className = 'security-timeline__badge';
+      item.appendChild(badge);
+      const content = document.createElement('div');
+      content.className = 'security-timeline__content';
+      const label = document.createElement('span');
+      label.className = 'security-timeline__label';
+      label.textContent = step.label;
+      content.appendChild(label);
+      const meta = document.createElement('span');
+      meta.className = 'security-timeline__meta';
+      if(step.timestamp){
+        const metaParts = [formatDateTime(step.timestamp)];
+        if(step.by) metaParts.push(`Responsable: ${step.by}`);
+        meta.textContent = metaParts.join(' · ');
+      }else if(stateTag === 'active'){
+        meta.textContent = 'Pendiente de registrar.';
+      }else{
+        meta.textContent = 'En espera del paso previo.';
+      }
+      content.appendChild(meta);
+      item.appendChild(content);
+      timeline.appendChild(item);
+    });
+  }
+
+  function updatePasswordActionVisibility(state){
+    const approveBtn = el('#passwordApproveBtn');
+    const completeBtn = el('#passwordCompleteBtn');
+    const actions = el('#passwordStatusActions');
+    const canApprove = Boolean(state?.requestedAt) && !state?.approvedAt;
+    const canComplete = Boolean(state?.approvedAt) && !state?.completedAt;
+    if(approveBtn) approveBtn.hidden = !canApprove;
+    if(completeBtn) completeBtn.hidden = !canComplete;
+    if(actions){
+      actions.hidden = !canApprove && !canComplete;
+    }
+  }
+
+  function persistPasswordRequestState(){
+    writeStorageJSON(STORAGE_KEYS.password, passwordRequestState);
+  }
+
+  function getCurrentOperatorLabel(){
+    if(currentUser){
+      if(currentUser.name) return currentUser.name;
+      if(currentUser.userId) return currentUser.userId;
+      if(currentUser.email) return currentUser.email;
+    }
+    if(userProfile){
+      if(userProfile.name) return userProfile.name;
+      if(userProfile.userId) return userProfile.userId;
+      if(userProfile.email) return userProfile.email;
+    }
+    return 'Administrador';
   }
   function showSettingsMessage(message, type = 'info'){
     const status = el('#settingsStatus');
@@ -5959,12 +6740,14 @@
     if(settingsReady){
       syncProfileUI();
       syncPreferencesForm();
+      renderPreferencePresets();
       updatePasswordInfo();
       return;
     }
     settingsReady = true;
     syncProfileUI();
     syncPreferencesForm();
+    renderPreferencePresets();
     updatePasswordInfo();
     const profileForm = el('#profileForm');
     if(profileForm){
@@ -6087,8 +6870,14 @@
           showSettingsMessage('La nueva contraseña debe ser distinta a la actual.', 'warning');
           return;
         }
-        lastPasswordRequest = Date.now();
-        writeStorageJSON(STORAGE_KEYS.password, { timestamp: lastPasswordRequest });
+        const requestedAt = Date.now();
+        passwordRequestState = {
+          ...DEFAULT_PASSWORD_REQUEST,
+          status: 'requested',
+          requestedAt,
+          requestedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
         clearPasswordForm();
         updatePasswordInfo();
         showSettingsMessage('Se registró tu solicitud de cambio de contraseña.', 'success');
@@ -6099,6 +6888,57 @@
       passwordClear.addEventListener('click', () => {
         clearPasswordForm();
         showSettingsMessage('Se limpiaron los campos de seguridad.', 'info');
+      });
+    }
+    const passwordApproveBtn = el('#passwordApproveBtn');
+    if(passwordApproveBtn){
+      passwordApproveBtn.addEventListener('click', () => {
+        if(!passwordRequestState?.requestedAt){
+          setPasswordStatus('Registra una solicitud antes de aprobarla.', 'warning');
+          showSettingsMessage('Registra una solicitud antes de aprobarla.', 'warning');
+          return;
+        }
+        if(passwordRequestState.approvedAt){
+          setPasswordStatus('La solicitud ya fue aprobada.', 'info');
+          return;
+        }
+        passwordRequestState = {
+          ...passwordRequestState,
+          status: 'approved',
+          approvedAt: Date.now(),
+          approvedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
+        updatePasswordInfo();
+        showSettingsMessage('Se registró la aprobación de la solicitud.', 'success');
+      });
+    }
+    const passwordCompleteBtn = el('#passwordCompleteBtn');
+    if(passwordCompleteBtn){
+      passwordCompleteBtn.addEventListener('click', () => {
+        if(!passwordRequestState?.requestedAt){
+          setPasswordStatus('Registra una solicitud antes de confirmarla.', 'warning');
+          showSettingsMessage('Registra una solicitud antes de confirmarla.', 'warning');
+          return;
+        }
+        if(!passwordRequestState.approvedAt){
+          setPasswordStatus('Aprueba la solicitud antes de confirmar la entrega.', 'warning');
+          showSettingsMessage('Aprueba la solicitud antes de confirmar la entrega.', 'warning');
+          return;
+        }
+        if(passwordRequestState.completedAt){
+          setPasswordStatus('La entrega ya fue confirmada.', 'info');
+          return;
+        }
+        passwordRequestState = {
+          ...passwordRequestState,
+          status: 'completed',
+          completedAt: Date.now(),
+          completedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
+        updatePasswordInfo();
+        showSettingsMessage('Se confirmó la entrega de credenciales.', 'success');
       });
     }
     const status = el('#settingsStatus');
@@ -6405,6 +7245,181 @@
     return raw;
   }
 
+  function formatContactTimestamp(date = new Date()){
+    const target = date instanceof Date ? date : new Date(date);
+    if(CONTACT_TIMESTAMP_FORMAT){
+      try{
+        return CONTACT_TIMESTAMP_FORMAT.format(target);
+      }catch(err){
+        /* fallback */
+      }
+    }
+    return target.toLocaleString('es-MX');
+  }
+
+  function computeLeadPriorityScore(row){
+    if(!row) return 0;
+    let score = 0;
+    const stage = etapaGroup(row.etapa);
+    if(stage === 'Nuevo') score += 3;
+    else if(stage === 'No Contactado') score += 2;
+    else if(stage === 'Contactado') score += 1;
+    const estadoNorm = String(row.estado || '').trim().toLowerCase();
+    if(KPI_INTEREST_STATES.has(estadoNorm)) score += 4;
+    if(row.campus) score += 0.5;
+    if(row.modalidad) score += 0.5;
+    return score;
+  }
+
+  function resolveLeadPriorityLevel(score){
+    if(score >= LEAD_PRIORITY_THRESHOLDS.high) return 'alta';
+    if(score >= LEAD_PRIORITY_THRESHOLDS.medium) return 'media';
+    if(score > 0) return 'baja';
+    return '';
+  }
+
+  function formatLeadPriorityLabel(level){
+    if(level === 'alta') return 'Alta prioridad';
+    if(level === 'media') return 'Seguimiento';
+    if(level === 'baja') return 'Primer contacto';
+    return '';
+  }
+
+  function buildContactScripts(lead){
+    const firstName = String(lead?.nombre || '').trim().split(/\s+/)[0] || '';
+    const asesorName = currentUser && currentUser.name ? String(currentUser.name).trim() : 'tu asesor de UNIDEP';
+    const campusText = lead?.campus ? ` de UNIDEP ${lead.campus}` : ' de UNIDEP';
+    const programaText = lead?.programa ? ` ${lead.programa}` : ' tu interés';
+    const modalidadText = lead?.modalidad ? ` (${lead.modalidad})` : '';
+    const saludo = firstName ? `Hola ${firstName},` : 'Hola,';
+    const greeting = firstName ? `Hola ${firstName}!` : 'Hola!';
+    const callScript = `${saludo} te habla ${asesorName}${campusText}. Me gustaría acompañarte${programaText}${modalidadText} y revisar contigo los siguientes pasos. ¿Tienes unos minutos hoy para que lo revisemos?`;
+    const whatsappScript = `${greeting} Soy ${asesorName}${campusText}. Te escribo${programaText}${modalidadText} para ayudarte con los siguientes pasos. ¿Agendamos una llamada breve hoy para revisar becas y asegurar tu lugar?`;
+    const subject = `Asunto: Seguimiento UNIDEP ${lead?.programa || 'tu inscripción'}`;
+    const emailGreeting = firstName ? `Hola ${firstName},` : 'Hola,';
+    const emailBody = `${subject}\n\n${emailGreeting}\n\nSoy ${asesorName}${campusText}. Gracias por tu interés${programaText}${modalidadText}. Te comparto los pasos para asegurar tu inscripción y las becas disponibles. ¿Qué día te gustaría que confirmemos juntos tu registro?\n\nQuedo al pendiente,\n${asesorName}\nUNIDEP`;
+    return { call: callScript, whatsapp: whatsappScript, email: emailBody };
+  }
+
+  function createContactNote(type, lead){
+    const timestamp = formatContactTimestamp();
+    const channel = CONTACT_CHANNEL_LABELS[type] || 'Contacto';
+    const programa = lead?.programa ? ` ${lead.programa}` : '';
+    const modalidad = lead?.modalidad ? ` (${lead.modalidad})` : '';
+    const campus = lead?.campus ? ` - ${lead.campus}` : '';
+    if(type === 'call'){
+      return `${timestamp} · ${channel}: llamada de seguimiento${programa}${modalidad}${campus}.`;
+    }
+    if(type === 'whatsapp'){
+      return `${timestamp} · ${channel}: mensaje inicial enviado, pendiente de respuesta.`;
+    }
+    if(type === 'email'){
+      return `${timestamp} · ${channel}: correo con información y próximos pasos enviado.`;
+    }
+    return `${timestamp} · ${channel}: contacto registrado.`;
+  }
+
+  async function copyToClipboard(text){
+    if(!text) return false;
+    try{
+      if(typeof navigator !== 'undefined' && navigator.clipboard && navigator.clipboard.writeText){
+        await navigator.clipboard.writeText(text);
+        return true;
+      }
+    }catch(err){
+      /* fallback below */
+    }
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.setAttribute('readonly','');
+    textarea.style.position = 'absolute';
+    textarea.style.left = '-9999px';
+    document.body.appendChild(textarea);
+    textarea.select();
+    let success = false;
+    try{
+      success = document.execCommand('copy');
+    }catch(err){
+      success = false;
+    }
+    document.body.removeChild(textarea);
+    return success;
+  }
+
+  function aggregateDailyShortcuts(rows, type){
+    if(!Array.isArray(rows) || !rows.length) return [];
+    const map = new Map();
+    if(type === 'campus'){
+      rows.forEach(row => {
+        const campus = String(row.campus || '').trim();
+        if(!campus) return;
+        const score = computeLeadPriorityScore(row);
+        if(score <= 0) return;
+        const entry = map.get(campus) || { key: campus, label: campus, value: campus, count: 0, score: 0 };
+        entry.count += 1;
+        entry.score += score;
+        map.set(campus, entry);
+      });
+    }else if(type === 'asesor'){
+      rows.forEach(row => {
+        const raw = String(row.asesor || '').trim();
+        const normalized = normalizeAsesorName(raw);
+        if(!normalized) return;
+        const score = computeLeadPriorityScore(row);
+        if(score <= 0) return;
+        const label = displayAsesorName(raw);
+        const entry = map.get(normalized) || { key: normalized, label, value: raw, count: 0, score: 0 };
+        entry.count += 1;
+        entry.score += score;
+        if(!entry.value && raw) entry.value = raw;
+        if(!entry.label && label) entry.label = label;
+        map.set(normalized, entry);
+      });
+    }
+    return Array.from(map.values())
+      .sort((a,b) => {
+        if(b.score !== a.score) return b.score - a.score;
+        if(b.count !== a.count) return b.count - a.count;
+        return (a.label || '').localeCompare(b.label || '', 'es', { sensitivity: 'base' });
+      })
+      .slice(0, DAILY_SHORTCUT_LIMIT);
+  }
+
+  function renderShortcutButton(type, entry){
+    const classes = ['daily-shortcuts__btn'];
+    let isActive = false;
+    if(type === 'campus'){
+      isActive = Boolean(state.campus) && state.campus === entry.value;
+    }else if(type === 'asesor'){
+      const selected = getAsesorFilter();
+      isActive = selected.length === 1 && normalizeAsesorName(selected[0]) === entry.key;
+    }
+    if(isActive) classes.push('is-active');
+    const countLabel = `${entry.count} ${entry.count === 1 ? 'lead' : 'leads'}`;
+    const title = `Prioridad combinada: ${Math.round(entry.score || 0)} pts`;
+    return `<button type="button" class="${classes.join(' ')}" data-type="${type}" data-value="${escapeHtml(entry.value || '')}" aria-pressed="${isActive ? 'true' : 'false'}" title="${escapeHtml(title)}"><span>${escapeHtml(entry.label || '')}</span><span>${escapeHtml(countLabel)}</span></button>`;
+  }
+
+  function renderDailyShortcuts(rows){
+    const container = el('#dailyShortcuts');
+    if(!container) return;
+    const list = Array.isArray(rows) ? rows : [];
+    const viable = list.filter(row => computeLeadPriorityScore(row) > 0);
+    const campusEntries = aggregateDailyShortcuts(viable, 'campus');
+    const asesorEntries = aggregateDailyShortcuts(viable, 'asesor');
+    const parts = ['<div class="daily-shortcuts__header">Listas diarias sugeridas</div>'];
+    if(campusEntries.length){
+      parts.push(`<div class="daily-shortcuts__group" data-group="campus"><span class="daily-shortcuts__label">Por campus</span>${campusEntries.map(entry => renderShortcutButton('campus', entry)).join('')}</div>`);
+    }
+    if(asesorEntries.length){
+      parts.push(`<div class="daily-shortcuts__group" data-group="asesor"><span class="daily-shortcuts__label">Por asesor</span>${asesorEntries.map(entry => renderShortcutButton('asesor', entry)).join('')}</div>`);
+    }
+    if(!campusEntries.length && !asesorEntries.length){
+      parts.push('<div class="daily-shortcuts__empty">Sin recomendaciones con los filtros actuales.</div>');
+    }
+    container.innerHTML = parts.join('');
+  }
+
   // —— Filtro base ——
   function applyFilters(){
     const q = state.query.toLowerCase();
@@ -6585,50 +7600,37 @@
     d.setAttribute('role','button');
     d.dataset.id = r.id;
     d.dataset.step = etapaGroup(r.etapa);
-    const campusModalidad = [r.campus, r.modalidad].filter(Boolean).join(' · ') || '—';
-    const programaDisplay = r.programa || '—';
-    const estadoAsesorDisplay = [r.estado, displayAsesorName(r.asesor)].filter(Boolean).join(' · ') || '—';
-    const phoneDisplay = fmtPhone(r.telefono || r.telefonoNormalizado);
-    const emailDisplay = (r.correo || '').trim();
-    const contacts = [];
-    if(phoneDisplay){
-      contacts.push({ type: 'phone', value: phoneDisplay });
+    const priorityScore = computeLeadPriorityScore(r);
+    const priorityLevel = resolveLeadPriorityLevel(priorityScore);
+    if(priorityLevel){
+      d.dataset.priority = priorityLevel;
+    }else{
+      delete d.dataset.priority;
     }
-    if(emailDisplay){
-      contacts.push({ type: 'mail', value: emailDisplay });
-    }
-    const primaryContact = contacts[0];
-    const secondaryContacts = contacts.slice(1);
-    const iconFor = type => type === 'phone' ? 'bi-telephone-fill' : 'bi-envelope-fill';
-    const labelFor = type => type === 'phone' ? 'Llamar' : 'Correo';
-    const chip = (contact, variant = 'primary') => `
-      <span class="contact-chip contact-chip--${variant} contact-chip--${contact.type}" data-label="${labelFor(contact.type)}">
-        <i class="bi ${iconFor(contact.type)}" aria-hidden="true"></i>
-        <span>${contact.value}</span>
-      </span>`;
-    const contactSection = primaryContact ? `
-      <div class="card-lead__contact" aria-label="Datos de contacto prioritarios">
-        <span class="contact-label">Contacto recomendado</span>
-        <div class="card-lead__contact-row">
-          ${chip(primaryContact)}
-          ${secondaryContacts.map(secondary => chip(secondary, 'secondary')).join('')}
-        </div>
-      </div>` : '';
-    const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${r.id}</span>` : '';
-    const extraPills = [idPill];
-    const detailsFooter = extraPills.filter(Boolean).length ? `
-      <div class="card-lead__footer">
-        ${extraPills.filter(Boolean).join('')}
-      </div>` : '';
+    const priorityLabel = formatLeadPriorityLabel(priorityLevel);
+    const priorityPill = priorityLabel ? `<span class="pill priority-pill priority-${priorityLevel}">${priorityLabel}</span>` : '';
+    const campusLabel = [r.campus, r.modalidad].filter(Boolean).join(' · ');
+    const campusTag = campusLabel ? `<span class="tag">${escapeHtml(campusLabel)}</span>` : '';
+    const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${escapeHtml(String(r.id))}</span>` : '';
+    const phoneValue = fmtPhone(r.telefono || r.telefonoNormalizado);
+    const phonePill = phoneValue ? `<span class="pill">${escapeHtml(phoneValue)}</span>` : '';
+    const mailPill = r.correo ? `<span class="pill">${escapeHtml(r.correo)}</span>` : '';
+    const programLine = r.programa ? `<div class="muted">${escapeHtml(r.programa)}</div>` : '';
+    const estadoLine = `<div class="muted">${escapeHtml(r.estado || '—')} · ${escapeHtml(displayAsesorName(r.asesor))}</div>`;
     d.innerHTML = `
-      <div class="card-lead__header">
-        <strong>${r.nombre}</strong>
-        <span class="tag">${campusModalidad}</span>
+      <div class="row between align-start">
+        <strong>${escapeHtml(r.nombre || 'Sin nombre')}</strong>
+        <div class="row gap6 align-center">
+          ${priorityPill}
+          ${campusTag}
+        </div>
       </div>
-      ${contactSection}
-      <div class="card-lead__meta">
-        <div class="muted">${programaDisplay}</div>
-        <div class="muted">${estadoAsesorDisplay}</div>
+      ${programLine}
+      ${estadoLine}
+      <div class="row gap8" style="margin-top:8px">
+        ${idPill}
+        ${phonePill}
+        ${mailPill}
       </div>
       ${detailsFooter}
     `;
@@ -6758,7 +7760,7 @@
       }
       if(controls.estadoSelect){
         fillEstadoOptions(r.etapa, controls.estadoSelect);
-        const hasOption = Array.from(controls.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+        const hasOption = Array.from(controls.estadoSelect.options || []).some(opt => opt.value === r.estado);
         controls.estadoSelect.value = hasOption ? r.estado : (controls.estadoSelect.options[0]?.value || '');
         if(!hasOption){
           r.estado = controls.estadoSelect.value || r.estado;
@@ -6770,7 +7772,10 @@
       }
     };
 
-    const refreshForms = () => { formSets.forEach(applyFormState); };
+    const refreshForms = () => {
+      formSets.forEach(applyFormState);
+      syncSaveAvailability();
+    };
 
     let isSaving = false;
     const handleUpdate = async button => {
@@ -6786,6 +7791,16 @@
       const comentarioChanged = comentarioActual !== (r._originalComentario || '').trim();
       if(!etapaChanged && !estadoChanged && !comentarioChanged){
         alert('No hay cambios para guardar');
+        return;
+      }
+      const commentText = (r.comentario || '').trim();
+      if(!commentText){
+        broadcastScriptStatus('Agrega una nota en el comentario antes de guardar.');
+        const commentControl = formSets.find(set => set.comentarioInput)?.comentarioInput;
+        if(commentControl){
+          commentControl.focus();
+        }
+        alert('Agrega un comentario antes de guardar.');
         return;
       }
       const registrarToque = etapaChanged || estadoChanged;
@@ -6809,10 +7824,10 @@
       if(registrarToque){
         params.set('fecha', new Date().toISOString());
       }
-      const buttons = formSets.map(set=>set.updateBtn).filter(Boolean);
+      const buttons = formSets.map(set => set.updateBtn).filter(Boolean);
       try{
         isSaving = true;
-        buttons.forEach(btn=>{ btn.disabled = true; });
+        buttons.forEach(btn => { btn.disabled = true; });
         const res = await apiFetch(`${API_URL}?${params.toString()}`);
         if(!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
@@ -6824,7 +7839,7 @@
         if(updated.asignacion !== undefined) r.asignacion = updated.asignacion;
         if(updated.resolucion !== undefined) r.resolucion = updated.resolucion;
         if(Array.isArray(updated.toques)){
-          ['toque1','toque2','toque3','toque4'].forEach((k,idx)=>{
+          ['toque1','toque2','toque3','toque4'].forEach((k,idx) => {
             if(updated.toques[idx] !== undefined) r[k] = updated.toques[idx];
           });
         }
@@ -6840,7 +7855,7 @@
         const message = resolveErrorMessage(err, 'No se pudo actualizar el lead.');
         broadcastMessage('error', 'No se pudo actualizar el lead', message);
       }finally{
-        buttons.forEach(btn=>{ btn.disabled = false; });
+        buttons.forEach(btn => { btn.disabled = false; });
         isSaving = false;
       }
     };
@@ -6865,13 +7880,13 @@
           r.estado = nextEstado;
           clearAllMessages();
           updateDetailState();
-          formSets.forEach(set=>{
+          formSets.forEach(set => {
             if(set.etapaSelect){
               set.etapaSelect.value = r.etapa;
             }
             if(set.estadoSelect){
               fillEstadoOptions(r.etapa, set.estadoSelect);
-              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt => opt.value === r.estado);
               set.estadoSelect.value = hasOpt ? r.estado : (set.estadoSelect.options[0]?.value || '');
               if(!hasOpt){
                 r.estado = set.estadoSelect.value || '';
@@ -6887,9 +7902,9 @@
           r.estado = controls.estadoSelect.value;
           clearAllMessages();
           updateDetailState();
-          formSets.forEach(set=>{
+          formSets.forEach(set => {
             if(set !== controls && set.estadoSelect){
-              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt=>opt.value===r.estado);
+              const hasOpt = Array.from(set.estadoSelect.options || []).some(opt => opt.value === r.estado);
               if(hasOpt){
                 set.estadoSelect.value = r.estado;
               }
@@ -6926,6 +7941,33 @@
         return;
       }
       attachListeners(controls);
+      syncSaveAvailability();
+    };
+
+    const applyContactScripts = () => {
+      const scripts = buildContactScripts(r);
+      broadcastScriptStatus('');
+      ['contactScripts','drawerContactScripts'].forEach(id => {
+        const container = document.getElementById(id);
+        if(!container) return;
+        CONTACT_SCRIPT_TYPES.forEach(type => {
+          const textEl = container.querySelector(`[data-script-text="${type}"]`);
+          if(textEl){
+            textEl.value = scripts[type] || 'No hay guion disponible para este lead.';
+          }
+          const actionBtn = container.querySelector(`[data-script-apply="${type}"]`);
+          if(actionBtn){
+            actionBtn.disabled = !scripts[type];
+            actionBtn.onclick = async event => {
+              event.preventDefault();
+              if(!scripts[type]) return;
+              const copied = await copyToClipboard(scripts[type]);
+              registerContactNote(type);
+              broadcastScriptStatus(copied ? `${CONTACT_CHANNEL_LABELS[type]} copiado. Completa la nota y guarda el lead.` : `${CONTACT_CHANNEL_LABELS[type]} registrado. Copia el guion manualmente si lo necesitas.`);
+            };
+          }
+        });
+      });
     };
 
     registerForm({
@@ -6956,18 +7998,27 @@
       actCall.classList.toggle('hidden', !hasCallLink);
       if(hasCallLink){
         actCall.href = callHref;
+        actCall.onclick = () => { maybeRegisterContactNote('call'); };
+      }else{
+        actCall.onclick = null;
       }
     }
     if(actWa){
       actWa.classList.toggle('hidden', !hasWaLink);
       if(hasWaLink){
         actWa.href = waHref;
+        actWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
+      }else{
+        actWa.onclick = null;
       }
     }
     if(actMail){
       actMail.classList.toggle('hidden', !hasMailLink);
       if(hasMailLink){
         actMail.href = mailHref;
+        actMail.onclick = () => { maybeRegisterContactNote('email'); };
+      }else{
+        actMail.onclick = null;
       }
     }
 
@@ -7016,7 +8067,11 @@
           <div class="drawer-quick__actions">
             <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
           </div>
-        </section>`;
+          <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
+        </div>
+        <div class="actions" style="margin-top:12px">
+          <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar</button>
+        </div>`;
       registerForm({
         etapaSelect: el('#drawerEtapa'),
         estadoSelect: el('#drawerEstado'),
@@ -7026,7 +8081,21 @@
         feedbackTitleEl: el('#drawerFeedbackTitle'),
         feedbackMessageEl: el('#drawerFeedbackMessage')
       });
+      const drawerCall = document.getElementById('drawerActCall');
+      if(drawerCall){
+        drawerCall.onclick = () => { maybeRegisterContactNote('call'); };
+      }
+      const drawerWa = document.getElementById('drawerActWa');
+      if(drawerWa){
+        drawerWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
+      }
+      const drawerMail = document.getElementById('drawerActMail');
+      if(drawerMail){
+        drawerMail.onclick = () => { maybeRegisterContactNote('email'); };
+      }
     }
+    applyContactScripts();
+    syncSaveAvailability();
   }
 
 
@@ -7858,10 +8927,26 @@
     }
     initPermissionScopeSelectors();
     renderPermissionReference();
+    renderTeamTemplateToolbar();
     const permRoleSelect = el('#permRole');
     if(permRoleSelect){
-      permRoleSelect.addEventListener('change', ()=> updatePermissionRoleHint(permRoleSelect.value));
+      permRoleSelect.addEventListener('change', () => {
+        const value = permRoleSelect.value;
+        updatePermissionRoleHint(value);
+        applyRoleScopeTemplate(value, { silent: true });
+      });
       updatePermissionRoleHint(permRoleSelect.value);
+    }
+    const permApplyRolePreset = el('#permApplyRolePreset');
+    if(permApplyRolePreset){
+      permApplyRolePreset.addEventListener('click', () => {
+        const roleSelect = el('#permRole');
+        const role = roleSelect ? roleSelect.value : 'asesor';
+        const applied = applyRoleScopeTemplate(role, { force: true, silent: false });
+        if(applied){
+          updatePermissionRoleHint(role);
+        }
+      });
     }
     const permList = el('#permList');
     if(permList){
@@ -7958,6 +9043,10 @@
           startTeamCreation({ resetStatus: true });
         }
       });
+    }
+    const teamCloneBtn = el('#teamCloneBtn');
+    if(teamCloneBtn){
+      teamCloneBtn.addEventListener('click', cloneSelectedTeam);
     }
     const teamDeleteBtn = el('#teamDeleteBtn');
     if(teamDeleteBtn){
@@ -8063,6 +9152,35 @@
       campusSel.addEventListener('change', ()=>{ state.campus = campusSel.value; state.page=0; refresh(); });
     }
 
+    const dailyShortcuts = el('#dailyShortcuts');
+    if(dailyShortcuts){
+      dailyShortcuts.addEventListener('click', event => {
+        const button = event.target.closest('button[data-type]');
+        if(!button) return;
+        const type = button.dataset.type;
+        const value = button.dataset.value || '';
+        state.query = '';
+        const qInput = el('#q');
+        if(qInput) qInput.value = '';
+        if(type === 'campus'){
+          state.campus = state.campus === value ? '' : value;
+          populateCampuses();
+        }else if(type === 'asesor'){
+          const normalizedValue = normalizeAsesorName(value);
+          const selected = getAsesorFilter();
+          const isActive = selected.length === 1 && normalizeAsesorName(selected[0]) === normalizedValue;
+          if(isActive){
+            setAsesorFilter([]);
+          }else{
+            setAsesorFilter(value ? [value] : []);
+          }
+          populateAsesores();
+        }
+        state.page = 0;
+        refresh();
+      });
+    }
+
     // Filtros por columna
     els('input[data-col]').forEach(inp=>{
       inp.addEventListener('input', ()=>{
@@ -8124,6 +9242,7 @@
 
   function refresh(){
     const rows = applyFilters();
+    renderDailyShortcuts(rows);
     const {key, dir} = state.sort;
     if(key){ rows.sort((a,b)=> (a[key]||'').localeCompare(b[key]||'') * dir ); }
     const totals = etapasUI.reduce((acc, step)=>{ acc[step] = 0; return acc; }, {});
@@ -8929,9 +10048,17 @@
   Object.entries(estadosByEtapa).forEach(([etapa, estados]) => {
     estados.forEach(estado => registerEstadoAlias(etapa, estado));
   });
-  registerEstadoAlias('No Contactado','Mensaje no contestado',['mensaje sin responder','mensaje no respondido']);
-  registerEstadoAlias('Descartado','Límite intentos de contacto',['limite intentos contacto','limite de intentos de contacto']);
+  registerEstadoAlias('Nuevo','Sin contactar',['nuevo']);
+  registerEstadoAlias('No Contactado','No contesta',['sin respuesta','no responde','buzon de voz','buzón de voz','cuelga','no contesta whatsapp']);
+  registerEstadoAlias('No Contactado','Mensaje no respondido',['mensaje sin responder','mensaje no contestado']);
+  registerEstadoAlias('No Contactado','Pendiente de reintento',['volver a marcar','reintentar','limite intentos contacto','limite de intentos de contacto']);
+  registerEstadoAlias('Contactado','Seguimiento activo',['seguimiento']);
+  registerEstadoAlias('Contactado','En labor de venta',['labor de venta']);
+  registerEstadoAlias('Descartado','Sin interés',['no interesado','no interesada','no desea informacion','no desea información','inscrito en otra escuela']);
+  registerEstadoAlias('Descartado','Datos incorrectos',['datos falsos','telefono incorrecto','correo incorrecto']);
+  registerEstadoAlias('Descartado','Duplicado',['duplicado','duplicada']);
   registerEstadoAlias('Descartado','SPAM',['spam']);
+  registerEstadoAlias('Inscrito','Inscrito confirmado',['inscrito']);
 
   function resolveHeaderKey(header){
     const norm = normalizeAliasKey(header);
