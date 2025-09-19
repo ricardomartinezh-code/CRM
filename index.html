@@ -811,6 +811,80 @@
     .preview-box{ color: var(--text); font-size:14px; }
     .preview-box .table-wrap{ margin-top:8px; }
     .preview-summary{ color: var(--muted); font-size:13px; margin-bottom:6px; }
+    .modal-overlay{
+      position:fixed;
+      inset:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:var(--space);
+      background: rgba(11,18,32,0.72);
+      backdrop-filter: blur(12px);
+      z-index:140;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .24s ease;
+    }
+    .modal-overlay.active{
+      opacity:1;
+      pointer-events:auto;
+    }
+    .modal-card{
+      width:min(960px, 100%);
+      max-height:90vh;
+      overflow:hidden;
+      background: var(--card);
+      border:1px solid rgba(255,255,255,0.12);
+      border-radius: calc(var(--radius) + 4px);
+      box-shadow: 0 30px 70px rgba(2,10,28,0.55);
+      display:flex;
+      flex-direction:column;
+      position:relative;
+    }
+    html[data-theme="light"] .modal-card{ border-color: rgba(15,23,42,0.1); box-shadow: 0 28px 60px rgba(15,23,42,0.18); }
+    .modal-close{
+      position:absolute;
+      top:16px;
+      right:16px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:36px;
+      height:36px;
+      border-radius:50%;
+      border:none;
+      background: rgba(255,255,255,0.08);
+      color:var(--text);
+      cursor:pointer;
+      transition: background .2s ease, transform .2s ease;
+    }
+    .modal-close:hover{ background: rgba(255,255,255,0.16); transform: rotate(90deg); }
+    html[data-theme="light"] .modal-close{ background: rgba(15,23,42,0.08); color:#0f172a; }
+    html[data-theme="light"] .modal-close:hover{ background: rgba(15,23,42,0.16); }
+    .modal-header, .modal-footer{ padding: calc(var(--space) * 1.25); border-bottom:1px solid rgba(255,255,255,0.08); }
+    html[data-theme="light"] .modal-header, html[data-theme="light"] .modal-footer{ border-color: rgba(15,23,42,0.08); }
+    .modal-header h2{ margin:0; font-size:1.25rem; }
+    .modal-message{ margin:6px 0 0; color:var(--muted); }
+    .modal-body{ padding: var(--space); overflow:auto; display:flex; flex-direction:column; gap:var(--space); }
+    .modal-section{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .modal-validations{ display:grid; gap:var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+    .modal-summary-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .modal-summary-list li{ display:flex; align-items:center; gap:10px; border-radius: var(--radius); padding:10px 12px; background: var(--card-2); border:1px solid rgba(255,255,255,0.08); font-weight:600; letter-spacing:.2px; }
+    .modal-summary-list.modal-errors li .badge{ background: rgba(239,68,68,0.18); color: var(--bad); }
+    .modal-summary-list.modal-warnings li .badge{ background: rgba(245,158,11,0.2); color: var(--warn); }
+    .modal-summary-list li .badge{ display:inline-flex; align-items:center; justify-content:center; min-width:32px; padding:4px 10px; border-radius:999px; font-size:13px; font-weight:700; }
+    html[data-theme="light"] .modal-summary-list li{ border-color: rgba(15,23,42,0.08); background:#ffffff; }
+    .modal-table{ width:100%; border-collapse:collapse; font-size:13px; }
+    .modal-table th, .modal-table td{ padding:8px 10px; text-align:left; border-bottom:1px solid rgba(255,255,255,0.08); }
+    .modal-table th{ font-weight:700; text-transform:uppercase; font-size:12px; letter-spacing:.3px; color:var(--muted); }
+    html[data-theme="light"] .modal-table th, html[data-theme="light"] .modal-table td{ border-color: rgba(15,23,42,0.08); }
+    .modal-table-wrap .table-wrap{ max-height:260px; }
+    .modal-actions{ display:flex; gap:var(--space-sm); justify-content:flex-end; flex-wrap:wrap; }
+    .modal-counters{ font-weight:600; color:var(--muted); display:flex; align-items:center; gap:var(--space); flex-wrap:wrap; }
+    .modal-footer{ display:flex; flex-direction:column; gap:var(--space); border-top:1px solid rgba(255,255,255,0.08); }
+    html[data-theme="light"] .modal-footer{ border-top-color: rgba(15,23,42,0.08); }
+    .modal-footnote{ margin-top:8px; font-size:12px; color:var(--muted); }
+    body.modal-open{ overflow:hidden; }
     /* Details panel */
     .panel {
       position: relative;
@@ -1408,6 +1482,47 @@
     <div class="loading-card">
       <div class="loading-spinner" aria-hidden="true"></div>
       <p class="loading-message" id="globalLoadingMessage">Procesando…</p>
+    </div>
+  </div>
+  <div class="modal-overlay" id="importConfirmModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <button type="button" class="modal-close" id="importModalClose" aria-label="Cerrar revisión">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <h2 id="importModalTitle">Revisión de importación</h2>
+        <p class="modal-message" id="importModalMessage"></p>
+      </div>
+      <div class="modal-body">
+        <section class="modal-section" aria-labelledby="importModalSkippedTitle">
+          <div class="section-heading">
+            <h3 id="importModalSkippedTitle">Registros omitidos</h3>
+          </div>
+          <div id="importModalSkipped" class="modal-table-wrap"></div>
+        </section>
+        <section class="modal-section" aria-labelledby="importModalSummaryTitle">
+          <div class="section-heading">
+            <h3 id="importModalSummaryTitle">Resumen de validaciones</h3>
+          </div>
+          <div class="modal-validations">
+            <div>
+              <h4>Errores</h4>
+              <ul id="importModalErrors" class="modal-summary-list modal-errors"></ul>
+            </div>
+            <div>
+              <h4>Advertencias</h4>
+              <ul id="importModalWarnings" class="modal-summary-list modal-warnings"></ul>
+            </div>
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <div id="importModalCounters" class="modal-counters"></div>
+        <div class="modal-actions">
+          <button type="button" class="btn" id="importModalCancel">Cancelar</button>
+          <button type="button" class="btn primary" id="importModalConfirm">Confirmar importación</button>
+        </div>
+      </div>
     </div>
   </div>
   <div class="app hidden" id="app">
@@ -9441,6 +9556,251 @@
   const importPreview = el('#importPreview');
   const dupWrap = el('#dupWrap');
   const execBtn = el('#btnExecute');
+  const importModal = el('#importConfirmModal');
+  const importModalConfirm = el('#importModalConfirm');
+  const importModalCancel = el('#importModalCancel');
+  const importModalClose = el('#importModalClose');
+  const importModalSkipped = el('#importModalSkipped');
+  const importModalErrors = el('#importModalErrors');
+  const importModalWarnings = el('#importModalWarnings');
+  const importModalMessage = el('#importModalMessage');
+  const importModalTitle = el('#importModalTitle');
+  const importModalCounters = el('#importModalCounters');
+  let pendingImportPayload = null;
+  let pendingImportInsertable = 0;
+  let pendingImportSummary = { errors: [], warnings: [] };
+  let pendingImportSkipped = [];
+  let importModalConfirmable = false;
+  const SKIPPED_MODAL_FIELDS = ['row','id','nombre','matricula','telefono','correo','motivo'];
+
+  const summarizeValidationTotals = summary => ({
+    errors: Array.isArray(summary?.errors)
+      ? summary.errors.reduce((acc, item) => acc + (Number(item?.count) || 0), 0)
+      : 0,
+    warnings: Array.isArray(summary?.warnings)
+      ? summary.warnings.reduce((acc, item) => acc + (Number(item?.count) || 0), 0)
+      : 0
+  });
+
+  function resetPendingImportState(){
+    pendingImportPayload = null;
+    pendingImportInsertable = 0;
+    pendingImportSummary = { errors: [], warnings: [] };
+    pendingImportSkipped = [];
+    importModalConfirmable = false;
+  }
+
+  function labelForSkippedField(field){
+    if(field === 'row') return 'Fila';
+    return FIELD_LABELS[field] || field;
+  }
+
+  function renderValidationList(target, items, emptyLabel){
+    if(!target) return;
+    target.innerHTML = '';
+    const list = Array.isArray(items) ? items : [];
+    if(!list.length){
+      const li = document.createElement('li');
+      li.className = 'muted';
+      li.textContent = emptyLabel;
+      target.appendChild(li);
+      return;
+    }
+    list.forEach(item => {
+      const li = document.createElement('li');
+      const badge = document.createElement('span');
+      badge.className = 'badge';
+      badge.textContent = String(item?.count ?? 0);
+      const text = document.createElement('span');
+      text.textContent = item?.message || '';
+      li.appendChild(badge);
+      li.appendChild(text);
+      target.appendChild(li);
+    });
+  }
+
+  function renderSkippedPreview(target, rows){
+    if(!target) return;
+    target.innerHTML = '';
+    const records = Array.isArray(rows) ? rows : [];
+    if(!records.length){
+      const empty = document.createElement('p');
+      empty.className = 'muted';
+      empty.textContent = 'No hay registros omitidos.';
+      target.appendChild(empty);
+      return;
+    }
+    const wrapper = document.createElement('div');
+    wrapper.className = 'table-wrap';
+    const table = document.createElement('table');
+    table.className = 'modal-table';
+    const thead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    SKIPPED_MODAL_FIELDS.forEach(field => {
+      const th = document.createElement('th');
+      th.textContent = labelForSkippedField(field);
+      headRow.appendChild(th);
+    });
+    thead.appendChild(headRow);
+    table.appendChild(thead);
+    const tbody = document.createElement('tbody');
+    records.slice(0, 20).forEach(row => {
+      const tr = document.createElement('tr');
+      SKIPPED_MODAL_FIELDS.forEach(field => {
+        const td = document.createElement('td');
+        let value;
+        if(field === 'row'){
+          value = row?.row ?? '';
+        }else{
+          const formatter = FIELD_FORMATTERS[field];
+          value = formatter ? formatter(row?.[field]) : row?.[field];
+        }
+        td.textContent = value === undefined || value === null ? '' : String(value);
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    wrapper.appendChild(table);
+    target.appendChild(wrapper);
+    if(records.length > 20){
+      const footnote = document.createElement('div');
+      footnote.className = 'modal-footnote';
+      footnote.textContent = `Se muestran 20 de ${records.length} registros omitidos.`;
+      target.appendChild(footnote);
+    }
+  }
+
+  function updateImportModal(options = {}){
+    const { skipped = [], summary = { errors: [], warnings: [] }, insertable = 0, confirmable = false, message, title } = options;
+    importModalConfirmable = Boolean(confirmable);
+    pendingImportInsertable = Number(insertable) || 0;
+    if(importModalTitle){
+      importModalTitle.textContent = title || 'Revisión de importación';
+    }
+    if(importModalMessage){
+      importModalMessage.textContent = message || (confirmable
+        ? 'Se importarán los registros listos una vez que confirmes.'
+        : 'Revisa las incidencias detectadas antes de intentar nuevamente.');
+    }
+    renderSkippedPreview(importModalSkipped, skipped);
+    renderValidationList(importModalErrors, summary?.errors, 'Sin errores detectados.');
+    renderValidationList(importModalWarnings, summary?.warnings, 'Sin advertencias.');
+    const totals = summarizeValidationTotals(summary);
+    if(importModalCounters){
+      const parts = [
+        `Listos: ${pendingImportInsertable}`,
+        `Omitidos: ${Array.isArray(skipped) ? skipped.length : 0}`,
+        `Errores: ${totals.errors}`,
+        `Advertencias: ${totals.warnings}`
+      ];
+      importModalCounters.textContent = parts.join(' · ');
+    }
+    if(importModalConfirm){
+      importModalConfirm.classList.toggle('hidden', !importModalConfirmable);
+      importModalConfirm.disabled = !importModalConfirmable;
+    }
+    if(importModalCancel){
+      importModalCancel.textContent = confirmable ? 'Cancelar' : 'Cerrar';
+    }
+  }
+
+  function showImportModal(options){
+    if(!importModal) return;
+    updateImportModal(options);
+    importModal.classList.add('active');
+    importModal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeImportModal(resetState = false){
+    if(!importModal) return;
+    importModal.classList.remove('active');
+    importModal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    if(resetState){
+      resetPendingImportState();
+    }
+    setButtonBusy(importModalConfirm, false);
+  }
+
+  if(importModalCancel){
+    importModalCancel.addEventListener('click', ()=> closeImportModal(true));
+  }
+  if(importModalClose){
+    importModalClose.addEventListener('click', ()=> closeImportModal(true));
+  }
+  if(importModal){
+    importModal.addEventListener('click', event => {
+      if(event.target === importModal){
+        closeImportModal(true);
+      }
+    });
+  }
+
+  async function requestImport(confirmFlag, override){
+    const payload = {
+      action: 'importLeads',
+      sheet: override?.sheet || state.sheet,
+      rows: Array.isArray(override?.rows) ? override.rows : importData,
+      confirm: confirmFlag === true
+    };
+    const response = await apiFetch(API_URL, {
+      method: 'POST',
+      body: payload
+    });
+    const rawBody = await response.text().catch(()=> '');
+    if(!response.ok){
+      let message = rawBody || `HTTP ${response.status}`;
+      try{
+        const parsed = rawBody ? JSON.parse(rawBody) : null;
+        if(parsed && parsed.error){
+          message = parsed.error;
+        }
+      }catch(_ignore){}
+      throw new Error(message);
+    }
+    let parsed = null;
+    if(rawBody){
+      try{
+        parsed = JSON.parse(rawBody);
+      }catch(_ignore){}
+    }
+    if(parsed && parsed.ok === false){
+      const error = new Error(parsed.error || 'No se pudo completar la importación.');
+      error.details = parsed;
+      throw error;
+    }
+    return parsed || { ok:true, message: rawBody };
+  }
+
+  async function handleImportSuccess(result){
+    closeImportModal(true);
+    const summary = result?.summary;
+    const totals = summarizeValidationTotals(summary);
+    const messages = [];
+    if(result?.message){
+      messages.push(result.message);
+    }else{
+      messages.push('Importación completada');
+    }
+    if(totals.errors || totals.warnings){
+      messages.push(`Validaciones · Errores: ${totals.errors} · Advertencias: ${totals.warnings}`);
+    }
+    alert(messages.join('\n'));
+    importData = [];
+    clearContainer(importPreview);
+    clearContainer(dupWrap);
+    if(execBtn) execBtn.disabled = true;
+    resetPendingImportState();
+    invalidateGlobalLeadIndex();
+    await withGlobalLoading('Actualizando leads…', () => loadLeads());
+    populateAsesores();
+    populateCampuses();
+    populateExportFilters();
+    refresh();
+  }
+
   if(importFile) importFile.addEventListener('change', ()=>{
     importData = [];
     clearContainer(importPreview);
@@ -9886,49 +10246,75 @@
     if(!canPerform('importData')){ alert('No tienes permisos para importar datos.'); return; }
     if(!importData.length){ alert('No hay datos verificados'); return; }
     if(!state.sheet){ alert('Selecciona una base antes de importar.'); return; }
-    setButtonBusy(execBtn, true, 'Enviando...');
+    setButtonBusy(execBtn, true, 'Verificando...');
     try{
-      const payload = { action:'importLeads', sheet: state.sheet, rows: importData };
-      const response = await apiFetch(API_URL, {
-        method: 'POST',
-        body: payload
-      });
-      const rawBody = await response.text().catch(()=> '');
-      if(!response.ok){
-        let message = rawBody || `HTTP ${response.status}`;
-        try{
-          const parsed = rawBody ? JSON.parse(rawBody) : null;
-          if(parsed && parsed.error){
-            message = parsed.error;
-          }
-        }catch(_ignore){}
-        throw new Error(message);
+      const result = await requestImport(false);
+      if(result?.requiresConfirmation){
+        pendingImportPayload = {
+          sheet: state.sheet,
+          rows: importData.map(row => ({ ...row }))
+        };
+        pendingImportSummary = {
+          errors: Array.isArray(result?.summary?.errors) ? result.summary.errors : [],
+          warnings: Array.isArray(result?.summary?.warnings) ? result.summary.warnings : []
+        };
+        pendingImportSkipped = Array.isArray(result?.skipped) ? result.skipped : [];
+        showImportModal({
+          confirmable: true,
+          insertable: Number(result?.insertable || importData.length || 0),
+          skipped: pendingImportSkipped,
+          summary: pendingImportSummary,
+          message: result?.message || `Se importarán ${Number(result?.insertable || importData.length || 0)} registros válidos una vez que confirmes.`
+        });
+        return;
       }
-      let successMessage = 'Importación completada';
-      if(rawBody){
-        try{
-          const parsed = JSON.parse(rawBody);
-          if(parsed && parsed.message){
-            successMessage = parsed.message;
-          }
-        }catch(_ignore){}
-      }
-      alert(successMessage);
-      importData = [];
-      clearContainer(importPreview);
-      clearContainer(dupWrap);
-      execBtn.disabled = true;
-      invalidateGlobalLeadIndex();
-      await withGlobalLoading('Actualizando leads…', () => loadLeads());
-      populateAsesores();
-      populateCampuses();
-      populateExportFilters();
-      refresh();
+      await handleImportSuccess(result);
     }catch(err){
-      console.error('Error al importar',err);
-      alert(`Error al importar: ${err.message || err}`);
+      console.error('Error al importar', err);
+      const details = err?.details;
+      if(details){
+        resetPendingImportState();
+        showImportModal({
+          confirmable: false,
+          insertable: Number(details?.insertable || 0),
+          skipped: Array.isArray(details?.skipped) ? details.skipped : [],
+          summary: details?.summary || { errors: [], warnings: [] },
+          message: details?.error || err.message || 'No se pudo completar la importación.'
+        });
+      }else{
+        alert(`Error al importar: ${err.message || err}`);
+      }
     }finally{
       setButtonBusy(execBtn, false);
+    }
+  });
+
+  if(importModalConfirm) importModalConfirm.addEventListener('click', async()=>{
+    if(!importModalConfirmable || !pendingImportPayload){
+      closeImportModal(true);
+      return;
+    }
+    setButtonBusy(importModalConfirm, true, 'Confirmando...');
+    try{
+      const result = await requestImport(true, pendingImportPayload);
+      await handleImportSuccess(result);
+    }catch(err){
+      console.error('Error al confirmar importación', err);
+      const details = err?.details;
+      if(details){
+        resetPendingImportState();
+        showImportModal({
+          confirmable: false,
+          insertable: Number(details?.insertable || 0),
+          skipped: Array.isArray(details?.skipped) ? details.skipped : [],
+          summary: details?.summary || { errors: [], warnings: [] },
+          message: details?.error || err.message || 'No se pudo completar la importación.'
+        });
+      }else{
+        alert(`Error al importar: ${err.message || err}`);
+      }
+    }finally{
+      setButtonBusy(importModalConfirm, false);
     }
   });
 
