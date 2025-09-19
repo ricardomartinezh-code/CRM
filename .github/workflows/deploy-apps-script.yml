@@ -1,0 +1,50 @@
+name: Deploy Apps Script
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    name: Push Apps Script
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        if: ${{ hashFiles('package-lock.json') != '' }}
+        run: npm ci
+
+      - name: Run lint (optional)
+        if: ${{ env.SKIP_LINT != 'true' }}
+        run: |
+          if npm run | grep -q " lint"; then
+            npm run lint
+          else
+            echo "No lint script detected; skipping."
+          fi
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+
+      - name: Install clasp
+        run: npm install -g @google/clasp
+
+      - name: Push to Apps Script
+        run: clasp push --force
