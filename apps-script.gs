@@ -140,6 +140,20 @@ const TOKEN_EXP_MINUTES = 12 * 60;
 const ADMIN_ROLES = new Set(['admin']);
 const SPREADSHEET_ID_PROPERTY = 'APP_SPREADSHEET_ID';
 const SPREADSHEET_ERROR_MESSAGE = 'No se encontró la hoja de cálculo principal. Configura el ID del libro en la propiedad de script "APP_SPREADSHEET_ID".';
+const DIAGNOSTICS_PRIORITY_BASE_PROPERTY = 'DIAGNOSTICS_PRIORITY_BASE';
+const DIAGNOSTICS_ALERT_RECIPIENTS_PROPERTY = 'DIAGNOSTICS_ALERT_RECIPIENTS';
+const DIAGNOSTICS_ALERT_WEBHOOK_PROPERTY = 'DIAGNOSTICS_ALERT_WEBHOOK';
+const DIAGNOSTICS_CONTROL_SHEET_NAME = 'Control Diagnósticos';
+const DIAGNOSTICS_CONTROL_HEADERS = [
+  'Fecha',
+  'Base solicitada',
+  'Base analizada',
+  'Errores detectados',
+  'Advertencias',
+  'Filas inválidas',
+  'Estado del sistema',
+  'Resumen'
+];
 let ACTIVE_USER = null;
 
 const COLUMNS = ['ID','Nombre','Matricula','Correo','Teléfono','Plantel','Modalidad','Programa','Etapa','Estado','Asesor','Comentario','Asignación','Toque 1','Toque 2','Toque 3','Toque 4','CRM','Resolución','Metadatos'];
@@ -982,13 +996,12 @@ function handleUpdateLead_(e, user){
   return jsonResponse({ok:true, lead: responseLead}, e);
 }
 
-function handleDiagnostics_(e, user){
-  e = e || { parameter: {} };
-  const requestedSheet = e.parameter.sheet || '';
+function computeDiagnosticsReport_(requestedSheet){
+  const requested = String(requestedSheet || '').trim();
   const timezone = Session.getScriptTimeZone() || '';
   const result = {
     timestamp: new Date().toISOString(),
-    sheet: requestedSheet,
+    sheet: requested,
     connection: false,
     read: false,
     write: false,
@@ -1003,7 +1016,7 @@ function handleDiagnostics_(e, user){
     sheets: [],
     aggregate: { duplicateIds: [], duplicatePhones: [] },
     login: getAuthDiagnostics_(),
-    status: { spreadsheet: '', totalSheets: 0, requestedSheet },
+    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested },
     summary: { sheetsWithErrors: 0, sheetsWithWarnings: 0, invalidRows: 0 },
     system: { status: 'En espera', timezone }
   };
@@ -1012,7 +1025,7 @@ function handleDiagnostics_(e, user){
     result.errors.push(SPREADSHEET_ERROR_MESSAGE);
     result.checks.connection.message = SPREADSHEET_ERROR_MESSAGE;
     result.system.status = 'Con incidencias';
-    return jsonResponse(result, e);
+    return result;
   }
   try{
     result.status.spreadsheet = ss.getName();
@@ -1022,9 +1035,9 @@ function handleDiagnostics_(e, user){
   const leadSheets = ss.getSheets().filter(isLeadSheet_);
   result.status.totalSheets = leadSheets.length;
   result.status.sheetNames = leadSheets.map(s => s.getName());
-  let targetSheet = requestedSheet ? ss.getSheetByName(requestedSheet) : null;
-  if(requestedSheet && !targetSheet){
-    result.warnings.push('La hoja solicitada "' + requestedSheet + '" no existe. Se utilizará la primera hoja disponible.');
+  let targetSheet = requested ? ss.getSheetByName(requested) : null;
+  if(requested && !targetSheet){
+    result.warnings.push('La hoja solicitada "' + requested + '" no existe. Se utilizará la primera hoja disponible.');
   }
   if(targetSheet && !isLeadSheet_(targetSheet)){
     result.warnings.push('La hoja "' + targetSheet.getName() + '" no coincide con el formato esperado de leads.');
@@ -1036,7 +1049,7 @@ function handleDiagnostics_(e, user){
     result.checks.connection.message = 'Sin hojas válidas para auditar.';
     result.errors.push('No se encontró ninguna hoja válida para analizar.');
     result.system.status = 'Con incidencias';
-    return jsonResponse(result, e);
+    return result;
   }
   result.sheet = targetSheet.getName();
   result.connection = true;
@@ -1088,7 +1101,228 @@ function handleDiagnostics_(e, user){
   result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + s.invalidCount, 0);
   result.system.status = result.summary.sheetsWithErrors ? 'Con incidencias' : 'Operativo';
 
-  return jsonResponse(result, e);
+  return result;
+}
+
+function handleDiagnostics_(e, user){
+  e = e || { parameter: {} };
+  const requestedSheet = e.parameter.sheet || '';
+  const report = computeDiagnosticsReport_(requestedSheet);
+  return jsonResponse(report, e);
+}
+
+function runDailyDiagnosticsAudit(){
+  const requestedSheet = getPriorityDiagnosticsBase_();
+  const report = computeDiagnosticsReport_(requestedSheet);
+  const processed = processDiagnosticsReport_(report, requestedSheet);
+  return { requestedSheet, report, processed };
+}
+
+function ensureDailyDiagnosticsTrigger(){
+  const handlerName = 'runDailyDiagnosticsAudit';
+  const triggers = ScriptApp.getProjectTriggers();
+  const exists = triggers.some(trigger => trigger.getHandlerFunction && trigger.getHandlerFunction() === handlerName);
+  if(exists) return false;
+  ScriptApp.newTrigger(handlerName)
+    .timeBased()
+    .atHour(7)
+    .everyDays(1)
+    .create();
+  return true;
+}
+
+function processDiagnosticsReport_(report, requestedSheet){
+  const summary = { logged: false, notified: false };
+  try{
+    summary.logged = logDiagnosticsAudit_(report, requestedSheet);
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al registrar el resultado: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  try{
+    const sheetsWithErrors = Number(report?.summary?.sheetsWithErrors || 0);
+    if(sheetsWithErrors > 0){
+      summary.notified = notifyDiagnosticsIncident_(report);
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al enviar la notificación: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  return summary;
+}
+
+function logDiagnosticsAudit_(report, requestedSheet){
+  const sheet = getDiagnosticsControlSheet_();
+  if(!sheet) return false;
+  const requested = String(requestedSheet || '').trim() || String(report?.status?.requestedSheet || '').trim();
+  const analyzed = String(report?.sheet || '').trim();
+  const errors = Number(report?.summary?.sheetsWithErrors || 0);
+  const warnings = Number(report?.summary?.sheetsWithWarnings || 0);
+  const invalidRows = Number(report?.summary?.invalidRows || 0);
+  const status = String(report?.system?.status || '').trim();
+  const errorMessages = Array.isArray(report?.errors) ? report.errors.filter(Boolean) : [];
+  const warningMessages = Array.isArray(report?.warnings) ? report.warnings.filter(Boolean) : [];
+  const messageParts = [];
+  if(errorMessages.length){
+    messageParts.push('Errores: ' + errorMessages.join(' | '));
+  }
+  if(warningMessages.length){
+    messageParts.push('Advertencias: ' + warningMessages.join(' | '));
+  }
+  if(!messageParts.length){
+    if(status){
+      messageParts.push('Estado: ' + status);
+    }else{
+      messageParts.push('Sin incidencias registradas.');
+    }
+  }
+  const summaryText = messageParts.join(' · ');
+  const timestamp = formatDateTime_(new Date());
+  sheet.appendRow([
+    timestamp,
+    requested,
+    analyzed,
+    errors,
+    warnings,
+    invalidRows,
+    status,
+    summaryText
+  ]);
+  return true;
+}
+
+function notifyDiagnosticsIncident_(report){
+  const recipients = getDiagnosticsAlertRecipients_();
+  const webhookUrl = getDiagnosticsWebhookUrl_();
+  const sheet = String(report?.sheet || '').trim() || 'bases';
+  const errors = Number(report?.summary?.sheetsWithErrors || 0);
+  const warnings = Number(report?.summary?.sheetsWithWarnings || 0);
+  const invalidRows = Number(report?.summary?.invalidRows || 0);
+  const status = String(report?.system?.status || '').trim();
+  const errorMessages = Array.isArray(report?.errors) ? report.errors.filter(Boolean) : [];
+  const warningMessages = Array.isArray(report?.warnings) ? report.warnings.filter(Boolean) : [];
+  const header = 'Diagnóstico diario · Incidencias detectadas en ' + sheet;
+  const bodyLines = [
+    header,
+    '',
+    'Estado: ' + (status || 'Desconocido'),
+    'Hojas con errores: ' + errors,
+    'Hojas con advertencias: ' + warnings,
+    'Filas inválidas: ' + invalidRows,
+    ''
+  ];
+  if(errorMessages.length){
+    bodyLines.push('Errores:');
+    errorMessages.forEach(message => bodyLines.push('• ' + message));
+    bodyLines.push('');
+  }
+  if(warningMessages.length){
+    bodyLines.push('Advertencias:');
+    warningMessages.forEach(message => bodyLines.push('• ' + message));
+    bodyLines.push('');
+  }
+  const body = bodyLines.join('\n');
+  let notified = false;
+  if(recipients.length){
+    MailApp.sendEmail({
+      to: recipients.join(','),
+      subject: header,
+      body
+    });
+    notified = true;
+  }
+  if(webhookUrl){
+    const payload = {
+      text: header,
+      status,
+      summary: report?.summary || {},
+      errors: errorMessages,
+      warnings: warningMessages,
+      timestamp: report?.timestamp || new Date().toISOString()
+    };
+    UrlFetchApp.fetch(webhookUrl, {
+      method: 'post',
+      contentType: 'application/json',
+      payload: JSON.stringify(payload),
+      muteHttpExceptions: true
+    });
+    notified = true;
+  }
+  return notified;
+}
+
+function getPriorityDiagnosticsBase_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(props){
+      const configured = String(props.getProperty(DIAGNOSTICS_PRIORITY_BASE_PROPERTY) || '').trim();
+      if(configured) return configured;
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] Error al leer la base prioritaria: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  try{
+    const ss = getSpreadsheet_();
+    if(!ss) return '';
+    const leadSheets = ss.getSheets().filter(isLeadSheet_);
+    if(leadSheets.length){
+      return leadSheets[0].getName();
+    }
+  }catch(err){
+    try{
+      Logger.log('[Diagnostics] No fue posible determinar la base prioritaria: ' + err.message);
+    }catch(loggingError){
+      // ignored on purpose
+    }
+  }
+  return '';
+}
+
+function getDiagnosticsControlSheet_(){
+  const ss = getSpreadsheet_();
+  if(!ss){
+    throw new Error(SPREADSHEET_ERROR_MESSAGE);
+  }
+  let sheet = ss.getSheetByName(DIAGNOSTICS_CONTROL_SHEET_NAME);
+  if(sheet) return sheet;
+  sheet = ss.insertSheet(DIAGNOSTICS_CONTROL_SHEET_NAME);
+  sheet.getRange(1, 1, 1, DIAGNOSTICS_CONTROL_HEADERS.length).setValues([DIAGNOSTICS_CONTROL_HEADERS]);
+  return sheet;
+}
+
+function getDiagnosticsAlertRecipients_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return [];
+    const raw = props.getProperty(DIAGNOSTICS_ALERT_RECIPIENTS_PROPERTY);
+    if(!raw) return [];
+    return String(raw)
+      .split(/[,;\n]/)
+      .map(item => String(item || '').trim())
+      .filter(Boolean);
+  }catch(err){
+    return [];
+  }
+}
+
+function getDiagnosticsWebhookUrl_(){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return '';
+    return String(props.getProperty(DIAGNOSTICS_ALERT_WEBHOOK_PROPERTY) || '').trim();
+  }catch(err){
+    return '';
+  }
 }
 
 function handleResolveDuplicates_(e, user){
