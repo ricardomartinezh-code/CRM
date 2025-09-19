@@ -1,6 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { parseNumericValue, formatLosgNumber, formatLosgList } = require('../js/utils/data-format.js');
+const {
+  parseNumericValue,
+  formatLosgNumber,
+  formatLosgList,
+} = require('../js/utils/data-format.js');
 
 test('parseNumericValue extracts numbers from nested totals', () => {
   const payload = { total: { value: 'Total: 128' } };
