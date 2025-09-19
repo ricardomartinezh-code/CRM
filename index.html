@@ -803,6 +803,11 @@
     }
     .panel .actions { gap:10px; margin-top:14px }
     .pill { padding:8px 12px; border:1px solid color-mix(in srgb, var(--panel-tone-bright) 36%, #1e293b 64%); border-radius:12px }
+    .pill[data-type="source"]{ background:rgba(var(--panel-base-rgb),0.16); border-color:rgba(var(--panel-base-rgb),0.35); color:var(--text); font-weight:600; letter-spacing:.2px; text-transform:uppercase; font-size:11px; }
+    .pill[data-type="interest"]{ background:rgba(124,58,237,0.18); border-color:rgba(124,58,237,0.35); color:var(--text); font-weight:600; letter-spacing:.2px; text-transform:uppercase; font-size:11px; }
+    .pill.pill-empty{ color:var(--muted); border-style:dashed; font-style:italic; }
+    html[data-theme="light"] .pill[data-type="source"]{ background:rgba(var(--panel-base-rgb),0.14); border-color:rgba(var(--panel-base-rgb),0.32); color:#0f172a; }
+    html[data-theme="light"] .pill[data-type="interest"]{ background:rgba(124,58,237,0.12); border-color:rgba(124,58,237,0.28); color:#312e81; }
     .id-pill{ font-weight:700; letter-spacing:.32px; background:var(--panel-tone-soft); border-color:var(--panel-tone-strong); color:var(--panel-tone-text); }
 
     .panel .contact-btn{
@@ -1378,6 +1383,8 @@
             <div class="kv-label" id="lab-programa">Programa</div><div id="d-programa">—</div>
             <div class="kv-label" id="lab-estado">Estado</div><div id="d-estado">—</div>
             <div class="kv-label" id="lab-asesor">Asesor</div><div id="d-asesor">—</div>
+            <div class="kv-label" id="lab-fuente">Fuente</div><div id="d-fuente">—</div>
+            <div class="kv-label" id="lab-interes">Interés declarado</div><div id="d-interes">—</div>
           </div>
           <div class="row gap12 stage-group">
             <label>Etapa
@@ -1388,7 +1395,7 @@
             </label>
           </div>
           <label style="display:block;margin-top:10px">Comentario
-            <textarea id="txtComentario" class="w100" rows="3"></textarea>
+            <textarea id="txtComentario" class="w100" rows="3" placeholder="Registra motivos de respuesta o no respuesta para retroalimentar marketing."></textarea>
           </label>
           <div class="actions" style="margin-top:10px">
             <button class="btn primary" id="updateBtn">Guardar</button>
@@ -2048,21 +2055,48 @@
     'Inscrito':['Inscrito']
   };
 
-  const columns = ['id','nombre','matricula','correo','telefono','campus','modalidad','programa','etapa','estado','asesor','comentario','asignacion'];
+  const columns = ['id','nombre','matricula','correo','telefono','campus','modalidad','programa','etapa','estado','asesor','comentario','asignacion','fuente','interesDeclarado'];
 
   const KPI_INTEREST_STATES = new Set(['interesado','en labor de venta']);
   const KPI_NUMBER_FORMAT = new Intl.NumberFormat('es-MX');
   const KPI_PERCENT_FORMAT = new Intl.NumberFormat('es-MX', { style: 'percent', minimumFractionDigits: 0, maximumFractionDigits: 1 });
+
+  const createStageMetric = (stageKey, { key, label, description, emptyNote }) => ({
+    key,
+    label,
+    description,
+    compute: ctx => {
+      const totalStage = ctx?.stageCounts?.[stageKey] || 0;
+      const ratio = safeDivide(totalStage, ctx.total);
+      return {
+        value: formatKpiNumber(totalStage),
+        extra: ratio !== null ? `${formatKpiPercent(ratio)} del total` : '',
+        note: ratio === null ? (emptyNote || 'Carga leads para revisar la distribución por etapa.') : ''
+      };
+    }
+  });
   const KPI_GROUPS = {
     Base_Fria: {
       label: 'Base fría',
       description: 'Volumen y depuración de la base fría en seguimiento.',
       metrics: [
         {
+          key: 'Base_Seleccionada',
+          label: 'Base seleccionada',
+          description: 'Base y filtros activos para la medición desde marketing.',
+          compute: ctx => {
+            const filters = ctx.filterSummary || '';
+            return {
+              value: ctx.baseLabel || 'Sin base',
+              note: filters || 'Usa filtros de Base, Asesor y Plantel para crear micro-cohortes antes de la campaña.'
+            };
+          }
+        },
+        {
           key: 'Total_Leads_Frios',
           label: 'Total leads fríos',
-          description: 'Número total de leads en la base fría',
-          compute: ctx => ({ value: formatKpiNumber(ctx.total) })
+          description: 'Número total de leads en la base fría seleccionada',
+          compute: ctx => ({ value: formatKpiNumber(ctx.total || 0) })
         },
         {
           key: 'Leads_Reimpactados',
@@ -2093,13 +2127,46 @@
           label: 'Leads descartados',
           description: 'Cantidad y % de leads con datos falsos, sin interés o imposibles de recuperar',
           compute: ctx => {
-            const ratio = safeDivide(ctx.descartados, ctx.total);
+            const descartados = ctx.stageCounts?.['Descartado'] || ctx.descartados;
+            const ratio = safeDivide(descartados, ctx.total);
             return {
-              value: formatKpiNumber(ctx.descartados),
+              value: formatKpiNumber(descartados),
               extra: ratio !== null ? `${formatKpiPercent(ratio)} del total` : ''
             };
           }
         }
+      ]
+    },
+    Distribucion_Etapas: {
+      label: 'Distribución por etapa',
+      description: 'Seguimiento por etapa de la base filtrada desde el arranque de la campaña.',
+      metrics: [
+        createStageMetric('Nuevo', {
+          key: 'Distribucion_Nuevos',
+          label: 'Nuevos',
+          description: 'Leads fríos aún sin trabajar en la segunda vuelta.',
+          emptyNote: 'Selecciona una base para ver la distribución por etapa.'
+        }),
+        createStageMetric('Contactado', {
+          key: 'Distribucion_Contactados',
+          label: 'Contactados',
+          description: 'Leads con contacto reciente dentro de la campaña de reactivación.'
+        }),
+        createStageMetric('No Contactado', {
+          key: 'Distribucion_NoContactados',
+          label: 'No contactados',
+          description: 'Leads reintentados que siguen sin respuesta efectiva.'
+        }),
+        createStageMetric('Inscrito', {
+          key: 'Distribucion_Inscritos',
+          label: 'Inscritos',
+          description: 'Leads de base fría que ya completaron la inscripción tras la campaña.'
+        }),
+        createStageMetric('Descartado', {
+          key: 'Distribucion_Descartados',
+          label: 'Descartados',
+          description: 'Leads que se descartaron después de los intentos de reactivación.'
+        })
       ]
     },
     Reactivacion: {
@@ -2116,6 +2183,19 @@
               value: formatKpiNumber(ctx.reactivados),
               extra: ratio !== null ? `${formatKpiPercent(ratio)} de reimpactados` : '',
               note: ctx.reimpactados ? '' : 'Aún no hay leads reimpactados en la base.'
+            };
+          }
+        },
+        {
+          key: 'Contactos_Activos',
+          label: 'Contactos activos',
+          description: 'Leads fríos que ya pasaron a contacto activo (contactados o inscritos).',
+          compute: ctx => {
+            const ratio = safeDivide(ctx.activos, ctx.total);
+            return {
+              value: formatKpiNumber(ctx.activos),
+              extra: ratio !== null ? `${formatKpiPercent(ratio)} del total` : '',
+              note: ratio === null ? 'Carga leads filtrados para medir contactos activos.' : ''
             };
           }
         },
@@ -2327,8 +2407,8 @@
   const KPI_ROLE_GROUPS = {
     admin: Object.keys(KPI_GROUPS),
     coordinador: Object.keys(KPI_GROUPS),
-    asesor: ['Base_Fria','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base'],
-    viewer: ['Base_Fria','Reactivacion','Conversion','Salud_Base']
+    asesor: ['Base_Fria','Distribucion_Etapas','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base'],
+    viewer: ['Base_Fria','Distribucion_Etapas','Reactivacion','Conversion','Salud_Base']
   };
 
   const STORAGE_KEYS = {
@@ -2714,6 +2794,58 @@
         if(!value) continue;
         if(!fallbackPredicate(key, value, map)) continue;
         return value;
+      }
+    }
+    return '';
+  }
+
+  function parseLeadMetadataValue(raw){
+    if(!raw) return {};
+    if(typeof raw === 'object' && !Array.isArray(raw)) return raw;
+    const text = cleanValue(raw);
+    if(!text) return {};
+    try{
+      const parsed = JSON.parse(text);
+      if(parsed && typeof parsed === 'object' && !Array.isArray(parsed)){
+        return parsed;
+      }
+    }catch(_err){
+      // Ignorar errores de parseo y continuar con heurísticas básicas
+    }
+    const out = {};
+    text.split(/[;|\n]/).forEach(part => {
+      if(!part) return;
+      const pieces = part.split(/[:=]/);
+      if(pieces.length < 2) return;
+      const key = cleanValue(pieces.shift());
+      const value = cleanValue(pieces.join(':'));
+      if(!key || !value) return;
+      out[key] = value;
+    });
+    return out;
+  }
+
+  function getMetadataValue(meta, keys = []){
+    if(!meta || typeof meta !== 'object') return '';
+    const normalizedEntries = new Map();
+    Object.keys(meta).forEach(key => {
+      const norm = String(key || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .replace(/\s+/g,'')
+        .toLowerCase();
+      normalizedEntries.set(norm, meta[key]);
+    });
+    for(const key of keys){
+      if(!key) continue;
+      const norm = String(key)
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'')
+        .replace(/\s+/g,'')
+        .toLowerCase();
+      if(normalizedEntries.has(norm)){
+        const value = cleanValue(normalizedEntries.get(norm));
+        if(value) return value;
       }
     }
     return '';
@@ -5117,6 +5249,33 @@
     const comentarioVal = map.comentario || '';
     const resolVal = map.resolucion || '';
     const crmVal = map.crm || '';
+    const metadataObj = parseLeadMetadataValue(map.metadatos || '');
+    const fuenteVal =
+      pickField(
+        map,
+        ['fuente','origen','source','canal','canalentrada','canalprincipal','campana','campanaprincipal','medio','procedencia','tipofuente'],
+        key => {
+          const lower = String(key || '').toLowerCase();
+          return lower.includes('fuente') || lower.includes('origen') || lower.includes('source') || lower.includes('canal') || lower.includes('campan') || lower.includes('medio');
+        }
+      ) ||
+      getMetadataValue(metadataObj, ['fuente','origen','source','canal','campana','medio','procedencia']);
+    let interesVal =
+      pickField(
+        map,
+        ['interes','interesdecl','interesprincipal','motivointeres','motivodeinteres','motivoprincipal','motivocontacto','intencion','intencioninscripcion','seguimientointeres'],
+        key => {
+          const lower = String(key || '').toLowerCase();
+          return lower.includes('interes') || lower.includes('intencion') || lower.includes('motivo');
+        }
+      ) ||
+      getMetadataValue(metadataObj, ['interes','interes declarado','interesprincipal','motivointeres','intencion']);
+    if(!interesVal && estadoVal){
+      const estadoLower = String(estadoVal).toLowerCase();
+      if(estadoLower.includes('interes')){
+        interesVal = estadoVal;
+      }
+    }
     const telefonoVal = pickField(
       map,
       ['telefononormalizado','telefono','telefonos','telefonocelular','telefonofijo','telefono1','telefono2','celular','movil','whatsapp','tel'],
@@ -5171,6 +5330,8 @@
       resolucion: resolVal,
       crm: crmVal,
       metadatos: map.metadatos || '',
+      fuente: fuenteVal,
+      interesDeclarado: interesVal,
       base: sheetName,
       _originalEtapa: etapaVal,
       _originalEstado: estadoVal,
@@ -6046,6 +6207,19 @@
     const basePendiente = stageCounts['Nuevo'] || Math.max(0, total - reimpactados);
     const reactivados = interesados + inscritos;
     const asesorList = Object.values(asesorMap);
+    const activos = (stageCounts['Contactado'] || 0) + (stageCounts['Inscrito'] || 0);
+    const baseName = state.sheet || '';
+    const baseLabel = sheetDisplayName(baseName) || baseName || '';
+    const selectedAsesores = getAsesorFilter().map(displayAsesorName);
+    const campusFilter = state.campus || '';
+    const filterParts = [];
+    if(selectedAsesores.length){
+      filterParts.push(`Asesor${selectedAsesores.length > 1 ? 'es' : ''}: ${selectedAsesores.join(', ')}`);
+    }
+    if(campusFilter){
+      filterParts.push(`Plantel: ${campusFilter}`);
+    }
+    const filterSummary = filterParts.join(' · ');
     return {
       total,
       stageCounts,
@@ -6056,7 +6230,13 @@
       descartados,
       basePendiente,
       reactivados,
-      asesorList
+      asesorList,
+      activos,
+      baseName,
+      baseLabel,
+      selectedAsesores,
+      campusFilter,
+      filterSummary
     };
   }
 
@@ -6325,19 +6505,51 @@
     d.setAttribute('role','button');
     d.dataset.id = r.id;
     d.dataset.step = etapaGroup(r.etapa);
-    const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${r.id}</span>` : '';
+    const campusPieces = [r.campus, r.modalidad]
+      .map(value => value ? escapeHtml(value) : '')
+      .filter(Boolean);
+    const campusLabel = campusPieces.length ? campusPieces.join(' · ') : 'Sin campus';
+    const programLabel = r.programa ? escapeHtml(r.programa) : '—';
+    const asesorDisplay = escapeHtml(displayAsesorName(r.asesor));
+    const estadoPieces = [];
+    if(r.estado){
+      estadoPieces.push(escapeHtml(r.estado));
+    }
+    if(asesorDisplay){
+      estadoPieces.push(asesorDisplay);
+    }
+    const estadoLabel = estadoPieces.length ? estadoPieces.join(' · ') : asesorDisplay || '—';
+    const metadataPills = [];
+    if(r.fuente){
+      metadataPills.push(`<span class="pill" data-type="source">${escapeHtml(r.fuente)}</span>`);
+    }
+    if(r.interesDeclarado){
+      metadataPills.push(`<span class="pill" data-type="interest">${escapeHtml(r.interesDeclarado)}</span>`);
+    }
+    const contactPills = [];
+    if(userPreferences.showLeadId && r.id){
+      contactPills.push(`<span class="pill id-pill">ID ${escapeHtml(String(r.id))}</span>`);
+    }
+    const phoneValue = fmtPhone(r.telefono || r.telefonoNormalizado);
+    if(phoneValue){
+      contactPills.push(`<span class="pill">${escapeHtml(phoneValue)}</span>`);
+    }
+    if(r.correo){
+      contactPills.push(`<span class="pill">${escapeHtml(r.correo)}</span>`);
+    }
+    const metadataRow = metadataPills.length
+      ? `<div class="row gap8" style="margin-top:8px; flex-wrap:wrap">${metadataPills.join('')}</div>`
+      : '';
+    const contactRow = `<div class="row gap8" style="margin-top:8px; flex-wrap:wrap">${contactPills.length ? contactPills.join('') : '<span class="pill pill-empty">Sin datos de contacto</span>'}</div>`;
     d.innerHTML = `
       <div class="row between">
-        <strong>${r.nombre}</strong>
-        <span class="tag">${r.campus} · ${r.modalidad}</span>
+        <strong>${escapeHtml(r.nombre || 'Sin nombre')}</strong>
+        <span class="tag">${campusLabel}</span>
       </div>
-      <div class="muted">${r.programa}</div>
-      <div class="muted">${r.estado} · ${displayAsesorName(r.asesor)}</div>
-      <div class="row gap8" style="margin-top:8px">
-        ${idPill}
-        <span class="pill">${fmtPhone(r.telefono || r.telefonoNormalizado)}</span>
-        <span class="pill">${r.correo}</span>
-      </div>
+      <div class="muted">${programLabel}</div>
+      <div class="muted">${estadoLabel}</div>
+      ${metadataRow}
+      ${contactRow}
     `;
     d.addEventListener('click', ()=>openDetails(r));
     d.addEventListener('keypress',e=>{ if(e.key==="Enter") openDetails(r) });
@@ -6394,6 +6606,8 @@
     showField(r.modalidad,'lab-modalidad','d-modalidad');
     showField(r.programa,'lab-programa','d-programa');
     showField(displayAsesorName(r.asesor),'lab-asesor','d-asesor');
+    showField(r.fuente,'lab-fuente','d-fuente');
+    showField(r.interesDeclarado,'lab-interes','d-interes');
 
     const stageEl = el('#d-etapa');
     const panelEl = el('#panelOverlay .panel');
@@ -9747,11 +9961,26 @@
   }
 
   function exportData(rows,name){
-    const headers=['Matricula','Nombre','Telefono','Correo','ID','Etapa'];
-    const csv=[headers.join(',')].concat(rows.map(r=>[r.matricula||'',r.nombre,r.telefono,r.correo,r.id,r.etapa].join(','))).join('\n');
-    const blob=new Blob([csv],{type:'text/csv'});
-    const url=URL.createObjectURL(blob);
-    const a=document.createElement('a'); a.href=url; a.download=name; a.click(); URL.revokeObjectURL(url);
+    if(!Array.isArray(rows) || !rows.length) return;
+    const columns = [
+      { key:'id', label:'ID' },
+      { key:'nombre', label:'Nombre' },
+      { key:'telefono', label:'Teléfono', value: row => fmtPhone(row.telefono || row.telefonoNormalizado) },
+      { key:'correo', label:'Correo' },
+      { key:'base', label:'Base', value: row => sheetDisplayName(row.base) || row.base || '' },
+      { key:'campus', label:'Plantel' },
+      { key:'modalidad', label:'Modalidad' },
+      { key:'programa', label:'Programa' },
+      { key:'etapa', label:'Etapa' },
+      { key:'estado', label:'Estado' },
+      { key:'fuente', label:'Fuente' },
+      { key:'interesDeclarado', label:'Interés declarado' },
+      { key:'asesor', label:'Asesor', value: row => displayAsesorName(row.asesor) },
+      { key:'comentario', label:'Comentario' },
+      { key:'asignacion', label:'Asignación' },
+      { key:'crm', label:'CRM' }
+    ];
+    downloadCsvFromRows(rows, columns, name || 'datos.csv');
   }
   const formatCsvField = value => {
     const text = cleanValue(value);
@@ -9763,8 +9992,13 @@
     const cols = Array.isArray(columns) && columns.length
       ? columns
       : Object.keys(rows[0] || {}).map(key => ({ key, label: key }));
-    const header = cols.map(col => formatCsvField(col.label)).join(',');
-    const lines = rows.map(row => cols.map(col => formatCsvField(row?.[col.key])).join(','));
+    const header = cols.map(col => formatCsvField(col.label || col.key || '')).join(',');
+    const lines = rows.map(row => cols.map(col => {
+      const raw = typeof col.value === 'function'
+        ? col.value(row)
+        : (col.key ? row?.[col.key] : undefined);
+      return formatCsvField(raw);
+    }).join(','));
     const csv = [header].concat(lines).join('\n');
     const blob = new Blob([csv],{type:'text/csv'});
     const url = URL.createObjectURL(blob);
