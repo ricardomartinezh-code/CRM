@@ -1508,6 +1508,328 @@
     .panel .contact-call i{ color:#ef4444; }
     .panel .contact-wa i{ color:#22c55e; }
     .panel .contact-mail i{ color:#2563eb; }
+
+    .panel-tags{
+      margin:var(--space) 0;
+      padding:var(--space);
+      border-radius:var(--radius);
+      background:color-mix(in srgb, var(--card) 88%, var(--panel-base-soft) 12%);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    html[data-theme="light"] .panel-tags{
+      border-color:rgba(15,23,42,0.08);
+      background:color-mix(in srgb, #ffffff 92%, var(--panel-base-soft) 8%);
+    }
+    .panel-tags__header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:var(--space);
+      margin-bottom:var(--space-sm);
+    }
+    .panel-tags__header h4{ margin:0; }
+    .panel-tags__hint{
+      margin:0 0 var(--space-sm);
+      color:var(--muted);
+      font-size:13px;
+    }
+    .panel-tags__list{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin:0;
+      padding:0;
+      list-style:none;
+    }
+    .panel-tags__list.is-empty{
+      color:var(--muted);
+      font-style:italic;
+    }
+    .panel-tags__chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:999px;
+      background:color-mix(in srgb, var(--tag-color, var(--accent)) 22%, transparent);
+      border:1px solid color-mix(in srgb, var(--tag-color, var(--accent)) 36%, rgba(255,255,255,0.18));
+      color:var(--panel-stage-text);
+      font-size:13px;
+      line-height:1;
+    }
+    html[data-theme="light"] .panel-tags__chip{
+      background:color-mix(in srgb, var(--tag-color, var(--accent)) 20%, #ffffff 80%);
+      border-color:color-mix(in srgb, var(--tag-color, var(--accent)) 28%, rgba(15,23,42,0.12));
+      color:#1e293b;
+    }
+    .panel-tags__dot{
+      width:10px;
+      height:10px;
+      border-radius:50%;
+      background:var(--tag-color, var(--accent));
+      box-shadow:0 0 0 1px rgba(255,255,255,0.35);
+    }
+    html[data-theme="light"] .panel-tags__dot{
+      box-shadow:0 0 0 1px rgba(15,23,42,0.08);
+    }
+    .panel-tags__remove{
+      border:none;
+      background:none;
+      color:inherit;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      cursor:pointer;
+      padding:0;
+    }
+    .panel-tags__remove:hover,
+    .panel-tags__remove:focus{
+      background:rgba(0,0,0,0.12);
+    }
+    html[data-theme="light"] .panel-tags__remove:hover,
+    html[data-theme="light"] .panel-tags__remove:focus{
+      background:rgba(15,23,42,0.08);
+    }
+    .panel-tags__form{
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+      margin-top:var(--space);
+    }
+    .panel-tags__form-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:var(--space);
+    }
+    .panel-tags__form-row label{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .panel-tags__form-row input{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.16);
+      background:rgba(15,23,42,0.6);
+      color:var(--text);
+    }
+    .panel-tags__form-row input[type="color"]{
+      padding:0;
+      width:48px;
+      height:36px;
+      border-radius:12px;
+      cursor:pointer;
+    }
+    html[data-theme="light"] .panel-tags__form-row input{
+      border-color:rgba(15,23,42,0.16);
+      background:#ffffff;
+      color:#0f172a;
+    }
+    .panel-tags__form-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:var(--space-sm);
+      align-items:center;
+    }
+    .panel-tags__feedback{
+      margin:0;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .tag.tag-custom{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      background:color-mix(in srgb, var(--tag-color, var(--accent)) 24%, transparent);
+      border:1px solid color-mix(in srgb, var(--tag-color, var(--accent)) 36%, rgba(255,255,255,0.18));
+      color:var(--panel-stage-text);
+      font-weight:600;
+    }
+    html[data-theme="light"] .tag.tag-custom{
+      background:color-mix(in srgb, var(--tag-color, var(--accent)) 18%, #ffffff 82%);
+      border-color:color-mix(in srgb, var(--tag-color, var(--accent)) 28%, rgba(15,23,42,0.12));
+      color:#1e293b;
+    }
+    .tag.tag-custom::before{
+      content:'';
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:var(--tag-color, var(--accent));
+      box-shadow:0 0 0 1px rgba(255,255,255,0.35);
+    }
+    html[data-theme="light"] .tag.tag-custom::before{
+      box-shadow:0 0 0 1px rgba(15,23,42,0.08);
+    }
+    .card-tags{
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+      margin-top:8px;
+    }
+    .auto-reassign-badge{
+      margin-top:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:6px 10px;
+      border-radius:12px;
+      background:rgba(37,99,235,0.14);
+      color:var(--panel-stage-text);
+      font-size:13px;
+    }
+    .auto-reassign-badge i{ font-size:14px; }
+    .auto-reassign-badge[data-status="applied"]{
+      background:rgba(34,197,94,0.18);
+      color:#34d399;
+    }
+    html[data-theme="light"] .auto-reassign-badge{
+      background:rgba(37,99,235,0.16);
+      color:#1e293b;
+    }
+    html[data-theme="light"] .auto-reassign-badge[data-status="applied"]{
+      background:rgba(34,197,94,0.18);
+      color:#166534;
+    }
+    .panel-hint{
+      margin-top:var(--space);
+      padding:14px;
+      border-radius:var(--radius);
+      border:1px solid rgba(37,99,235,0.35);
+      background:rgba(37,99,235,0.16);
+      color:var(--panel-stage-text);
+    }
+    .panel-hint strong{ display:block; margin-bottom:6px; }
+    .panel-hint__actions{
+      margin-top:10px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:var(--space-sm);
+    }
+    .panel-hint[data-tone="success"]{
+      border-color:rgba(34,197,94,0.35);
+      background:rgba(34,197,94,0.18);
+      color:#34d399;
+    }
+    html[data-theme="light"] .panel-hint{
+      border-color:rgba(37,99,235,0.24);
+      background:rgba(37,99,235,0.18);
+      color:#1e293b;
+    }
+    html[data-theme="light"] .panel-hint[data-tone="success"]{
+      border-color:rgba(34,197,94,0.28);
+      background:rgba(34,197,94,0.18);
+      color:#166534;
+    }
+    .calendar-form{
+      margin-top:var(--space);
+      padding:var(--space);
+      border-radius:var(--radius);
+      border:1px solid rgba(255,255,255,0.08);
+      background:color-mix(in srgb, var(--card) 88%, var(--panel-base-soft) 12%);
+    }
+    html[data-theme="light"] .calendar-form{
+      border-color:rgba(15,23,42,0.08);
+      background:color-mix(in srgb, #ffffff 92%, var(--panel-base-soft) 8%);
+    }
+    .calendar-form h4{ margin:0 0 6px; }
+    .calendar-form p{ margin:0 0 var(--space-sm); color:var(--muted); font-size:13px; }
+    .calendar-form__grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:var(--space);
+      margin-bottom:var(--space-sm);
+    }
+    .calendar-form__grid label{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:14px;
+      color:var(--muted);
+    }
+    .calendar-form__grid input,
+    .calendar-form__grid select{
+      padding:8px 10px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.16);
+      background:rgba(15,23,42,0.6);
+      color:var(--text);
+    }
+    html[data-theme="light"] .calendar-form__grid input,
+    html[data-theme="light"] .calendar-form__grid select{
+      border-color:rgba(15,23,42,0.16);
+      background:#ffffff;
+      color:#0f172a;
+    }
+    .calendar-form__actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:var(--space-sm);
+      align-items:center;
+    }
+    .calendar-form__status{
+      margin:0;
+      font-size:13px;
+      color:var(--muted);
+    }
+    .auto-reassign-card{
+      padding:var(--space);
+      border-radius:var(--radius);
+      background:color-mix(in srgb, var(--card) 90%, var(--panel-base-soft) 10%);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    html[data-theme="light"] .auto-reassign-card{
+      border-color:rgba(15,23,42,0.08);
+      background:color-mix(in srgb, #ffffff 92%, var(--panel-base-soft) 8%);
+    }
+    .auto-reassign-summary{
+      margin:0 0 var(--space-sm);
+      font-weight:600;
+      color:var(--panel-stage-text);
+    }
+    .auto-reassign-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      font-size:13px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .auto-reassign-list{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+    }
+    .auto-reassign-item{
+      display:flex;
+      flex-wrap:wrap;
+      gap:12px;
+      align-items:center;
+      border:1px dashed rgba(255,255,255,0.18);
+      border-radius:var(--radius);
+      padding:12px 14px;
+      background:rgba(37,99,235,0.08);
+    }
+    html[data-theme="light"] .auto-reassign-item{
+      border-color:rgba(15,23,42,0.12);
+      background:rgba(37,99,235,0.12);
+    }
+    .auto-reassign-actions{
+      margin-left:auto;
+      display:flex;
+      gap:var(--space-sm);
+      align-items:center;
+    }
     html[data-theme="light"] .panel .contact-btn{
       border-color: color-mix(in srgb, var(--panel-tone-strong) 35%, #ffffff 65%);
       box-shadow: 0 12px 26px rgba(15,23,42,0.16);
@@ -2505,6 +2827,13 @@
             <div class="daily-shortcuts" id="dailyShortcuts" aria-label="Listas diarias sugeridas"></div>
           </div>
         </div>
+        <div class="panel-section hidden" id="autoReassignSection" aria-live="polite" aria-label="Reasignación automática">
+          <h3>Reasignación automática</h3>
+          <div class="auto-reassign-card">
+            <p class="auto-reassign-summary" id="autoReassignSummary">Analizando distribución de leads por asesor…</p>
+            <ul class="auto-reassign-list" id="autoReassignList"></ul>
+          </div>
+        </div>
         <div class="panel-section">
           <div class="row between align-center" style="gap:var(--space-sm)">
             <h3>Leads</h3>
@@ -2585,6 +2914,37 @@
             <div class="kv-label" id="lab-estado">Estado</div><div id="d-estado">—</div>
             <div class="kv-label" id="lab-asesor">Asesor</div><div id="d-asesor">—</div>
           </div>
+          <section class="panel-tags" aria-labelledby="leadTagsTitle">
+            <div class="panel-tags__header">
+              <h4 id="leadTagsTitle">Etiquetas personalizadas</h4>
+              <button class="btn outline" type="button" id="leadTagAdd"><i class="bi bi-bookmark-plus"></i> Nueva etiqueta</button>
+            </div>
+            <p class="panel-tags__hint">Clasifica este lead con etiquetas privadas y resalta prioridades en tu tablero.</p>
+            <div class="panel-tags__list is-empty" id="leadTagList" aria-live="polite"></div>
+            <form class="panel-tags__form hidden" id="leadTagForm">
+              <div class="panel-tags__form-row">
+                <label>Nombre
+                  <input type="text" id="leadTagName" maxlength="40" required />
+                </label>
+                <label>Color
+                  <input type="color" id="leadTagColor" value="#2563eb" />
+                </label>
+              </div>
+              <div class="panel-tags__form-actions">
+                <button class="btn primary" type="submit" id="leadTagSave">Guardar etiqueta</button>
+                <button class="btn" type="button" id="leadTagCancel">Cancelar</button>
+              </div>
+            </form>
+            <p class="panel-tags__feedback hidden" id="leadTagFeedback"></p>
+          </section>
+          <div class="panel-hint hidden" id="autoReassignDetail" role="status" aria-live="polite">
+            <strong id="autoReassignDetailTitle"></strong>
+            <p id="autoReassignDetailMessage"></p>
+            <div class="panel-hint__actions">
+              <button class="btn primary" type="button" id="autoReassignApply"><i class="bi bi-arrow-left-right"></i> Reasignar ahora</button>
+              <button class="btn" type="button" id="autoReassignKeep">Mantener asignación</button>
+            </div>
+          </div>
           <section class="panel-quick" aria-labelledby="panelQuickTitle">
             <div class="panel-quick__header">
               <h4 id="panelQuickTitle">Actualiza y contacta</h4>
@@ -2631,14 +2991,30 @@
             </section>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
           </div>
-          <div class="actions" style="margin-top:10px">
-            <button class="btn primary" id="updateBtn">Guardar</button>
-          </div>
-          <div class="actions" style="margin-top:10px">
-              <a class="btn contact-btn contact-call" data-contact="call" href="#"><i class="bi bi-telephone"></i> Llamar</a>
-              <a class="btn contact-btn contact-wa" data-contact="whatsapp" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-              <a class="btn contact-btn contact-mail" data-contact="email" href="#"><i class="bi bi-envelope"></i> Email</a>
-          </div>
+            <section class="calendar-form" aria-labelledby="calendarFormTitle">
+            <h4 id="calendarFormTitle">Agendar seguimiento</h4>
+            <p>Genera un recordatorio de seguimiento en tu Google Calendar con los datos del lead.</p>
+            <div class="calendar-form__grid">
+              <label>Fecha
+                <input type="date" id="calendarDate" />
+              </label>
+              <label>Hora
+                <input type="time" id="calendarTime" />
+              </label>
+              <label>Duración
+                <select id="calendarDuration">
+                  <option value="15">15 minutos</option>
+                  <option value="30" selected>30 minutos</option>
+                  <option value="45">45 minutos</option>
+                  <option value="60">60 minutos</option>
+                </select>
+              </label>
+            </div>
+            <div class="calendar-form__actions">
+              <button class="btn outline" type="button" id="calendarCreateBtn"><i class="bi bi-calendar-event"></i> Agregar a Google Calendar</button>
+              <p class="calendar-form__status" id="calendarStatus"></p>
+            </div>
+          </section>
         </aside>
       </div>
       <!-- Drawer for mobile details -->
@@ -3553,9 +3929,11 @@
   let teamsLoaded = false;
   let teamsLoading = false;
   let selectedTeamId = '';
-  const assignmentCache = new Map();
-  let assignmentPreview = null;
-  let assignmentMode = 'single';
+  let customTagStore = {};
+  let storedReassignmentDecisions = {};
+  let autoReassignmentPlan = { stats: null, suggestions: [] };
+  let detailLeadContext = null;
+  const leadTagContext = { leadId: '', editingIndex: -1 };
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
@@ -3865,6 +4243,7 @@
     profile: 'pulseProfile',
     preferences: 'pulsePreferences',
     password: 'pulsePasswordRequest',
+
     favorites: 'pulseLeadFavorites',
     recents: 'pulseLeadRecents',
     whatsappTemplates: 'pulseWhatsappTemplates',
@@ -3908,6 +4287,9 @@
     showLeadId: false,
     appliedPreset: ''
   };
+  const DEFAULT_TAG_COLOR = '#2563eb';
+  const AUTO_REASSIGN_DIFFERENCE_THRESHOLD = 1;
+  const CALENDAR_DEFAULT_DURATION = 30;
   const ACCENT_PALETTES = {
     blue: { primary: '#003a5f', secondary: '#8a9ca3', panel: '37,99,235' },
     green: { primary: '#047857', secondary: '#22c55e', panel: '5,150,105' },
@@ -7778,6 +8160,7 @@
       ['campus','plantel','sede'],
       key => key.includes('plantel') || key.includes('campus') || key.includes('sede')
     );
+    const resolvedAsesor = map.asesor || (sheetDisplayName(sheetName) === 'Carga de Datos' ? 'Sistema' : '');
     return {
       id: map.id || '',
       nombre: map.nombre || '',
@@ -7793,7 +8176,7 @@
       programa: map.programa || '',
       etapa: etapaVal,
       estado: estadoVal,
-      asesor: map.asesor || (sheetDisplayName(sheetName) === 'Carga de Datos' ? 'Sistema' : ''),
+      asesor: resolvedAsesor,
       comentario: comentarioVal,
       asignacion: map.asignacion || '',
       toque1: map.toque1 || '',
@@ -7806,7 +8189,8 @@
       base: sheetName,
       _originalEtapa: etapaVal,
       _originalEstado: estadoVal,
-      _originalComentario: String(comentarioVal || '').trim()
+      _originalComentario: String(comentarioVal || '').trim(),
+      _originalAsesor: resolvedAsesor
     };
   }
 
@@ -7868,7 +8252,8 @@
           }
         }
         leads = mapped;
-        syncQuickAccessWithLeads();
+        autoReassignmentPlan = buildAutoReassignmentPlan(leads);
+        applyAutoReassignmentAnnotations();
         state.columnLimits = {};
         state.columnLimitSignature = '';
       }else if(data && data.error){
@@ -8985,6 +9370,116 @@
     }
     return prefs;
   }
+  function loadStoredLeadTags(){
+    const stored = readStorageJSON(STORAGE_KEYS.leadTags);
+    return stored && typeof stored === 'object' ? stored : {};
+  }
+  function loadStoredReassignmentDecisions(){
+    const stored = readStorageJSON(STORAGE_KEYS.reassignments);
+    return stored && typeof stored === 'object' ? stored : {};
+  }
+  function getCurrentUserStorageKey(){
+    if(currentUser){
+      if(currentUser.userId){
+        return String(currentUser.userId).trim().toLowerCase();
+      }
+      if(currentUser.email){
+        return String(currentUser.email).trim().toLowerCase();
+      }
+    }
+    return 'anon';
+  }
+  function getUserLeadTagStore(create = true){
+    const key = getCurrentUserStorageKey();
+    if(!customTagStore || typeof customTagStore !== 'object'){
+      customTagStore = {};
+    }
+    if(!customTagStore[key]){
+      if(!create) return null;
+      customTagStore[key] = {};
+    }
+    return customTagStore[key];
+  }
+  function getUserReassignmentStore(create = true){
+    const key = getCurrentUserStorageKey();
+    if(!storedReassignmentDecisions || typeof storedReassignmentDecisions !== 'object'){
+      storedReassignmentDecisions = {};
+    }
+    if(!storedReassignmentDecisions[key]){
+      if(!create) return null;
+      storedReassignmentDecisions[key] = {};
+    }
+    return storedReassignmentDecisions[key];
+  }
+  function generateTagId(){
+    return `tag-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`;
+  }
+  function sanitizeTagColor(value){
+    const text = String(value || '').trim();
+    if(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(text)) return text;
+    return DEFAULT_TAG_COLOR;
+  }
+  function normalizeTagEntry(tag){
+    if(!tag || typeof tag !== 'object') return null;
+    const label = String(tag.label || '').trim();
+    if(!label) return null;
+    return {
+      id: tag.id || generateTagId(),
+      label,
+      color: sanitizeTagColor(tag.color)
+    };
+  }
+  function getLeadTagsForLead(leadId){
+    const id = String(leadId || '').trim();
+    if(!id) return [];
+    const store = getUserLeadTagStore(false);
+    if(!store || typeof store !== 'object') return [];
+    const tags = store[id];
+    return Array.isArray(tags) ? tags.slice() : [];
+  }
+  function saveLeadTagsForLead(leadId, tags){
+    const id = String(leadId || '').trim();
+    if(!id) return;
+    const store = getUserLeadTagStore(true);
+    const normalized = (Array.isArray(tags) ? tags : [])
+      .map(normalizeTagEntry)
+      .filter(Boolean);
+    if(normalized.length){
+      store[id] = normalized;
+    }else{
+      delete store[id];
+    }
+    writeStorageJSON(STORAGE_KEYS.leadTags, customTagStore);
+  }
+  function getStoredReassignmentDecision(leadId){
+    const id = String(leadId || '').trim();
+    if(!id) return null;
+    const store = getUserReassignmentStore(false);
+    const decision = store && store[id];
+    return decision && typeof decision === 'object' ? { ...decision } : null;
+  }
+  function saveReassignmentDecision(leadId, decision){
+    const id = String(leadId || '').trim();
+    if(!id) return;
+    const store = getUserReassignmentStore(true);
+    if(decision && typeof decision === 'object'){
+      store[id] = { ...decision, updatedAt: decision.updatedAt || Date.now() };
+    }else{
+      delete store[id];
+    }
+    writeStorageJSON(STORAGE_KEYS.reassignments, storedReassignmentDecisions);
+  }
+  function clearReassignmentDecision(leadId){
+    const id = String(leadId || '').trim();
+    if(!id) return;
+    const store = getUserReassignmentStore(false);
+    if(store && store[id]){
+      delete store[id];
+      writeStorageJSON(STORAGE_KEYS.reassignments, storedReassignmentDecisions);
+    }
+  }
+  customTagStore = loadStoredLeadTags();
+  storedReassignmentDecisions = loadStoredReassignmentDecisions();
   function loadStoredPasswordRequest(){
     const stored = readStorageJSON(STORAGE_KEYS.password);
     if(stored && typeof stored === 'object'){
@@ -9717,6 +10212,25 @@
     overlay.setAttribute('aria-hidden','true');
     if(panel){
       panel.classList.remove('show');
+    }
+    detailLeadContext = null;
+    leadTagContext.leadId = '';
+    hideLeadTagForm();
+    setLeadTagFeedback('');
+    renderLeadTagList(null);
+    updateAutoReassignDetail(null);
+    const leadTagAddBtn = el('#leadTagAdd');
+    if(leadTagAddBtn){
+      leadTagAddBtn.disabled = true;
+    }
+    const calendarStatusEl = el('#calendarStatus');
+    if(calendarStatusEl){
+      calendarStatusEl.textContent = '';
+    }
+    const calendarBtn = el('#calendarCreateBtn');
+    if(calendarBtn){
+      calendarBtn.disabled = true;
+      calendarBtn.dataset.href = '';
     }
     if(panelHideTimer){
       clearTimeout(panelHideTimer);
@@ -10459,6 +10973,9 @@
     const mailPill = r.correo ? `<span class="pill">${escapeHtml(r.correo)}</span>` : '';
     const programLine = r.programa ? `<div class="muted">${escapeHtml(r.programa)}</div>` : '';
     const estadoLine = `<div class="muted">${escapeHtml(r.estado || '—')} · ${escapeHtml(displayAsesorName(r.asesor))}</div>`;
+    const reassignBadge = renderAutoReassignBadge(r);
+    const customTagBadges = renderLeadTagBadges(r);
+    const tagRow = customTagBadges ? `<div class="card-tags">${customTagBadges}</div>` : '';
     d.innerHTML = `
       <div class="row between align-start">
         <strong>${escapeHtml(r.nombre || 'Sin nombre')}</strong>
@@ -10469,6 +10986,8 @@
       </div>
       ${programLine}
       ${estadoLine}
+      ${reassignBadge ? reassignBadge : ''}
+      ${tagRow}
       <div class="row gap8" style="margin-top:8px">
         ${idPill}
         ${phonePill}
@@ -10504,20 +11023,22 @@
       const etapaLabel = r.etapa || '—';
       const etapaClass = etapaLabel === 'Inscrito' ? 'ok' : etapaLabel === 'Descartado' ? 'bad' : '';
       const tr = document.createElement('tr');
+      const tagBadges = renderLeadTagBadges(r);
+      const reassignBadge = renderAutoReassignBadge(r);
       tr.innerHTML = `
-        <td>${formatValue(r.id)}</td>
-        <td>${formatValue(r.nombre)}</td>
-        <td>${formatValue(r.matricula)}</td>
-        <td>${formatValue(r.correo)}</td>
-        <td>${formatValue(fmtPhone(r.telefono || r.telefonoNormalizado))}</td>
-        <td>${formatValue(r.campus)}</td>
-        <td>${formatValue(r.modalidad)}</td>
-        <td>${formatValue(r.programa)}</td>
-        <td><span class="tag ${etapaClass}">${escapeHtml(etapaLabel)}</span></td>
-        <td>${formatValue(r.estado)}</td>
-        <td>${formatValue(displayAsesorName(r.asesor))}</td>
-        <td>${formatValue(r.comentario)}</td>
-        <td>${formatValue(r.asignacion)}</td>
+        <td>${r.id}</td>
+        <td>${r.nombre}</td>
+        <td>${r.matricula}</td>
+        <td>${r.correo}</td>
+        <td>${fmtPhone(r.telefono || r.telefonoNormalizado)}</td>
+        <td>${r.campus}</td>
+        <td>${r.modalidad}</td>
+        <td>${r.programa}</td>
+        <td><span class="tag ${r.etapa==='Inscrito'?'ok':''} ${r.etapa==='Descartado'?'bad':''}">${r.etapa}</span></td>
+        <td>${r.estado}</td>
+        <td>${displayAsesorName(r.asesor)}${reassignBadge ? reassignBadge : ''}</td>
+        <td>${r.comentario}${tagBadges ? `<div class="card-tags">${tagBadges}</div>` : ''}</td>
+        <td>${r.asignacion}</td>
       `;
       tr.addEventListener('click', ()=>openDetails(r));
       tr.addEventListener('keypress', e=>{ if(e.key === 'Enter'){ openDetails(r); } });
@@ -10528,6 +11049,7 @@
 
   // —— Detalle ——
   function openDetails(r){
+    detailLeadContext = r;
     el('#d-nombre').textContent = r.nombre || '—';
     const basePhone = r.telefono || r.telefonoNormalizado || '';
     currentLeadRecord = r;
@@ -10551,7 +11073,10 @@
     showField(r.campus,'lab-campus','d-campus');
     showField(r.modalidad,'lab-modalidad','d-modalidad');
     showField(r.programa,'lab-programa','d-programa');
-    showField(displayAsesorName(r.asesor),'lab-asesor','d-asesor');
+    updateLeadDetailAssignmentDisplay(r);
+    updateLeadTagsSection(r);
+    updateAutoReassignDetail(r);
+    prepareCalendarForm(r);
 
     const stageEl = el('#d-etapa');
     const panelEl = el('#panelOverlay .panel');
@@ -11122,6 +11647,608 @@
     }
     return phone.raw || '';
   };
+
+  function updateLeadDetailAssignmentDisplay(lead){
+    const labelEl = el('#lab-asesor');
+    const valueEl = el('#d-asesor');
+    const value = displayAsesorName(lead && lead.asesor);
+    const hasValue = Boolean(value);
+    if(labelEl){
+      labelEl.classList.toggle('hidden', !hasValue);
+    }
+    if(valueEl){
+      valueEl.classList.toggle('hidden', !hasValue);
+      valueEl.textContent = hasValue ? value : '—';
+    }
+  }
+
+  function renderLeadTagBadges(lead){
+    const tags = getLeadTagsForLead(lead ? lead.id : '');
+    if(!tags.length) return '';
+    return tags
+      .map(tag => `<span class="tag tag-custom" style="--tag-color:${sanitizeTagColor(tag.color)}">${escapeHtml(tag.label)}</span>`)
+      .join('');
+  }
+
+  function updateLeadTagsSection(lead){
+    leadTagContext.leadId = lead && lead.id ? String(lead.id) : '';
+    leadTagContext.editingIndex = -1;
+    const addBtn = el('#leadTagAdd');
+    if(addBtn){
+      addBtn.disabled = !leadTagContext.leadId;
+    }
+    hideLeadTagForm();
+    setLeadTagFeedback('');
+    renderLeadTagList(lead);
+  }
+
+  function renderLeadTagList(lead){
+    const listEl = el('#leadTagList');
+    if(!listEl) return;
+    const tags = getLeadTagsForLead(lead ? lead.id : leadTagContext.leadId);
+    if(!tags.length){
+      listEl.classList.add('is-empty');
+      listEl.innerHTML = '<span>Sin etiquetas personalizadas.</span>';
+      return;
+    }
+    listEl.classList.remove('is-empty');
+    listEl.innerHTML = tags
+      .map((tag, index) => {
+        const color = sanitizeTagColor(tag.color);
+        const label = escapeHtml(tag.label);
+        return `<span class="panel-tags__chip" data-tag-index="${index}" style="--tag-color:${color}"><span class="panel-tags__dot" aria-hidden="true"></span><span class="panel-tags__label">${label}</span><button type="button" class="panel-tags__remove" data-remove-index="${index}" aria-label="Eliminar etiqueta ${label}"><i class="bi bi-x"></i></button></span>`;
+      })
+      .join('');
+  }
+
+  function setLeadTagFeedback(message){
+    const feedback = el('#leadTagFeedback');
+    if(!feedback) return;
+    if(message){
+      feedback.textContent = message;
+      feedback.classList.remove('hidden');
+    }else{
+      feedback.textContent = '';
+      feedback.classList.add('hidden');
+    }
+  }
+
+  function startLeadTagCreation(){
+    if(!leadTagContext.leadId) return;
+    leadTagContext.editingIndex = -1;
+    const form = el('#leadTagForm');
+    const nameInput = el('#leadTagName');
+    const colorInput = el('#leadTagColor');
+    if(form) form.classList.remove('hidden');
+    if(colorInput) colorInput.value = DEFAULT_TAG_COLOR;
+    if(nameInput){
+      nameInput.value = '';
+      nameInput.focus();
+    }
+    setLeadTagFeedback('');
+  }
+
+  function startLeadTagEdit(index){
+    if(!leadTagContext.leadId) return;
+    const tags = getLeadTagsForLead(leadTagContext.leadId);
+    if(index < 0 || index >= tags.length) return;
+    leadTagContext.editingIndex = index;
+    const tag = tags[index];
+    const form = el('#leadTagForm');
+    const nameInput = el('#leadTagName');
+    const colorInput = el('#leadTagColor');
+    if(form) form.classList.remove('hidden');
+    if(nameInput){
+      nameInput.value = tag.label;
+      nameInput.focus();
+      nameInput.select();
+    }
+    if(colorInput) colorInput.value = sanitizeTagColor(tag.color);
+    setLeadTagFeedback('');
+  }
+
+  function hideLeadTagForm(){
+    const form = el('#leadTagForm');
+    if(form) form.classList.add('hidden');
+    leadTagContext.editingIndex = -1;
+  }
+
+  function handleLeadTagSubmit(event){
+    event.preventDefault();
+    if(!leadTagContext.leadId) return;
+    const nameInput = el('#leadTagName');
+    const colorInput = el('#leadTagColor');
+    const label = nameInput ? nameInput.value.trim() : '';
+    if(!label){
+      setLeadTagFeedback('Escribe un nombre para la etiqueta.');
+      if(nameInput) nameInput.focus();
+      return;
+    }
+    const color = colorInput ? sanitizeTagColor(colorInput.value) : DEFAULT_TAG_COLOR;
+    const tags = getLeadTagsForLead(leadTagContext.leadId);
+    if(leadTagContext.editingIndex >= 0 && leadTagContext.editingIndex < tags.length){
+      tags[leadTagContext.editingIndex] = { ...tags[leadTagContext.editingIndex], label, color };
+    }else{
+      tags.push({ id: generateTagId(), label, color });
+    }
+    saveLeadTagsForLead(leadTagContext.leadId, tags);
+    hideLeadTagForm();
+    setLeadTagFeedback('Etiqueta guardada.');
+    renderLeadTagList(detailLeadContext);
+    refresh();
+  }
+
+  function handleLeadTagListClick(event){
+    const removeBtn = event.target.closest('[data-remove-index]');
+    if(removeBtn){
+      const index = Number(removeBtn.getAttribute('data-remove-index'));
+      if(Number.isFinite(index) && leadTagContext.leadId){
+        const tags = getLeadTagsForLead(leadTagContext.leadId);
+        if(index >= 0 && index < tags.length){
+          tags.splice(index, 1);
+          saveLeadTagsForLead(leadTagContext.leadId, tags);
+          renderLeadTagList(detailLeadContext);
+          setLeadTagFeedback('Etiqueta eliminada.');
+          refresh();
+        }
+      }
+      return;
+    }
+    const chip = event.target.closest('[data-tag-index]');
+    if(chip){
+      const index = Number(chip.getAttribute('data-tag-index'));
+      if(Number.isFinite(index)){
+        startLeadTagEdit(index);
+      }
+    }
+  }
+
+  function leadReassignmentScore(lead){
+    const stage = etapaGroup(lead && lead.etapa);
+    switch(stage){
+      case 'Nuevo': return 3;
+      case 'No Contactado': return 2;
+      case 'Contactado': return 1;
+      case 'Inscrito': return -1;
+      case 'Descartado': return -2;
+      default: return 0;
+    }
+  }
+
+  function isLeadEligibleForReassignment(lead){
+    if(!lead || !lead.id) return false;
+    const stage = etapaGroup(lead.etapa);
+    if(stage === 'Inscrito' || stage === 'Descartado') return false;
+    return true;
+  }
+
+  function buildAutoReassignmentPlan(rows){
+    const plan = {
+      stats: {
+        totalLeads: 0,
+        advisorCount: 0,
+        average: 0,
+        overloaded: [],
+        underloaded: [],
+        unassigned: 0
+      },
+      suggestions: []
+    };
+    const advisorMap = new Map();
+    const dataset = Array.isArray(rows) ? rows : [];
+    dataset.forEach(lead => {
+      if(!lead || !lead.id) return;
+      const key = normalizeAsesorName(lead.asesor);
+      if(!key){
+        plan.stats.unassigned++;
+        return;
+      }
+      if(!advisorMap.has(key)){
+        advisorMap.set(key, { key, name: displayAsesorName(lead.asesor), total: 0, leads: [] });
+      }
+      const entry = advisorMap.get(key);
+      entry.total++;
+      entry.leads.push(lead);
+    });
+    const entries = Array.from(advisorMap.values());
+    plan.stats.totalLeads = entries.reduce((sum, entry) => sum + entry.total, 0);
+    plan.stats.advisorCount = entries.length;
+    if(!entries.length || !plan.stats.totalLeads){
+      return plan;
+    }
+    const average = plan.stats.totalLeads / entries.length;
+    plan.stats.average = average;
+    const overloaded = entries.filter(entry => entry.total - average >= AUTO_REASSIGN_DIFFERENCE_THRESHOLD);
+    const underloaded = entries.filter(entry => average - entry.total >= AUTO_REASSIGN_DIFFERENCE_THRESHOLD);
+    plan.stats.overloaded = overloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total })).sort((a,b) => b.total - a.total);
+    plan.stats.underloaded = underloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total })).sort((a,b) => a.total - b.total);
+    if(!overloaded.length || !underloaded.length){
+      return plan;
+    }
+    const overQueue = overloaded
+      .map(entry => ({
+        key: entry.key,
+        name: entry.name,
+        total: entry.total,
+        leads: entries.find(e => e.key === entry.key)?.leads
+          .filter(isLeadEligibleForReassignment)
+          .sort((a, b) => leadReassignmentScore(b) - leadReassignmentScore(a)) || []
+      }))
+      .filter(entry => entry.leads.length);
+    const underQueue = underloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total }));
+    const suggestions = [];
+    while(overQueue.length && underQueue.length){
+      overQueue.sort((a, b) => (b.total - average) - (a.total - average));
+      underQueue.sort((a, b) => (a.total - average) - (b.total - average));
+      const source = overQueue[0];
+      const target = underQueue[0];
+      if(!source || !target){
+        break;
+      }
+      let lead = null;
+      while(source.leads.length){
+        const candidate = source.leads.shift();
+        const decision = getStoredReassignmentDecision(candidate.id);
+        if(decision && decision.status === 'dismissed'){
+          continue;
+        }
+        if(decision && decision.status === 'applied'){
+          continue;
+        }
+        lead = candidate;
+        break;
+      }
+      if(!lead){
+        overQueue.shift();
+        continue;
+      }
+      if(source.key === target.key){
+        continue;
+      }
+      suggestions.push({
+        leadId: lead.id,
+        lead,
+        fromKey: source.key,
+        fromName: source.name,
+        toKey: target.key,
+        toName: target.name
+      });
+      source.total -= 1;
+      target.total += 1;
+      if(source.total - average < AUTO_REASSIGN_DIFFERENCE_THRESHOLD || !source.leads.length){
+        overQueue.shift();
+      }
+      if(average - target.total < AUTO_REASSIGN_DIFFERENCE_THRESHOLD){
+        underQueue.shift();
+      }
+    }
+    plan.suggestions = suggestions;
+    return plan;
+  }
+
+  function applyAutoReassignmentAnnotations(){
+    const suggestionMap = new Map();
+    (autoReassignmentPlan?.suggestions || []).forEach(item => {
+      if(item && item.leadId){
+        suggestionMap.set(String(item.leadId), item);
+      }
+    });
+    leads.forEach(lead => {
+      const id = String(lead.id || '');
+      if(!id) return;
+      const decision = getStoredReassignmentDecision(id);
+      if(decision && decision.status === 'applied' && decision.toName){
+        if(!lead._originalAsesor) lead._originalAsesor = lead._originalAsesor || lead.asesor;
+        lead.asesor = decision.toName;
+        lead.autoReassign = {
+          status: 'applied',
+          toName: decision.toName,
+          toKey: decision.toKey || normalizeAsesorName(decision.toName),
+          fromName: decision.fromName || lead._originalAsesor || '',
+          fromKey: decision.fromKey || normalizeAsesorName(decision.fromName || lead._originalAsesor || ''),
+          appliedAt: decision.updatedAt || Date.now()
+        };
+        return;
+      }
+      if(decision && decision.status === 'dismissed'){
+        delete lead.autoReassign;
+        return;
+      }
+      const suggestion = suggestionMap.get(id);
+      if(suggestion){
+        lead.autoReassign = {
+          status: 'pending',
+          toName: suggestion.toName,
+          toKey: suggestion.toKey,
+          fromName: suggestion.fromName,
+          fromKey: suggestion.fromKey
+        };
+      }else{
+        delete lead.autoReassign;
+      }
+    });
+  }
+
+  function formatAutoReassignSummary(stats, suggestionCount){
+    if(!stats) return 'Las cargas por asesor están equilibradas.';
+    const advisors = stats.advisorCount || 0;
+    if(!advisors) return 'Aún no hay asesores con leads asignados.';
+    const avg = stats.average || 0;
+    const averageLabel = `${avg.toFixed(1)} leads por asesor (${advisors} asesores analizados)`;
+    const suggestionLabel = suggestionCount
+      ? `${suggestionCount} reasignación${suggestionCount === 1 ? '' : 'es'} sugerida${suggestionCount === 1 ? '' : 's'}`
+      : 'Sin reasignaciones pendientes';
+    const unassigned = stats.unassigned || 0;
+    const unassignedLabel = unassigned ? ` · ${unassigned} lead${unassigned === 1 ? '' : 's'} sin asignar` : '';
+    return `${averageLabel} · ${suggestionLabel}${unassignedLabel}`;
+  }
+
+  function renderAutoReassignmentPanel(_filteredRows){
+    const section = el('#autoReassignSection');
+    if(!section) return;
+    const summaryEl = el('#autoReassignSummary');
+    const listEl = el('#autoReassignList');
+    const suggestions = autoReassignmentPlan?.suggestions || [];
+    const pending = suggestions.slice();
+    if(!pending.length){
+      const hasOverload = (autoReassignmentPlan?.stats?.overloaded || []).length > 0;
+      if(summaryEl){
+        summaryEl.textContent = hasOverload
+          ? formatAutoReassignSummary(autoReassignmentPlan.stats, 0)
+          : 'Las cargas actuales por asesor están equilibradas.';
+      }
+      if(listEl){
+        listEl.innerHTML = hasOverload
+          ? '<li class="auto-reassign-item"><div><strong>Seguimiento equilibrado</strong><div class="auto-reassign-meta">Las sugerencias anteriores se han aplicado o descartado.</div></div></li>'
+          : '';
+      }
+      section.classList.toggle('hidden', !hasOverload);
+      section.setAttribute('aria-hidden', hasOverload ? 'false' : 'true');
+      return;
+    }
+    section.classList.remove('hidden');
+    section.setAttribute('aria-hidden', 'false');
+    if(summaryEl){
+      summaryEl.textContent = formatAutoReassignSummary(autoReassignmentPlan?.stats, pending.length);
+    }
+    if(listEl){
+      listEl.innerHTML = pending
+        .map(item => {
+          const lead = item.lead;
+          const stage = etapaGroup(lead && lead.etapa);
+          const name = escapeHtml(lead && lead.nombre ? lead.nombre : (lead && lead.id ? String(lead.id) : 'Lead sin nombre'));
+          const from = escapeHtml(item.fromName || 'Sin asesor');
+          const to = escapeHtml(item.toName || 'Sin asignar');
+          const stageLabel = escapeHtml(stage || '—');
+          const leadId = escapeHtml(String(item.leadId || ''));
+          return `<li class="auto-reassign-item" data-lead-id="${leadId}"><div><strong>${name}</strong><div class="auto-reassign-meta"><span><i class="bi bi-arrow-left-right"></i> ${from} → ${to}</span><span><i class="bi bi-kanban"></i> Etapa: ${stageLabel}</span></div></div><div class="auto-reassign-actions"><button class="btn outline" type="button" data-lead-open="${leadId}"><i class="bi bi-search"></i> Revisar lead</button></div></li>`;
+        })
+        .join('');
+    }
+  }
+
+  function renderAutoReassignBadge(lead){
+    if(!lead || !lead.autoReassign) return '';
+    const info = lead.autoReassign;
+    if(info.status === 'pending'){
+      return `<div class="auto-reassign-badge" data-status="pending"><i class="bi bi-arrow-left-right"></i> Reasignar a ${escapeHtml(info.toName || 'otro asesor')}</div>`;
+    }
+    if(info.status === 'applied'){
+      return `<div class="auto-reassign-badge" data-status="applied"><i class="bi bi-check2-circle"></i> Reasignado a ${escapeHtml(info.toName || 'nuevo asesor')}</div>`;
+    }
+    return '';
+  }
+
+  function updateAutoReassignDetail(lead){
+    const container = el('#autoReassignDetail');
+    if(!container){
+      return;
+    }
+    const titleEl = el('#autoReassignDetailTitle');
+    const messageEl = el('#autoReassignDetailMessage');
+    const applyBtn = el('#autoReassignApply');
+    const keepBtn = el('#autoReassignKeep');
+    if(!lead || !lead.autoReassign){
+      container.classList.add('hidden');
+      container.removeAttribute('data-tone');
+      if(applyBtn) applyBtn.disabled = true;
+      return;
+    }
+    const info = lead.autoReassign;
+    container.classList.remove('hidden');
+    container.removeAttribute('data-tone');
+    if(info.status === 'pending'){
+      if(titleEl) titleEl.textContent = 'Reasignación sugerida';
+      if(messageEl) messageEl.textContent = `Se recomienda mover este lead de ${info.fromName || 'tu equipo'} a ${info.toName || 'otro asesor'} para equilibrar la carga.`;
+      if(applyBtn) applyBtn.disabled = false;
+      if(keepBtn) keepBtn.textContent = 'Mantener asignación actual';
+    }else if(info.status === 'applied'){
+      container.setAttribute('data-tone', 'success');
+      if(titleEl) titleEl.textContent = 'Reasignación aplicada';
+      if(messageEl) messageEl.textContent = `Marcaste localmente este lead con ${info.toName || 'otro asesor'}. Puedes revertir el cambio cuando lo necesites.`;
+      if(applyBtn) applyBtn.disabled = true;
+      if(keepBtn) keepBtn.textContent = 'Deshacer reasignación';
+    }else{
+      container.classList.add('hidden');
+      if(applyBtn) applyBtn.disabled = true;
+    }
+  }
+
+  function handleAutoReassignApply(){
+    const lead = detailLeadContext;
+    if(!lead || !lead.autoReassign || lead.autoReassign.status !== 'pending') return;
+    const info = lead.autoReassign;
+    lead._originalAsesor = lead._originalAsesor || lead.asesor;
+    lead.asesor = info.toName || lead.asesor;
+    saveReassignmentDecision(lead.id, {
+      status: 'applied',
+      toName: lead.asesor,
+      toKey: info.toKey || normalizeAsesorName(lead.asesor),
+      fromName: info.fromName || lead._originalAsesor || '',
+      fromKey: info.fromKey || normalizeAsesorName(info.fromName || lead._originalAsesor || '')
+    });
+    autoReassignmentPlan = buildAutoReassignmentPlan(leads);
+    applyAutoReassignmentAnnotations();
+    updateLeadDetailAssignmentDisplay(lead);
+    updateAutoReassignDetail(lead);
+    refresh();
+  }
+
+  function handleAutoReassignKeep(){
+    const lead = detailLeadContext;
+    if(!lead || !lead.autoReassign) return;
+    if(lead.autoReassign.status === 'pending'){
+      saveReassignmentDecision(lead.id, {
+        status: 'dismissed',
+        toName: lead.autoReassign.toName,
+        toKey: lead.autoReassign.toKey,
+        fromName: lead.autoReassign.fromName,
+        fromKey: lead.autoReassign.fromKey
+      });
+    }else if(lead.autoReassign.status === 'applied'){
+      lead.asesor = lead._originalAsesor || lead.autoReassign.fromName || lead.asesor;
+      clearReassignmentDecision(lead.id);
+    }
+    autoReassignmentPlan = buildAutoReassignmentPlan(leads);
+    applyAutoReassignmentAnnotations();
+    updateLeadDetailAssignmentDisplay(lead);
+    updateAutoReassignDetail(lead);
+    refresh();
+  }
+
+  function getDefaultCalendarStart(){
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + 60);
+    now.setSeconds(0, 0);
+    return now;
+  }
+
+  function formatDateInput(date){
+    if(!(date instanceof Date)) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatTimeInput(date){
+    if(!(date instanceof Date)) return '';
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${hours}:${minutes}`;
+  }
+
+  function parseCalendarDateTime(dateValue, timeValue){
+    if(!dateValue || !timeValue) return null;
+    const [year, month, day] = dateValue.split('-').map(Number);
+    const [hour, minute] = timeValue.split(':').map(Number);
+    if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(hour) || !Number.isFinite(minute)){
+      return null;
+    }
+    const date = new Date(year, month - 1, day, hour, minute, 0, 0);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  function buildCalendarEventLink(lead, start, end){
+    const formatCalDate = date => {
+      const year = date.getFullYear();
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const day = String(date.getDate()).padStart(2, '0');
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const seconds = String(date.getSeconds()).padStart(2, '0');
+      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+    };
+    const startStr = formatCalDate(start);
+    const endStr = formatCalDate(end);
+    const titleParts = ['Seguimiento'];
+    if(lead && lead.nombre) titleParts.push(lead.nombre);
+    const title = titleParts.join(' · ');
+    const detailLines = [];
+    if(lead && lead.nombre) detailLines.push(`Lead: ${lead.nombre}`);
+    if(lead && lead.programa) detailLines.push(`Programa: ${lead.programa}`);
+    if(lead && lead.modalidad) detailLines.push(`Modalidad: ${lead.modalidad}`);
+    if(lead && (lead.telefono || lead.telefonoNormalizado)) detailLines.push(`Teléfono: ${fmtPhone(lead.telefono || lead.telefonoNormalizado)}`);
+    if(lead && lead.correo) detailLines.push(`Correo: ${lead.correo}`);
+    if(lead && lead.comentario) detailLines.push(`Último comentario: ${lead.comentario}`);
+    const params = new URLSearchParams({ action: 'TEMPLATE', text: title });
+    if(detailLines.length){
+      params.set('details', detailLines.join('\n'));
+    }
+    params.set('dates', `${startStr}/${endStr}`);
+    if(lead && lead.correo){
+      params.append('add', lead.correo);
+    }
+    if(lead && lead.campus){
+      params.set('location', lead.campus);
+    }
+    return `https://calendar.google.com/calendar/render?${params.toString()}`;
+  }
+
+  function updateCalendarStatusMessage(lead){
+    const dateInput = el('#calendarDate');
+    const timeInput = el('#calendarTime');
+    const durationSelect = el('#calendarDuration');
+    const statusEl = el('#calendarStatus');
+    const button = el('#calendarCreateBtn');
+    if(!dateInput || !timeInput || !durationSelect || !button) return;
+    const duration = Number(durationSelect.value) || CALENDAR_DEFAULT_DURATION;
+    const start = parseCalendarDateTime(dateInput.value, timeInput.value);
+    if(!start){
+      button.disabled = true;
+      button.dataset.href = '';
+      if(statusEl){
+        statusEl.textContent = 'Selecciona fecha y hora válidas para agendar el seguimiento.';
+      }
+      return;
+    }
+    const end = new Date(start.getTime() + duration * 60000);
+    const url = buildCalendarEventLink(lead, start, end);
+    button.disabled = false;
+    button.dataset.href = url;
+    if(statusEl){
+      let formatted;
+      try{
+        formatted = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(start);
+      }catch(err){
+        formatted = `${dateInput.value} ${timeInput.value}`;
+      }
+      statusEl.textContent = `El recordatorio se programará el ${formatted} (${duration} minutos).`;
+    }
+  }
+
+  function prepareCalendarForm(lead){
+    const dateInput = el('#calendarDate');
+    const timeInput = el('#calendarTime');
+    const durationSelect = el('#calendarDuration');
+    const statusEl = el('#calendarStatus');
+    const button = el('#calendarCreateBtn');
+    if(!dateInput || !timeInput || !durationSelect || !button) return;
+    const defaultStart = getDefaultCalendarStart();
+    dateInput.value = formatDateInput(defaultStart);
+    timeInput.value = formatTimeInput(defaultStart);
+    durationSelect.value = String(CALENDAR_DEFAULT_DURATION);
+    if(durationSelect.value !== String(CALENDAR_DEFAULT_DURATION) && durationSelect.options.length){
+      durationSelect.value = durationSelect.options[0].value;
+    }
+    if(statusEl){
+      statusEl.textContent = '';
+    }
+    button.disabled = false;
+    button.dataset.href = '';
+    updateCalendarStatusMessage(lead);
+  }
+
+  function handleCalendarCreate(){
+    const button = el('#calendarCreateBtn');
+    if(!button || button.disabled) return;
+    const href = button.dataset.href;
+    if(!href){
+      updateCalendarStatusMessage(detailLeadContext);
+      return;
+    }
+    window.open(href, '_blank', 'noopener');
+  }
 
   function isLeadSheetName(name){
     if(typeof name !== 'string') return false;
@@ -12248,6 +13375,57 @@
       }
     });
 
+    const leadTagAddBtn = el('#leadTagAdd');
+    if(leadTagAddBtn){
+      leadTagAddBtn.addEventListener('click', () => startLeadTagCreation());
+    }
+    const leadTagForm = el('#leadTagForm');
+    if(leadTagForm){
+      leadTagForm.addEventListener('submit', handleLeadTagSubmit);
+    }
+    const leadTagCancel = el('#leadTagCancel');
+    if(leadTagCancel){
+      leadTagCancel.addEventListener('click', () => hideLeadTagForm());
+    }
+    const leadTagListEl = el('#leadTagList');
+    if(leadTagListEl){
+      leadTagListEl.addEventListener('click', handleLeadTagListClick);
+    }
+    const autoApplyBtn = el('#autoReassignApply');
+    if(autoApplyBtn){
+      autoApplyBtn.addEventListener('click', handleAutoReassignApply);
+    }
+    const autoKeepBtn = el('#autoReassignKeep');
+    if(autoKeepBtn){
+      autoKeepBtn.addEventListener('click', handleAutoReassignKeep);
+    }
+    const autoListEl = el('#autoReassignList');
+    if(autoListEl){
+      autoListEl.addEventListener('click', event => {
+        const button = event.target.closest('[data-lead-open]');
+        if(!button) return;
+        const leadId = button.getAttribute('data-lead-open');
+        if(!leadId) return;
+        const targetLead = leads.find(item => String(item.id || '') === leadId);
+        if(targetLead){
+          openDetails(targetLead);
+        }
+      });
+    }
+    const calendarInputs = [el('#calendarDate'), el('#calendarTime'), el('#calendarDuration')];
+    calendarInputs.forEach(input => {
+      if(!input) return;
+      const handler = () => updateCalendarStatusMessage(detailLeadContext);
+      input.addEventListener('change', handler);
+      if(input.tagName === 'INPUT'){
+        input.addEventListener('input', handler);
+      }
+    });
+    const calendarBtn = el('#calendarCreateBtn');
+    if(calendarBtn){
+      calendarBtn.addEventListener('click', handleCalendarCreate);
+    }
+
     // Tamaño de página
     const sizeSel = el('#pageSize');
     if(sizeSel) sizeSel.addEventListener('change', ()=>{
@@ -12291,14 +13469,9 @@
     const start = hasPagination ? state.page * state.pageSize : 0;
     const end = hasPagination ? start + state.pageSize : rows.length;
     const pageRows = rows.slice(start, end);
-    if(state.viewMode === 'table'){
-      renderTabla(pageRows);
-    }else{
-      pruneColumnLimits(pageRows);
-      renderKanban(pageRows, totals);
-    }
-    updateViewModeUI();
-    updateSortIndicators();
+    pruneColumnLimits(pageRows);
+    renderKanban(pageRows, totals);
+    renderAutoReassignmentPanel(rows);
   }
 
   async function initializeApp(){
