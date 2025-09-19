@@ -3224,6 +3224,20 @@ function handleImportLeads_(e, body, user){
   const preparedRows = [];
   const needsAssignment = [];
   const skipped = [];
+  const summaryCounters = {
+    errors: new Map(),
+    warnings: new Map()
+  };
+  const CRITICAL_IDENTIFIER_MESSAGE = 'Sin identificadores críticos (ID, matrícula, correo o teléfono)';
+  let criticalIdentifierErrors = 0;
+  const registerValidation = (type, message) => {
+    if(!message) return;
+    const store = type === 'error' ? summaryCounters.errors : summaryCounters.warnings;
+    store.set(message, (store.get(message) || 0) + 1);
+    if(type === 'error' && message === CRITICAL_IDENTIFIER_MESSAGE){
+      criticalIdentifierErrors++;
+    }
+  };
   rows.forEach((rawRow, idx) => {
     const data = rawRow && typeof rawRow === 'object' ? rawRow : {};
     const idValue = String(data.id || '').trim();
@@ -3261,9 +3275,14 @@ function handleImportLeads_(e, body, user){
       if(indexes.byPhone.has(phoneKey)) reasons.push('Teléfono existente en la base');
       if(seen.phone.has(phoneKey)) reasons.push('Teléfono duplicado en la importación');
     }
+    if(!idKey && !matriculaKey && !emailKey && !phoneKey){
+      reasons.push(CRITICAL_IDENTIFIER_MESSAGE);
+    }
+    reasons.forEach(reason => registerValidation('error', reason));
     if(reasons.length){
       skipped.push({
         row: idx + 1,
+        nombre,
         id: idValue,
         matricula: matriculaValue,
         telefono: telefonoValue,
@@ -3302,13 +3321,37 @@ function handleImportLeads_(e, body, user){
       updatedAt: timestamp
     };
     if(!asesorValue){
+      registerValidation('warning', 'Registros sin asesor asignado. Se asignará automáticamente.');
       needsAssignment.push(prepared);
     }
     preparedRows.push(prepared);
   });
+  const buildSummaryPayload = () => ({
+    errors: Array.from(summaryCounters.errors.entries()).map(([message, count]) => ({ message, count })),
+    warnings: Array.from(summaryCounters.warnings.entries()).map(([message, count]) => ({ message, count }))
+  });
   if(!preparedRows.length){
     const message = skipped.length ? 'No se importó ningún registro por incidencias detectadas.' : 'No hay registros válidos para importar.';
-    return jsonResponse({ ok:false, error: message, skipped }, e);
+    return jsonResponse({ ok:false, error: message, skipped, summary: buildSummaryPayload(), insertable: 0 }, e);
+  }
+  if(criticalIdentifierErrors > 0){
+    return jsonResponse({
+      ok: false,
+      error: 'Se detectaron registros sin identificadores críticos. Corrige el archivo e intenta nuevamente.',
+      skipped,
+      summary: buildSummaryPayload(),
+      insertable: preparedRows.length
+    }, e);
+  }
+  const confirmImport = body && (body.confirm === true || body.confirm === 'true' || body.confirm === 1);
+  if(!confirmImport){
+    return jsonResponse({
+      ok: true,
+      requiresConfirmation: true,
+      insertable: preparedRows.length,
+      skipped,
+      summary: buildSummaryPayload()
+    }, e);
   }
   if(needsAssignment.length){
     assignAsesoresRoundRobin_(needsAssignment, sheetName);
@@ -3354,6 +3397,12 @@ function handleImportLeads_(e, body, user){
   if(skipped.length){
     messageParts.push(`Omitidos: ${skipped.length}`);
   }
-  const response = { ok:true, inserted: toInsert.length, skipped, message: messageParts.join(' · ') };
+  const response = {
+    ok: true,
+    inserted: toInsert.length,
+    skipped,
+    summary: buildSummaryPayload(),
+    message: messageParts.join(' · ')
+  };
   return jsonResponse(response, e);
 }
