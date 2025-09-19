@@ -670,7 +670,11 @@
       background:#fff;
     }
     .panel-filters{ flex-wrap:wrap; align-items:stretch; gap:var(--space-sm); }
+    .panel-filters label{ display:flex; flex-direction:column; gap:6px; font-size:12px; text-transform:uppercase; letter-spacing:.45px; color:var(--muted); font-weight:700; }
     .panel-filters select{ min-width:160px; padding:10px 12px; }
+    .panel-filters label input[type="number"]{ min-width:120px; padding:10px 12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,.12); background:var(--card-2); color:var(--text); font:600 14px/1.25 'Manrope', var(--font); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .panel-filters label input[type="number"]:focus{ outline:none; border-color:var(--accent); box-shadow: var(--ring); }
+    html[data-theme="light"] .panel-filters label input[type="number"]{ border-color: rgba(15,23,42,0.12); background:#f8fafc; color:#0f172a; box-shadow: inset 0 1px 0 rgba(255,255,255,0.75); }
     .panel-section{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space) 0; border-top:1px solid rgba(255,255,255,.08); }
     .panel-section:first-of-type{ border-top:none; padding-top:0; }
     .panel-section h3{ margin:0; font-size:15px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:var(--space-sm); }
@@ -1258,6 +1262,23 @@
     .modal-header h2{ margin:0; font-size:1.25rem; }
     .modal-message{ margin:6px 0 0; color:var(--muted); }
     .modal-body{ padding: var(--space); overflow:auto; display:flex; flex-direction:column; gap:var(--space); }
+    .calendar-form{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .calendar-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:var(--space-sm); }
+    .calendar-field{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .calendar-field input,
+    .calendar-field select{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); padding:10px 12px; background:var(--card-2); color:var(--text); font:600 14px/1.35 'Manrope', var(--font); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .calendar-field input:focus,
+    .calendar-field select:focus{ outline:none; border-color:rgba(var(--panel-base-rgb),0.45); box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    .calendar-notes{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .calendar-notes textarea{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); padding:12px 14px; background:var(--card-2); color:var(--text); font:600 14px/1.4 'Manrope', var(--font); min-height:96px; resize:vertical; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .calendar-notes textarea:focus{ outline:none; border-color:rgba(var(--panel-base-rgb),0.45); box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    html[data-theme="light"] .calendar-field input,
+    html[data-theme="light"] .calendar-field select,
+    html[data-theme="light"] .calendar-notes textarea{ background:#f8fafc; border-color:rgba(148,163,184,0.35); color:#0f172a; box-shadow: inset 0 1px 0 rgba(255,255,255,0.75); }
+    .schedule-summary{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:rgba(148,163,184,0.12); padding:12px 14px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .schedule-summary__item strong{ color:var(--text); font-weight:700; }
+    html[data-theme="light"] .schedule-summary{ background:rgba(148,163,184,0.2); border-color:rgba(148,163,184,0.45); color:#475569; }
+    html[data-theme="light"] .schedule-summary__item strong{ color:#0f172a; }
     .modal-section{ display:flex; flex-direction:column; gap:var(--space-sm); }
     .modal-validations{ display:grid; gap:var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     .modal-summary-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
@@ -1521,7 +1542,8 @@
       background: rgba(254,226,226,0.92);
       color:#b91c1c;
     }
-    .drawer-quick__actions{ display:flex; justify-content:flex-end; }
+    .drawer-quick__actions{ display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .drawer-quick__actions .btn{ flex:1 1 160px; justify-content:center; }
 
     /* Responsive */
     @media (max-width: 1200px){ .panel-overlay{ display:none } }
@@ -2087,6 +2109,47 @@
       </div>
     </div>
   </div>
+  <div class="modal-overlay" id="calendarModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <button type="button" class="modal-close" id="calendarModalClose" aria-label="Cerrar agendador">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Agendar seguimiento</h2>
+        <p class="modal-message" id="calendarLeadSummary"></p>
+      </div>
+      <div class="modal-body">
+        <form id="calendarForm" class="calendar-form">
+          <div class="calendar-grid">
+            <label class="calendar-field">Fecha
+              <input type="date" id="calendarDate" required />
+            </label>
+            <label class="calendar-field">Hora
+              <input type="time" id="calendarTime" required />
+            </label>
+            <label class="calendar-field">Duración
+              <select id="calendarDuration">
+                <option value="15">15 minutos</option>
+                <option value="30" selected>30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">60 minutos</option>
+              </select>
+            </label>
+          </div>
+          <label class="calendar-notes">Notas para el evento
+            <textarea id="calendarNotes" rows="3" placeholder="Agrega detalles relevantes del seguimiento"></textarea>
+          </label>
+        </form>
+        <div class="schedule-summary" id="calendarSummary" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button type="button" class="btn" id="calendarCancelBtn">Cancelar</button>
+          <button type="submit" class="btn primary" form="calendarForm">Crear en Google Calendar</button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="app hidden" id="app">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar" aria-label="Navegación principal" aria-hidden="false">
@@ -2298,6 +2361,7 @@
             </div>
             <div class="panel-quick__actions">
               <button class="btn primary" id="updateBtn">Guardar actualización</button>
+              <button class="btn outline" type="button" id="scheduleBtn"><i class="bi bi-calendar-event"></i> Agendar seguimiento</button>
               <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
                 <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
                 <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
@@ -2333,6 +2397,10 @@
               <label>
                 Base de destino
                 <select id="importBaseSelect"></select>
+              </label>
+              <label>
+                Lote (01-99)
+                <input type="number" id="importLotInput" min="1" max="99" placeholder="01" inputmode="numeric" pattern="[0-9]*" />
               </label>
               <input type="file" id="importFile" accept=".csv,.xlsx" class="file-input">
             </div>
@@ -2995,6 +3063,7 @@
   let teamsLoaded = false;
   let teamsLoading = false;
   let selectedTeamId = '';
+  let activeScheduleLead = null;
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
@@ -3011,6 +3080,16 @@
   const CONTACT_CHANNEL_LABELS = { call: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo' };
   const DAILY_SHORTCUT_LIMIT = 3;
   const LEAD_PRIORITY_THRESHOLDS = { high: 6, medium: 3 };
+  const calendarModal = el('#calendarModal');
+  const calendarModalClose = el('#calendarModalClose');
+  const calendarForm = el('#calendarForm');
+  const calendarDateInput = el('#calendarDate');
+  const calendarTimeInput = el('#calendarTime');
+  const calendarDurationInput = el('#calendarDuration');
+  const calendarNotesInput = el('#calendarNotes');
+  const calendarSummary = el('#calendarSummary');
+  const calendarLeadSummary = el('#calendarLeadSummary');
+  const calendarCancelBtn = el('#calendarCancelBtn');
   const CONTACT_TIMESTAMP_FORMAT = (() => {
     try{
       return new Intl.DateTimeFormat('es-MX', { dateStyle: 'short', timeStyle: 'short' });
@@ -8453,6 +8532,11 @@
       feedbackMessageEl: el('#panelFeedbackMessage')
     });
 
+    const scheduleBtn = el('#scheduleBtn');
+    if(scheduleBtn){
+      scheduleBtn.onclick = () => { openScheduleModal(r); };
+    }
+
     const phone = parsePhone(basePhone);
     const phoneDigits = phone.intl || phone.digits;
     const waDigits = phone.wa || phoneDigits;
@@ -8538,6 +8622,7 @@
             <p id="drawerFeedbackMessage"></p>
           </div>
           <div class="drawer-quick__actions">
+            <button class="btn outline" type="button" id="drawerScheduleBtn"><i class="bi bi-calendar-event"></i> Agendar seguimiento</button>
             <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
           </div>
           <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
@@ -8554,6 +8639,10 @@
         feedbackTitleEl: el('#drawerFeedbackTitle'),
         feedbackMessageEl: el('#drawerFeedbackMessage')
       });
+      const drawerScheduleBtn = document.getElementById('drawerScheduleBtn');
+      if(drawerScheduleBtn){
+        drawerScheduleBtn.onclick = () => { openScheduleModal(r); };
+      }
       const drawerCall = document.getElementById('drawerActCall');
       if(drawerCall){
         drawerCall.onclick = () => { maybeRegisterContactNote('call'); };
@@ -8622,6 +8711,166 @@
     }
     return phone.raw || '';
   };
+
+  function computeDefaultScheduleStart(){
+    const now = new Date();
+    now.setSeconds(0, 0);
+    now.setMinutes(now.getMinutes() + 30);
+    const remainder = now.getMinutes() % 15;
+    if(remainder){
+      now.setMinutes(now.getMinutes() + (15 - remainder));
+    }
+    return now;
+  }
+  function formatCalendarDateTime(date){
+    if(!(date instanceof Date)) return '';
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}${month}${day}T${hours}${minutes}${seconds}`;
+  }
+  function buildCalendarEventUrl(lead, options = {}){
+    const url = new URL('https://calendar.google.com/calendar/render');
+    url.searchParams.set('action','TEMPLATE');
+    const leadName = cleanValue(lead?.nombre || '') || 'Seguimiento';
+    url.searchParams.set('text', `Seguimiento – ${leadName}`);
+    if(options.start instanceof Date && options.end instanceof Date){
+      url.searchParams.set('dates', `${formatCalendarDateTime(options.start)}/${formatCalendarDateTime(options.end)}`);
+    }
+    const details = [];
+    if(lead?.id) details.push(`ID: ${lead.id}`);
+    const baseLabel = lead?.base ? sheetDisplayName(lead.base) : (state.sheet ? sheetDisplayName(state.sheet) : '');
+    if(baseLabel) details.push(`Base: ${baseLabel}`);
+    if(lead?.campus) details.push(`Plantel: ${lead.campus}`);
+    if(lead?.programa) details.push(`Programa: ${lead.programa}`);
+    if(lead?.modalidad) details.push(`Modalidad: ${lead.modalidad}`);
+    const telefono = fmtPhone(lead?.telefono || lead?.telefonoNormalizado);
+    if(telefono) details.push(`Teléfono: ${telefono}`);
+    if(lead?.correo) details.push(`Correo: ${lead.correo}`);
+    const asesorName = lead?.asesor ? displayAsesorName(lead.asesor) : '';
+    if(asesorName) details.push(`Asesor asignado: ${asesorName}`);
+    const notes = typeof options.notes === 'string' ? options.notes.trim() : '';
+    if(notes) details.push(`Notas: ${notes}`);
+    if(details.length){
+      url.searchParams.set('details', details.join('\n'));
+    }
+    if(lead?.campus){
+      url.searchParams.set('location', lead.campus);
+    }
+    return url.toString();
+  }
+  function updateCalendarSummary(lead, notes){
+    if(!calendarSummary) return;
+    if(!lead){
+      calendarSummary.innerHTML = '';
+      return;
+    }
+    const items = [];
+    if(lead.id) items.push({ label:'ID', value: lead.id });
+    if(lead.campus) items.push({ label:'Plantel', value: lead.campus });
+    if(lead.programa) items.push({ label:'Programa', value: lead.programa });
+    if(lead.modalidad) items.push({ label:'Modalidad', value: lead.modalidad });
+    const telefono = fmtPhone(lead.telefono || lead.telefonoNormalizado);
+    if(telefono) items.push({ label:'Teléfono', value: telefono });
+    if(lead.correo) items.push({ label:'Correo', value: lead.correo });
+    const asesorName = lead.asesor ? displayAsesorName(lead.asesor) : '';
+    if(asesorName) items.push({ label:'Asesor', value: asesorName });
+    const trimmedNotes = typeof notes === 'string' ? notes.trim() : '';
+    if(trimmedNotes) items.push({ label:'Notas', value: trimmedNotes });
+    if(items.length){
+      calendarSummary.innerHTML = items
+        .map(item => `<div class="schedule-summary__item"><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(item.value)}</div>`)
+        .join('');
+    }else{
+      calendarSummary.innerHTML = '<span class="muted">Sin información adicional.</span>';
+    }
+  }
+  function openScheduleModal(lead){
+    if(!calendarModal || !lead) return;
+    activeScheduleLead = lead;
+    const defaultStart = computeDefaultScheduleStart();
+    if(calendarDateInput){
+      calendarDateInput.value = defaultStart.toISOString().slice(0, 10);
+    }
+    if(calendarTimeInput){
+      calendarTimeInput.value = defaultStart.toISOString().slice(11, 16);
+    }
+    if(calendarDurationInput){
+      calendarDurationInput.value = '30';
+    }
+    if(calendarNotesInput){
+      calendarNotesInput.value = lead.comentario || '';
+    }
+    if(calendarLeadSummary){
+      const summaryParts = [lead.nombre, lead.campus, lead.programa].filter(Boolean);
+      calendarLeadSummary.textContent = summaryParts.join(' · ');
+    }
+    updateCalendarSummary(lead, calendarNotesInput ? calendarNotesInput.value : '');
+    calendarModal.classList.add('active');
+    calendarModal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+    if(calendarDateInput){
+      calendarDateInput.focus();
+    }
+  }
+  function closeScheduleModal(){
+    if(!calendarModal) return;
+    calendarModal.classList.remove('active');
+    calendarModal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    activeScheduleLead = null;
+  }
+  if(calendarModalClose){
+    calendarModalClose.addEventListener('click', closeScheduleModal);
+  }
+  if(calendarCancelBtn){
+    calendarCancelBtn.addEventListener('click', closeScheduleModal);
+  }
+  if(calendarModal){
+    calendarModal.addEventListener('click', event => {
+      if(event.target === calendarModal){
+        closeScheduleModal();
+      }
+    });
+  }
+  if(calendarNotesInput){
+    calendarNotesInput.addEventListener('input', ()=>{
+      if(activeScheduleLead){
+        updateCalendarSummary(activeScheduleLead, calendarNotesInput.value);
+      }
+    });
+  }
+  if(calendarForm){
+    calendarForm.addEventListener('submit', event => {
+      event.preventDefault();
+      if(!activeScheduleLead){
+        closeScheduleModal();
+        return;
+      }
+      const dateValue = calendarDateInput?.value || '';
+      const timeValue = calendarTimeInput?.value || '';
+      if(!dateValue || !timeValue){
+        alert('Selecciona fecha y hora para el seguimiento.');
+        return;
+      }
+      const start = new Date(`${dateValue}T${timeValue}`);
+      if(Number.isNaN(start.getTime())){
+        alert('La fecha u hora seleccionada no es válida.');
+        return;
+      }
+      start.setSeconds(0, 0);
+      const durationMinutes = Number.parseInt(calendarDurationInput?.value || '30', 10);
+      const minutes = Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 30;
+      const end = new Date(start.getTime() + minutes * 60000);
+      const notesValue = calendarNotesInput?.value || '';
+      const calendarUrl = buildCalendarEventUrl(activeScheduleLead, { start, end, notes: notesValue });
+      window.open(calendarUrl, '_blank', 'noopener');
+      closeScheduleModal();
+    });
+  }
 
   function isLeadSheetName(name){
     if(typeof name !== 'string') return false;
@@ -10142,6 +10391,71 @@
     telefono: value => fmtPhone(value),
     telefonoNormalizado: value => fmtPhone(value)
   };
+  const BASE_CODE_MAP = (() => {
+    const map = new Map();
+    const register = (name, code, extras = []) => {
+      [name, ...extras].forEach(value => {
+        const key = normalizeBaseKey(value);
+        if(!key) return;
+        if(!map.has(key)) map.set(key, code);
+        const collapsed = key.replace(/[^a-z0-9]+/g, '');
+        if(collapsed && !map.has(collapsed)) map.set(collapsed, code);
+      });
+    };
+    register('Planteles', '01');
+    register('Regresos', '02');
+    register('Reciclados', '03');
+    register('Rescate', '04', ['Rescatados']);
+    return map;
+  })();
+  const PLANTEL_CODE_MAP = (() => {
+    const map = new Map();
+    const register = (name, code, extras = []) => {
+      [name, ...extras].forEach(value => {
+        const key = normalizePlantelKey(value);
+        if(!key) return;
+        if(!map.has(key)) map.set(key, code);
+        const collapsed = key.replace(/[^a-z0-9]+/g, '');
+        if(collapsed && !map.has(collapsed)) map.set(collapsed, code);
+      });
+    };
+    register('HERMOSILLO', '20');
+    register('AGUA PRIETA', '21');
+    register('NOGALES', '22');
+    register('OBREGÓN', '25');
+    register('CULIACÁN', '28');
+    register('MAZATLÁN', '29');
+    register('CHIHUAHUA', '31');
+    register('ZACATECAS', '32');
+    register('TORREÓN', '33', ['TORREON']);
+    register('LA PAZ', '35');
+    register('SALTILLO', '36');
+    register('TIJUANA', '37');
+    register('ENSENADA', '38');
+    register('MEXICALI', '39');
+    register('AGUASCALIENTES', '41');
+    register('QUERÉTARO', '42', ['QUERETARO']);
+    register('LOS CABOS', '43');
+    register('PUERTO PEÑASCO', '44', ['PUERTO PENASCO']);
+    register('ALTAMIRA', '45');
+    register('CD. MANTE', '48', ['CD MANTE', 'CIUDAD MANTE']);
+    register('ZIHUATANEJO', '49');
+    register('LÁZARO CÁRDENAS', '50', ['LAZARO CARDENAS']);
+    register('TUXPAN', '51');
+    register('CD. DEL CARMEN', '52', ['CD DEL CARMEN', 'CIUDAD DEL CARMEN']);
+    register('VERACRUZ', '53');
+    register('ACAPULCO', '54');
+    register('SAN MIGUEL DE ALLENDE', '55');
+    register('TULA', '56');
+    register('QUERÉTARO (2)', '57', ['QUERETARO (2)', 'QUERÉTARO 2', 'QUERETARO 2']);
+    register('HUICHAPAN', '58');
+    register('CANANEA', '59');
+    register('TEOCALTICHE', '60');
+    register('ONLINE', '64', ['EN LINEA', 'EN LÍNEA']);
+    register('SENADO DE LA REPÚBLICA', '65', ['SENADO DE LA REPUBLICA']);
+    register('PACHUCA', '66');
+    return map;
+  })();
 
   function normalizeAliasKey(value){
     return String(value || '')
@@ -10157,6 +10471,9 @@
       .toLowerCase()
       .replace(/\s+/g,' ')
       .trim();
+  }
+  function normalizeBaseKey(value){
+    return normalizeTextValue(value);
   }
   function registerHeaderAlias(key, aliases){
     const list = Array.isArray(aliases) ? aliases : [aliases];
@@ -10820,6 +11137,69 @@
     if(!hasFieldData(row, BULK_OUTPUT_FIELDS)) return null;
     return row;
   }
+  function resolveBaseCode(baseName){
+    const key = normalizeBaseKey(baseName);
+    if(!key) return '';
+    const collapsed = key.replace(/[^a-z0-9]+/g, '');
+    return BASE_CODE_MAP.get(key) || (collapsed ? BASE_CODE_MAP.get(collapsed) : '') || '';
+  }
+  function resolvePlantelCode(campus){
+    const key = normalizePlantelKey(campus);
+    if(!key) return '';
+    const collapsed = key.replace(/[^a-z0-9]+/g, '');
+    return PLANTEL_CODE_MAP.get(key) || (collapsed ? PLANTEL_CODE_MAP.get(collapsed) : '') || '';
+  }
+  function formatLotCode(value){
+    if(value === undefined || value === null) return '';
+    const str = typeof value === 'string' ? value.trim() : String(value);
+    if(!str) return '';
+    const numeric = Number.parseInt(str, 10);
+    if(!Number.isFinite(numeric)) return '';
+    if(numeric < 1 || numeric > 99) return '';
+    return String(Math.trunc(numeric)).padStart(2, '0');
+  }
+  function applyAutoId(rows, options = {}){
+    const list = Array.isArray(rows) ? rows : [];
+    const baseName = options.baseName || '';
+    const baseCode = resolveBaseCode(baseName);
+    if(!baseCode){
+      const error = new Error(`No se reconoce la base "${baseName}" para generar IDs automáticos.`);
+      error.code = 'INVALID_BASE';
+      throw error;
+    }
+    const lotCode = formatLotCode(options.lotNumber);
+    if(!lotCode){
+      const error = new Error('Ingresa un número de lote válido (01-99) para generar IDs.');
+      error.code = 'INVALID_LOT';
+      throw error;
+    }
+    const counters = new Map();
+    const processed = [];
+    const issues = [];
+    list.forEach(row => {
+      if(!row || typeof row !== 'object') return;
+      const existingId = cleanValue(row.id || '');
+      if(existingId){
+        row._idKey = normalizeIdentifierKey(existingId);
+        processed.push(row);
+        return;
+      }
+      const plantelCode = resolvePlantelCode(row.campus || '');
+      if(!plantelCode){
+        const hasCampus = cleanValue(row.campus || '');
+        issues.push({ row, reason: hasCampus ? 'Plantel sin código para generar ID' : 'Sin plantel para generar ID' });
+        return;
+      }
+      const count = (counters.get(plantelCode) || 0) + 1;
+      counters.set(plantelCode, count);
+      const recordCode = String(count).padStart(3, '0');
+      const newId = `${baseCode}-${plantelCode}-${lotCode}-${recordCode}`;
+      row.id = newId;
+      row._idKey = normalizeIdentifierKey(newId);
+      processed.push(row);
+    });
+    return { rows: processed, errors: issues };
+  }
   function createLeadKeyStores(){
     const stores = { phone:new Set(), email:new Set(), id:new Set(), matricula:new Set() };
     leads.forEach(lead => {
@@ -11134,6 +11514,7 @@
   }
 
   let importData = [];
+  const importLotInput = el('#importLotInput');
   const importFile = el('#importFile');
   const importPreview = el('#importPreview');
   const dupWrap = el('#dupWrap');
@@ -11154,6 +11535,21 @@
   let pendingImportSkipped = [];
   let importModalConfirmable = false;
   const SKIPPED_MODAL_FIELDS = ['row','id','nombre','matricula','telefono','correo','motivo'];
+
+  if(importLotInput){
+    importLotInput.addEventListener('input', ()=>{
+      importData = [];
+      clearContainer(importPreview);
+      clearContainer(dupWrap);
+      if(execBtn) execBtn.disabled = true;
+    });
+    importLotInput.addEventListener('blur', ()=>{
+      const formatted = formatLotCode(importLotInput.value);
+      if(formatted){
+        importLotInput.value = formatted;
+      }
+    });
+  }
 
   const summarizeValidationTotals = summary => ({
     errors: Array.isArray(summary?.errors)
@@ -11395,6 +11791,10 @@
       alert('No tienes permisos para importar datos.');
       return;
     }
+    if(!state.sheet){
+      alert('Selecciona una base antes de verificar la importación.');
+      return;
+    }
     const file = importFile?.files?.[0];
     if(!file){ alert('Selecciona un archivo'); return; }
     setButtonBusy(verifyBtn, true, 'Verificando...');
@@ -11420,9 +11820,45 @@
         if(execBtn) execBtn.disabled = true;
         return;
       }
-      const { valid, duplicates } = splitImportRows(normalized);
+      const lotValue = importLotInput?.value || '';
+      if(!lotValue){
+        alert('Ingresa el número de lote (01-99) antes de verificar.');
+        importData = [];
+        clearContainer(importPreview);
+        clearContainer(dupWrap);
+        if(execBtn) execBtn.disabled = true;
+        return;
+      }
+      let autoIdResult;
+      try{
+        autoIdResult = applyAutoId(normalized, {
+          baseName: sheetDisplayName(state.sheet),
+          lotNumber: lotValue
+        });
+      }catch(autoErr){
+        console.error('Error al generar IDs automáticos', autoErr);
+        alert(autoErr.message || 'No se pudieron generar los IDs automáticamente.');
+        importData = [];
+        clearContainer(importPreview);
+        clearContainer(dupWrap);
+        if(execBtn) execBtn.disabled = true;
+        return;
+      }
+      const normalizedWithIds = Array.isArray(autoIdResult?.rows) ? autoIdResult.rows : [];
+      const idGenerationIssues = Array.isArray(autoIdResult?.errors) ? autoIdResult.errors : [];
+      if(importLotInput){
+        const formattedLot = formatLotCode(importLotInput.value);
+        if(formattedLot) importLotInput.value = formattedLot;
+      }
+      const { valid, duplicates } = splitImportRows(normalizedWithIds);
+      const issues = duplicates.slice();
+      idGenerationIssues.forEach(entry => {
+        if(entry && entry.row){
+          issues.push({ data: entry.row, reason: entry.reason || 'No se pudo generar el ID' });
+        }
+      });
       const validRows = valid.map(projectImportRow);
-      const duplicateRows = duplicates.map(item => {
+      const duplicateRows = issues.map(item => {
         const projected = projectImportRow(item.data);
         projected.motivo = item.reason;
         return projected;
@@ -11430,7 +11866,7 @@
       importData = validRows;
       if(validRows.length){
         renderTable(importPreview, validRows, {
-          fields: ['nombre','matricula','telefono','programa','etapa','estado'],
+          fields: ['id','nombre','matricula','telefono','programa','etapa','estado'],
           summary: `Registros listos: ${validRows.length}${duplicateRows.length ? ` · Descartados: ${duplicateRows.length}` : ''}`
         });
         if(execBtn) execBtn.disabled = false;
@@ -11440,7 +11876,7 @@
       }
       if(duplicateRows.length){
         renderTable(dupWrap, duplicateRows, {
-          fields: ['nombre','matricula','telefono','motivo'],
+          fields: ['id','nombre','matricula','telefono','motivo'],
           limit: 10,
           summary: `Registros descartados: ${duplicateRows.length}`
         });
