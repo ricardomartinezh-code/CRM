@@ -182,6 +182,8 @@ const CANONICAL_ESTADO_LABELS = (() => {
   return map;
 })();
 
+const ROUND_ROBIN_PROPERTY_PREFIX = 'ROUND_ROBIN_INDEX_';
+
 function getSpreadsheet_(){
   let ss = null;
   try{
@@ -1809,6 +1811,94 @@ function canonicalBaseKey_(value){
   return BASE_NAME_ALIAS_MAP[normalized] || normalized;
 }
 
+function getRoundRobinPropertyKey_(sheetName){
+  const baseKey = canonicalBaseKey_(sheetName) || normalizeScopeKey_(sheetName) || 'default';
+  const sanitized = String(baseKey || 'default')
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '') || 'DEFAULT';
+  return `${ROUND_ROBIN_PROPERTY_PREFIX}${sanitized}`;
+}
+
+function readRoundRobinIndex_(sheetName){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return 0;
+    const key = getRoundRobinPropertyKey_(sheetName);
+    const raw = props.getProperty(key);
+    const value = Number(raw);
+    if(!isFinite(value) || value < 0) return 0;
+    return Math.floor(value);
+  }catch(err){
+    return 0;
+  }
+}
+
+function writeRoundRobinIndex_(sheetName, index){
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props) return;
+    const key = getRoundRobinPropertyKey_(sheetName);
+    const safeIndex = Math.max(0, Math.floor(Number(index) || 0));
+    props.setProperty(key, String(safeIndex));
+  }catch(err){
+    // ignored on purpose
+  }
+}
+
+function getActiveAsesoresForSheet_(sheetName){
+  try{
+    const meta = readUsersWithMeta_();
+    const asesores = meta.users
+      .filter(user => {
+        if(!user || user.active === false) return false;
+        const role = String(user.role || '').trim().toLowerCase();
+        if(role !== 'asesor') return false;
+        return userCanAccessSheet_(user, sheetName);
+      })
+      .map(user => ({
+        name: String(user.name || '').trim() || user.userId || user.email,
+        lead: user
+      }));
+    asesores.sort((a, b) => a.name.localeCompare(b.name, 'es', { sensitivity: 'base' }));
+    return asesores.map(entry => entry.name);
+  }catch(err){
+    return [];
+  }
+}
+
+function assignAsesoresRoundRobin_(rows, sheetName){
+  if(!Array.isArray(rows) || !rows.length) return;
+  const asesores = getActiveAsesoresForSheet_(sheetName);
+  if(!asesores.length){
+    try{
+      Logger.log(`[RoundRobin] Base ${sheetName} · Sin asesores activos disponibles para asignación.`);
+    }catch(err){
+      // logging failures are ignored
+    }
+    return;
+  }
+  let pointer = readRoundRobinIndex_(sheetName);
+  if(pointer >= asesores.length){
+    pointer = pointer % asesores.length;
+  }
+  const startPointer = pointer;
+  rows.forEach(row => {
+    const current = asesores[pointer % asesores.length];
+    row.asesorValue = current;
+    pointer = (pointer + 1) % asesores.length;
+  });
+  writeRoundRobinIndex_(sheetName, pointer);
+  try{
+    Logger.log(`[RoundRobin] Base ${sheetName} · Inicio:${startPointer} · Fin:${pointer} · Asignados:${rows.length}`);
+    rows.forEach((row, idx) => {
+      Logger.log(`[RoundRobin] ${sheetName} · #${idx + 1} Lead:${row.leadId || ''} -> ${row.asesorValue}`);
+    });
+  }catch(err){
+    // logging failures are ignored
+  }
+}
+
 function isGlobalBaseValue_(value){
   if(value === undefined || value === null) return false;
   return GLOBAL_BASE_SCOPE_TOKENS.has(normalizeScopeKey_(value));
@@ -2603,7 +2693,8 @@ function handleImportLeads_(e, body, user){
   const existingValues = dataRowCount > 0 ? sheet.getRange(2, 1, dataRowCount, headers.length).getValues() : [];
   const indexes = buildSheetLeadIndex_(existingValues, map);
   const seen = { id:new Set(), matricula:new Set(), email:new Set(), phone:new Set() };
-  const toInsert = [];
+  const preparedRows = [];
+  const needsAssignment = [];
   const skipped = [];
   rows.forEach((rawRow, idx) => {
     const data = rawRow && typeof rawRow === 'object' ? rawRow : {};
@@ -2657,50 +2748,78 @@ function handleImportLeads_(e, body, user){
     if(matriculaKey) seen.matricula.add(matriculaKey);
     if(emailKey) seen.email.add(emailKey);
     if(phoneKey) seen.phone.add(phoneKey);
-    const rowValues = new Array(totalCols).fill('');
     const leadId = idValue || generateLeadId_();
-    setRowValue_(rowValues, map, 'ID', leadId);
-    setRowValue_(rowValues, map, 'Nombre', nombre);
-    setRowValue_(rowValues, map, 'Matricula', matriculaValue);
-    setRowValue_(rowValues, map, 'Correo', correoValue);
-    setRowValue_(rowValues, map, 'Teléfono', telefonoValue);
-    setRowValue_(rowValues, map, 'Telefono', telefonoValue);
-    setRowValue_(rowValues, map, 'Plantel', campus);
-    setRowValue_(rowValues, map, 'Modalidad', modalidad);
-    setRowValue_(rowValues, map, 'Programa', programa);
-    setRowValue_(rowValues, map, 'Etapa', etapaValue);
-    if(estadoValue){
-      setRowValue_(rowValues, map, 'Estado', estadoValue);
-    }
-    if(asesorValue){
-      setRowValue_(rowValues, map, 'Asesor', asesorValue);
-    }
-    if(comentarioValue){
-      setRowValue_(rowValues, map, 'Comentario', comentarioValue);
-    }
-    if(metadataValue){
-      setRowValue_(rowValues, map, 'Metadatos', metadataValue);
-    }
     if(!asignacionValue){
       asignacionValue = formatDateTime_(new Date());
     }
-    setRowValue_(rowValues, map, 'Asignación', asignacionValue);
-    setRowValue_(rowValues, map, 'Asignacion', asignacionValue);
-    const resolution = computeResolutionForLead_(sheet.getName(), etapaValue, estadoValue || etapaValue);
-    if(resolution){
-      setRowValue_(rowValues, map, 'Resolución', resolution);
-      setRowValue_(rowValues, map, 'Resolucion', resolution);
-    }
-    applyContactLinksToRow_(rowValues, map, telefonoValue, correoValue, nombre);
     const timestamp = formatDateTime_(new Date());
-    setRowValue_(rowValues, map, 'CreadoEl', timestamp);
-    setRowValue_(rowValues, map, 'ActualizadoEl', timestamp);
-    toInsert.push(rowValues);
+    const resolution = computeResolutionForLead_(sheet.getName(), etapaValue, estadoValue || etapaValue);
+    const prepared = {
+      leadId,
+      nombre,
+      matriculaValue,
+      correoValue,
+      telefonoValue,
+      campus,
+      modalidad,
+      programa,
+      etapaValue,
+      estadoValue,
+      asesorValue,
+      comentarioValue,
+      metadataValue,
+      asignacionValue,
+      resolution,
+      createdAt: timestamp,
+      updatedAt: timestamp
+    };
+    if(!asesorValue){
+      needsAssignment.push(prepared);
+    }
+    preparedRows.push(prepared);
   });
-  if(!toInsert.length){
+  if(!preparedRows.length){
     const message = skipped.length ? 'No se importó ningún registro por incidencias detectadas.' : 'No hay registros válidos para importar.';
     return jsonResponse({ ok:false, error: message, skipped }, e);
   }
+  if(needsAssignment.length){
+    assignAsesoresRoundRobin_(needsAssignment, sheetName);
+  }
+  const toInsert = preparedRows.map(row => {
+    const rowValues = new Array(totalCols).fill('');
+    setRowValue_(rowValues, map, 'ID', row.leadId);
+    setRowValue_(rowValues, map, 'Nombre', row.nombre);
+    setRowValue_(rowValues, map, 'Matricula', row.matriculaValue);
+    setRowValue_(rowValues, map, 'Correo', row.correoValue);
+    setRowValue_(rowValues, map, 'Teléfono', row.telefonoValue);
+    setRowValue_(rowValues, map, 'Telefono', row.telefonoValue);
+    setRowValue_(rowValues, map, 'Plantel', row.campus);
+    setRowValue_(rowValues, map, 'Modalidad', row.modalidad);
+    setRowValue_(rowValues, map, 'Programa', row.programa);
+    setRowValue_(rowValues, map, 'Etapa', row.etapaValue);
+    if(row.estadoValue){
+      setRowValue_(rowValues, map, 'Estado', row.estadoValue);
+    }
+    if(row.asesorValue){
+      setRowValue_(rowValues, map, 'Asesor', row.asesorValue);
+    }
+    if(row.comentarioValue){
+      setRowValue_(rowValues, map, 'Comentario', row.comentarioValue);
+    }
+    if(row.metadataValue){
+      setRowValue_(rowValues, map, 'Metadatos', row.metadataValue);
+    }
+    setRowValue_(rowValues, map, 'Asignación', row.asignacionValue);
+    setRowValue_(rowValues, map, 'Asignacion', row.asignacionValue);
+    if(row.resolution){
+      setRowValue_(rowValues, map, 'Resolución', row.resolution);
+      setRowValue_(rowValues, map, 'Resolucion', row.resolution);
+    }
+    applyContactLinksToRow_(rowValues, map, row.telefonoValue, row.correoValue, row.nombre);
+    setRowValue_(rowValues, map, 'CreadoEl', row.createdAt);
+    setRowValue_(rowValues, map, 'ActualizadoEl', row.updatedAt);
+    return rowValues;
+  });
   const startRow = lastRow + 1;
   sheet.getRange(startRow, 1, toInsert.length, totalCols).setValues(toInsert);
   const messageParts = [`Registros importados: ${toInsert.length}`];
