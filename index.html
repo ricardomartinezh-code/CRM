@@ -359,6 +359,8 @@
 
     .actions { display:flex; align-items:center; gap:10px; flex:0 0 auto }
     .btn { display:inline-flex; align-items:center; gap:var(--space-sm); border:1px solid var(--accent-2); background: var(--card); color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer; box-shadow:0 2px 4px rgba(0,0,0,.2); transition:transform .1s ease, box-shadow .1s ease }
+    .btn.micro{ padding:6px 10px; font-size:12px; border-radius:10px; box-shadow:0 1px 2px rgba(0,0,0,0.18); }
+    .btn.micro i{ font-size:13px; }
     .btn:hover { border-color: var(--accent) }
     .btn:active { transform:translateY(1px); box-shadow:0 1px 2px rgba(0,0,0,.2) }
     .btn.primary { background: linear-gradient(135deg, var(--accent), var(--color-primary)); border-color: transparent; color:#fff; box-shadow: var(--shadow) }
@@ -1001,6 +1003,12 @@
     .profile-summary{ display:grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap:var(--space-sm); padding:var(--space); border-radius:var(--radius); background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); }
     html[data-theme="light"] .profile-summary{ background:rgba(15,23,42,0.04); border-color:rgba(15,23,42,0.08); }
     .profile-summary div{ display:flex; flex-direction:column; gap:4px; }
+    .profile-sync-alert{ padding:10px 12px; border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:rgba(148,163,184,0.12); display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .profile-sync-alert strong{ font-weight:700; color:var(--text); }
+    .profile-sync-alert[data-state="stale"]{ border-color:rgba(239,68,68,0.45); background:rgba(239,68,68,0.12); color:var(--bad); }
+    .profile-sync-alert[data-state="stale"] strong{ color:var(--bad); }
+    .profile-sync-alert[data-state="unknown"]{ border-color:rgba(245,158,11,0.45); background:rgba(245,158,11,0.12); color:var(--warn); }
+    .profile-sync-alert button{ align-self:flex-start; }
     .summary-label{ font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
     .summary-value{ font-size:14px; font-weight:600; color:var(--text); word-break:break-word; }
     .security-form{ gap:var(--space-sm); align-items:flex-end; }
@@ -1012,7 +1020,25 @@
     .security-status[data-tone="success"] .summary-value{ color:var(--ok); }
     .security-status[data-tone="warning"] .summary-value{ color:var(--warn); }
     .security-status[data-tone="error"] .summary-value{ color:var(--bad); }
+    .security-status__header{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .security-timeline{ margin:4px 0 0; display:flex; flex-direction:column; gap:6px; font-size:12px; color:var(--muted); }
+    .security-timeline__item{ display:flex; align-items:flex-start; gap:8px; }
+    .security-timeline__badge{ width:10px; height:10px; border-radius:50%; margin-top:5px; background:rgba(var(--panel-base-rgb),0.4); flex:0 0 auto; }
+    .security-timeline__item[data-state="done"] .security-timeline__badge{ background:var(--ok); }
+    .security-timeline__item[data-state="active"] .security-timeline__badge{ background:var(--warn); box-shadow:0 0 0 3px rgba(245,158,11,0.25); }
+    .security-timeline__item[data-state="future"] .security-timeline__badge{ background:rgba(148,163,184,0.4); }
+    .security-timeline__content{ display:flex; flex-direction:column; gap:2px; }
+    .security-timeline__label{ font-weight:600; color:var(--text); }
+    .security-timeline__meta{ font-size:11px; color:var(--muted); }
+    .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
     .settings-preferences{ display:grid; gap:var(--space); }
+    .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
+    .pref-presets[hidden]{ display:none; }
+    .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .pref-presets__list{ display:flex; flex-wrap:wrap; gap:10px; }
+    .pref-preset-card{ padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:var(--card); display:flex; flex-direction:column; gap:6px; max-width:320px; }
+    .pref-preset-card strong{ font-size:14px; color:var(--text); }
+    .pref-preset-card p{ margin:0; font-size:12px; color:var(--muted); }
     .settings-group{ display:flex; flex-direction:column; gap:var(--space-sm); font-size:13px; font-weight:600; color:var(--muted); }
     .settings-group legend{ font-size:13px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); margin-bottom:var(--space-sm); }
     .settings-group select{ width:100%; font-weight:600; color:var(--text); }
@@ -1076,6 +1102,20 @@
     .permissions-form input[type="password"],
     .permissions-form select{ background:var(--card); }
     .permissions-form input[readonly]{ opacity:0.8; cursor:not-allowed; }
+    .role-scope-suggestion{ margin-top:6px; padding:10px 12px; border-radius:12px; border:1px dashed rgba(255,255,255,0.18); background:rgba(255,255,255,0.04); display:flex; flex-direction:column; gap:8px; }
+    .role-scope-suggestion[hidden]{ display:none; }
+    .role-scope-suggestion__text{ margin:0; font-size:13px; color:var(--muted); line-height:1.45; }
+    .role-scope-suggestion__chips{ display:flex; flex-wrap:wrap; gap:6px; }
+    .role-scope-suggestion__chips .scope-chip{ display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:999px; background:rgba(var(--panel-base-rgb),0.18); border:1px solid rgba(var(--panel-base-rgb),0.35); font-size:12px; font-weight:600; color:var(--text); letter-spacing:.2px; text-transform:uppercase; }
+    .role-scope-suggestion__chips .scope-chip i{ font-size:12px; opacity:0.85; }
+    html[data-theme="light"] .role-scope-suggestion{ background:rgba(15,23,42,0.04); border-color:rgba(15,23,42,0.16); }
+    html[data-theme="light"] .role-scope-suggestion__chips .scope-chip{ background:rgba(var(--panel-base-rgb),0.12); color:#0f172a; }
+    .multi-select[data-dirty="true"] .multi-select__button{ border-color:rgba(239,68,68,0.55); box-shadow:0 0 0 2px rgba(239,68,68,0.18); }
+    .multi-select[data-dirty="true"]::after{ content:"Personalizado"; align-self:flex-start; font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:rgba(239,68,68,0.85); background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.35); border-radius:999px; padding:2px 8px; margin-top:-4px; }
+    .scope-template-toolbar{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:6px; }
+    .scope-template-btn{ display:inline-flex; flex-direction:column; align-items:flex-start; gap:4px; padding:8px 12px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.1); color:var(--text); font-size:12px; font-weight:600; cursor:pointer; transition:border-color .2s ease, background .2s ease, transform .12s ease; }
+    .scope-template-btn:hover{ border-color:var(--accent); background:rgba(var(--panel-base-rgb),0.18); transform:translateY(-1px); }
+    .scope-template-btn span{ font-weight:500; opacity:0.8; }
     .field-with-hint{ display:flex; flex-direction:column; }
     .field-with-hint .field-hint{ display:block; margin-top:6px; font-size:12px; color:var(--muted); line-height:1.45; }
     .multi-select{ position:relative; display:flex; flex-direction:column; gap:6px; }
@@ -1597,6 +1637,11 @@
                       <option value="viewer">Consulta</option>
                     </select>
                     <span class="field-hint" id="permRoleHint"></span>
+                    <div class="role-scope-suggestion" id="permRoleSuggestion" hidden>
+                      <p class="role-scope-suggestion__text" id="permRoleDescription"></p>
+                      <div class="role-scope-suggestion__chips" id="permRoleScopeChips" aria-live="polite"></div>
+                      <button type="button" class="btn micro" id="permApplyRolePreset"><i class="bi bi-magic"></i> Aplicar sugerencia</button>
+                    </div>
                   </label>
                   <label class="field-with-hint">
                     <span>Planteles autorizados</span>
@@ -1660,6 +1705,7 @@
               </div>
               <form class="permissions-form" id="teamForm" autocomplete="off" novalidate>
                 <h4 class="perm-form-title" id="teamFormTitle">Nuevo equipo</h4>
+                <div class="scope-template-toolbar" id="teamTemplateToolbar" aria-label="Plantillas sugeridas"></div>
                 <div class="form-grid">
                   <label>
                     <span>ID del equipo</span>
@@ -1721,6 +1767,7 @@
                 <div class="row gap10 panel-actions">
                   <button type="submit" class="btn primary" id="teamSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
                   <button type="button" class="btn" id="teamResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
+                  <button type="button" class="btn" id="teamCloneBtn"><i class="bi bi-copy"></i> Clonar configuración</button>
                   <button type="button" class="btn danger" id="teamDeleteBtn"><i class="bi bi-x-circle"></i> Desactivar</button>
                 </div>
               </form>
@@ -1770,6 +1817,7 @@
                     <span class="summary-value" id="profileSummaryCampus">Sin definir</span>
                   </div>
                 </div>
+                <div class="profile-sync-alert" id="profileSyncAlert" hidden></div>
               </div>
             </div>
           </div>
@@ -1777,8 +1825,15 @@
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
-                <span class="summary-label">Solicitud de cambio de contraseña</span>
-                <span class="summary-value" id="passwordRequestStatus">Sin solicitudes registradas.</span>
+                <div class="security-status__header">
+                  <span class="summary-label">Solicitud de cambio de contraseña</span>
+                  <span class="summary-value" id="passwordRequestStatus">Sin solicitudes registradas.</span>
+                </div>
+                <div class="security-timeline" id="passwordRequestTimeline" aria-live="polite"></div>
+                <div class="security-status__actions" id="passwordStatusActions">
+                  <button type="button" class="btn micro" id="passwordApproveBtn" hidden><i class="bi bi-check2-circle"></i> Registrar aprobación</button>
+                  <button type="button" class="btn micro" id="passwordCompleteBtn" hidden><i class="bi bi-send-check"></i> Confirmar entrega</button>
+                </div>
               </div>
               <label>
                 <span>Contraseña actual</span>
@@ -1872,6 +1927,10 @@
                 <input type="checkbox" id="prefShowLeadId" />
                 <span>Mostrar ID en tarjetas del tablero</span>
               </label>
+              <div class="pref-presets" id="prefPresetRecommendations" hidden>
+                <p class="pref-presets__title">Recomendaciones institucionales</p>
+                <div class="pref-presets__list" id="prefPresetList"></div>
+              </div>
               <div class="row gap10 pref-actions">
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
@@ -2336,6 +2395,15 @@
     preferences: 'pulsePreferences',
     password: 'pulsePasswordRequest'
   };
+  const DEFAULT_PASSWORD_REQUEST = {
+    status: 'idle',
+    requestedAt: 0,
+    requestedBy: '',
+    approvedAt: 0,
+    approvedBy: '',
+    completedAt: 0,
+    completedBy: ''
+  };
   const DEFAULT_LOGIN_HINT = '¿Olvidaste tu contraseña?';
   const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Cámbiala desde Configuración después de entrar.';
   const DEFAULT_PROFILE = {
@@ -2344,7 +2412,10 @@
     email: '',
     role: '',
     campus: '',
-    avatar: ''
+    avatar: '',
+    syncedAt: 0,
+    sourceUpdatedAt: 0,
+    sourceLabel: 'Directorio maestro'
   };
   const DEFAULT_PREFERENCES = {
     theme: 'system',
@@ -2356,7 +2427,8 @@
     largeText: false,
     boardDensity: 'standard',
     highContrast: false,
-    showLeadId: false
+    showLeadId: false,
+    appliedPreset: ''
   };
   const ACCENT_PALETTES = {
     blue: { primary: '#003a5f', secondary: '#8a9ca3', panel: '37,99,235' },
@@ -2480,15 +2552,88 @@
       summaryPlural: 'integrantes'
     }
   };
+  const ROLE_TEMPLATES = buildRoleTemplates();
+  const TEAM_TEMPLATES = [
+    {
+      id: 'comercial-noroeste',
+      name: 'Comercial Noroeste',
+      description: 'Planteles frontera y bases de seguimiento activo.',
+      planteles: ['HERMOSILLO', 'NOGALES', 'OBREGÓN'],
+      bases: ['Planteles', 'Rescatados', 'Regresos'],
+      members: ['coord.noroeste', 'asesor.nogales']
+    },
+    {
+      id: 'fuerza-online',
+      name: 'Fuerza Online',
+      description: 'Operación digital con foco en reciclados y rescates.',
+      planteles: ['ONLINE'],
+      bases: ['Reciclados', 'Rescatados'],
+      members: ['coord.online']
+    }
+  ];
+  const INSTITUTIONAL_PRESETS = [
+    {
+      id: 'institucional-diurno',
+      name: 'Institucional Diurno',
+      description: 'Tema claro, densidad cómoda, modo eco activo y contraste alto para pisos comerciales.',
+      values: { theme: 'light', density: 'comfortable', eco: true, highContrast: true }
+    },
+    {
+      id: 'institucional-nocturno',
+      name: 'Institucional Nocturno',
+      description: 'Tema oscuro, densidad compacta y contraste normal para guardias vespertinas.',
+      values: { theme: 'dark', density: 'compact', eco: false, highContrast: false }
+    }
+  ];
   let permissionMultiSelectsInitialized = false;
   const permissionMultiSelects = {};
+  const permissionScopeDirty = {};
+
+  function buildRoleTemplates(){
+    const plantelOptions = Array.isArray(PERMISSION_REFERENCE?.planteles?.values) ? PERMISSION_REFERENCE.planteles.values.slice() : [];
+    const baseOptions = Array.isArray(PERMISSION_REFERENCE?.bases?.values) ? PERMISSION_REFERENCE.bases.values.slice() : [];
+    const normalize = value => (value || '').toString().trim().toLowerCase();
+    const globalPlantel = PERMISSION_SCOPE_CONFIG?.planteles?.globalValue || 'Todos';
+    const globalBase = PERMISSION_SCOPE_CONFIG?.bases?.globalValue || 'Todas';
+    const localPlanteles = plantelOptions.filter(value => normalize(value) && normalize(value) !== normalize(globalPlantel));
+    const localBases = baseOptions.filter(value => normalize(value) && normalize(value) !== normalize(globalBase));
+    const ensureValues = (values, fallback = []) => {
+      const list = Array.from(new Set((values || []).filter(Boolean)));
+      if(list.length) return list;
+      return Array.from(new Set((fallback || []).filter(Boolean)));
+    };
+    const defaultPlanteles = ensureValues(localPlanteles.slice(0, 3), plantelOptions.slice(0, 3));
+    const defaultBases = ensureValues(localBases.slice(0, 3), baseOptions.slice(0, 3));
+    return {
+      admin: {
+        description: 'Aplica acceso total para supervisar equipos, reportes y catálogos sin restricciones.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      },
+      coordinador: {
+        description: 'Agrupa planteles y bases de su región para liderar la operación y monitorear a su equipo.',
+        planteles: ensureValues(['HERMOSILLO', 'NOGALES', 'OBREGÓN'].filter(value => plantelOptions.includes(value)), defaultPlanteles),
+        bases: ensureValues(['Planteles', 'Regresos', 'Rescatados'].filter(value => baseOptions.includes(value)), defaultBases)
+      },
+      asesor: {
+        description: 'Limita el alcance al plantel principal y a bases activas de seguimiento diario.',
+        planteles: ensureValues(localPlanteles.slice(0, 1), defaultPlanteles.slice(0, 1)),
+        bases: ensureValues(['Planteles', 'Reciclados'].filter(value => baseOptions.includes(value)), defaultBases.slice(0, 1))
+      },
+      viewer: {
+        description: 'Monitorea resultados institucionales sin exponer datos personales ni modificar información.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      }
+    };
+  }
   const AUTH_STORAGE_KEY = 'pulseAuthState';
   let authToken = '';
   let currentUser = null;
   let hasBound = false;
   let userProfile = loadStoredProfile();
   let userPreferences = loadStoredPreferences();
-  let lastPasswordRequest = loadStoredPasswordRequest();
+  let passwordRequestState = loadStoredPasswordRequest();
   let pendingResetCredentials = null;
   let lastLoginEmail = '';
   let settingsReady = false;
@@ -3012,7 +3157,7 @@
     control.selected = finalValues;
   }
 
-  function setPermissionScopeSelection(field, values){
+  function setPermissionScopeSelection(field, values, options = {}){
     if(!permissionMultiSelectsInitialized){
       initPermissionScopeSelectors();
     }
@@ -3025,6 +3170,9 @@
         if(hidden){
           hidden.value = normalized.join(', ');
         }
+      }
+      if(!options.preserveDirty){
+        markScopeDirty(field, Boolean(options.markDirty));
       }
       return;
     }
@@ -3057,6 +3205,9 @@
       }
     });
     updatePermissionMultiSelect(field, finalValues);
+    if(!options.preserveDirty){
+      markScopeDirty(field, Boolean(options.markDirty));
+    }
   }
 
   function togglePermissionMultiSelect(field){
@@ -3110,6 +3261,22 @@
     updatePermissionMultiSelect(field, control.selected || []);
   }
 
+  function markScopeDirty(field, dirty){
+    permissionScopeDirty[field] = Boolean(dirty);
+    const control = permissionMultiSelects[field];
+    if(control && control.container){
+      if(dirty){
+        control.container.dataset.dirty = 'true';
+      }else{
+        delete control.container.dataset.dirty;
+      }
+    }
+  }
+
+  function isScopeDirty(field){
+    return Boolean(permissionScopeDirty[field]);
+  }
+
   function initPermissionScopeSelectors(){
     if(permissionMultiSelectsInitialized) return;
     permissionMultiSelectsInitialized = true;
@@ -3134,6 +3301,7 @@
         menu.appendChild(optionLabel);
       });
       permissionMultiSelects[field] = { container, button, menu, chips, hidden, config, selected: [], options: resolvedOptions };
+      markScopeDirty(field, Boolean(permissionScopeDirty[field]));
       button.addEventListener('click', () => togglePermissionMultiSelect(field));
       menu.addEventListener('change', event => {
         const target = event.target;
@@ -3153,6 +3321,7 @@
         }
         const selected = Array.from(menu.querySelectorAll('input[type="checkbox"]:checked')).map(input => input.value).filter(Boolean);
         updatePermissionMultiSelect(field, selected);
+        markScopeDirty(field, true);
       });
     });
     document.addEventListener('click', event => {
@@ -3274,10 +3443,91 @@
   }
 
   function updatePermissionRoleHint(role){
-    const hint = el('#permRoleHint');
-    if(!hint) return;
     const key = String(role || '').trim().toLowerCase();
-    hint.textContent = ROLE_SCOPE_HINTS[key] || 'Selecciona el alcance que tendrá esta cuenta.';
+    const hint = el('#permRoleHint');
+    if(hint){
+      hint.textContent = ROLE_SCOPE_HINTS[key] || 'Selecciona el alcance que tendrá esta cuenta.';
+    }
+    const suggestion = el('#permRoleSuggestion');
+    const descriptionEl = el('#permRoleDescription');
+    const chipsEl = el('#permRoleScopeChips');
+    const applyBtn = el('#permApplyRolePreset');
+    if(!suggestion || !descriptionEl || !chipsEl || !applyBtn){
+      return;
+    }
+    const template = ROLE_TEMPLATES[key];
+    if(template){
+      suggestion.hidden = false;
+      descriptionEl.textContent = template.description || (hint ? hint.textContent : '');
+      chipsEl.innerHTML = '';
+      const chips = [];
+      chips.push(renderScopeChip(chipsEl, template.planteles, 'Planteles sugeridos', 'bi-diagram-3'));
+      chips.push(renderScopeChip(chipsEl, template.bases, 'Bases sugeridas', 'bi-hdd-stack'));
+      if(!chips.some(Boolean)){
+        const placeholder = document.createElement('span');
+        placeholder.className = 'scope-chip';
+        placeholder.textContent = 'Define manualmente el alcance.';
+        chipsEl.appendChild(placeholder);
+      }
+      applyBtn.disabled = false;
+    }else{
+      suggestion.hidden = true;
+      chipsEl.innerHTML = '';
+      applyBtn.disabled = true;
+    }
+  }
+
+  function summarizeScopeValues(values){
+    const list = Array.isArray(values) ? values.filter(Boolean) : [];
+    if(!list.length) return '';
+    if(list.length <= 3) return list.join(', ');
+    return `${list.slice(0, 2).join(', ')} +${list.length - 2}`;
+  }
+
+  function renderScopeChip(container, values, label, icon){
+    if(!container) return false;
+    const list = Array.isArray(values) ? values.filter(Boolean) : [];
+    if(!list.length) return false;
+    const chip = document.createElement('span');
+    chip.className = 'scope-chip';
+    const summary = summarizeScopeValues(list);
+    chip.innerHTML = `<i class="bi ${icon}"></i> ${label}: ${escapeHtml(summary)}`;
+    chip.title = `${label}: ${list.join(', ')}`;
+    container.appendChild(chip);
+    return true;
+  }
+
+  function applyRoleScopeTemplate(role, options = {}){
+    const key = String(role || '').trim().toLowerCase();
+    const template = ROLE_TEMPLATES[key];
+    if(!template) return false;
+    const { force = false, silent = false } = options;
+    const blockedFields = [];
+    if(!force){
+      if(isScopeDirty('planteles')) blockedFields.push('planteles');
+      if(isScopeDirty('bases')) blockedFields.push('bases');
+    }
+    let applied = false;
+    if(Array.isArray(template.planteles) && template.planteles.length && !blockedFields.includes('planteles')){
+      setPermissionScopeSelection('planteles', template.planteles, { markDirty: false });
+      applied = true;
+    }
+    if(Array.isArray(template.bases) && template.bases.length && !blockedFields.includes('bases')){
+      setPermissionScopeSelection('bases', template.bases, { markDirty: false });
+      applied = true;
+    }
+    if(!applied && blockedFields.length && !silent){
+      const labels = blockedFields.map(field => field === 'planteles' ? 'planteles' : 'bases');
+      const message = labels.length === 2
+        ? 'Mantuvimos tus planteles y bases personalizados. Usa “Aplicar sugerencia” para reemplazarlos.'
+        : `Mantuvimos tus ${labels[0]} personalizados. Usa “Aplicar sugerencia” para reemplazarlos.`;
+      setPermissionStatus(message, 'info');
+    }else if(!applied && !silent){
+      setPermissionStatus('No hay sugerencias definidas para este rol todavía.', 'warning');
+    }else if(applied && !silent){
+      setPermissionStatus('Se aplicó la sugerencia de alcance del rol seleccionado.', 'success');
+    }
+    return applied;
   }
 
   function comparePermissionUsers(a, b){
@@ -3385,9 +3635,11 @@
     if(roleSelect){
       roleSelect.value = 'asesor';
     }
-    updatePermissionRoleHint(roleSelect ? roleSelect.value : 'asesor');
+    const currentRole = roleSelect ? roleSelect.value : 'asesor';
+    updatePermissionRoleHint(currentRole);
     setPermissionScopeSelection('planteles', []);
     setPermissionScopeSelection('bases', []);
+    applyRoleScopeTemplate(currentRole, { force: true, silent: true });
     const passwordInput = el('#permPassword');
     if(passwordInput){
       passwordInput.value = '';
@@ -3456,8 +3708,8 @@
       roleSelect.value = user.role || 'asesor';
     }
     updatePermissionRoleHint(roleSelect ? roleSelect.value : user.role);
-    setPermissionScopeSelection('planteles', user.planteles || []);
-    setPermissionScopeSelection('bases', user.bases || []);
+    setPermissionScopeSelection('planteles', user.planteles || [], { markDirty: true });
+    setPermissionScopeSelection('bases', user.bases || [], { markDirty: true });
     const passwordInput = el('#permPassword');
     if(passwordInput){
       passwordInput.value = '';
@@ -3791,6 +4043,111 @@
       fragment.appendChild(item);
     });
     listEl.appendChild(fragment);
+  }
+
+  function renderTeamTemplateToolbar(){
+    const toolbar = el('#teamTemplateToolbar');
+    if(!toolbar) return;
+    toolbar.innerHTML = '';
+    const canUseTemplates = canPerform('manageTeams');
+    const templates = Array.isArray(TEAM_TEMPLATES) ? TEAM_TEMPLATES.filter(Boolean) : [];
+    if(!canUseTemplates || !templates.length){
+      toolbar.hidden = true;
+      toolbar.setAttribute('hidden', 'hidden');
+      return;
+    }
+    toolbar.hidden = false;
+    toolbar.removeAttribute('hidden');
+    templates.forEach(template => {
+      if(!template || !template.name) return;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'scope-template-btn';
+      btn.dataset.templateId = template.id || '';
+      const title = document.createElement('strong');
+      title.textContent = template.name;
+      btn.appendChild(title);
+      if(template.description){
+        const desc = document.createElement('span');
+        desc.textContent = template.description;
+        btn.appendChild(desc);
+      }
+      const scopeSummary = document.createElement('span');
+      const plantelSummary = summarizeScopeValues(template.planteles || []);
+      const baseSummary = summarizeScopeValues(template.bases || []);
+      scopeSummary.textContent = `Planteles: ${plantelSummary || '—'} · Bases: ${baseSummary || '—'}`;
+      btn.appendChild(scopeSummary);
+      btn.addEventListener('click', () => applyTeamTemplate(template));
+      toolbar.appendChild(btn);
+    });
+  }
+
+  function applyTeamTemplate(template, options = {}){
+    if(!template) return false;
+    const form = el('#teamForm');
+    const isEdit = form && form.dataset.mode === 'edit';
+    if(isEdit && !options.force){
+      const confirmed = confirm('Aplicar la plantilla reemplazará la configuración actual del equipo. ¿Deseas continuar?');
+      if(!confirmed) return false;
+    }
+    const idInput = el('#teamId');
+    if(idInput && !idInput.value && template.id){
+      idInput.value = template.id;
+    }
+    const nameInput = el('#teamName');
+    if(nameInput && template.name && (!nameInput.value || options.overwrite !== false)){
+      nameInput.value = template.name;
+    }
+    const descriptionInput = el('#teamDescription');
+    if(descriptionInput && template.description && (!descriptionInput.value || options.overwrite !== false)){
+      descriptionInput.value = template.description;
+    }
+    setPermissionScopeSelection('teamPlanteles', template.planteles || [], { markDirty: false });
+    setPermissionScopeSelection('teamBases', template.bases || [], { markDirty: false });
+    const members = Array.isArray(template.members) ? template.members.filter(Boolean) : [];
+    const memberOptions = new Set((permissionMultiSelects.teamMembers?.options || []).map(option => option.value));
+    const availableMembers = members.filter(memberId => memberOptions.has(memberId));
+    const missingMembers = members.filter(memberId => !memberOptions.has(memberId));
+    setPermissionScopeSelection('teamMembers', availableMembers, { markDirty: false });
+    if(!options.silent){
+      let message = `Se aplicó la plantilla “${template.name}”.`;
+      if(missingMembers.length){
+        message += ` Integrantes no disponibles: ${missingMembers.join(', ')}.`;
+      }
+      setTeamStatus(message, 'info');
+    }
+    return true;
+  }
+
+  function cloneSelectedTeam(){
+    if(!selectedTeamId){
+      setTeamStatus('Selecciona un equipo para clonar su configuración.', 'warning');
+      return;
+    }
+    const team = teams.find(t => t.teamId === selectedTeamId);
+    if(!team){
+      setTeamStatus('No se encontró el equipo seleccionado para clonar.', 'error');
+      return;
+    }
+    startTeamCreation({ focus: false, renderList: true });
+    const idInput = el('#teamId');
+    if(idInput){
+      idInput.value = '';
+      idInput.focus();
+    }
+    const nameInput = el('#teamName');
+    if(nameInput){
+      const sourceName = team.name || team.teamId || 'Equipo';
+      nameInput.value = `${sourceName} (copia)`;
+    }
+    const descriptionInput = el('#teamDescription');
+    if(descriptionInput){
+      descriptionInput.value = team.description || '';
+    }
+    setPermissionScopeSelection('teamPlanteles', team.planteles || [], { markDirty: false });
+    setPermissionScopeSelection('teamBases', team.bases || [], { markDirty: false });
+    setPermissionScopeSelection('teamMembers', team.members || [], { markDirty: false });
+    setTeamStatus(`Se clonó la configuración de ${team.name || team.teamId}. Define un nuevo ID para guardarla.`, 'info');
   }
 
   function startTeamCreation(options = {}){
@@ -4656,6 +5013,19 @@
         updates.campus = planteles[0];
       }
     }
+    const sourceTimestamp = Number(currentUser.directoryUpdatedAt || currentUser.sourceUpdatedAt || currentUser.updatedAt || 0);
+    if(sourceTimestamp && (!userProfile.sourceUpdatedAt || userProfile.sourceUpdatedAt !== sourceTimestamp)){
+      updates.sourceUpdatedAt = sourceTimestamp;
+    }
+    if(currentUser.sourceLabel || currentUser.directorySource){
+      const label = currentUser.sourceLabel || currentUser.directorySource;
+      if(label && label !== userProfile.sourceLabel){
+        updates.sourceLabel = label;
+      }
+    }
+    if(Number.isFinite(currentUser.profileSyncedAt) && currentUser.profileSyncedAt > 0){
+      updates.syncedAt = Number(currentUser.profileSyncedAt);
+    }
     if(Object.keys(updates).length){
       updateProfileData(updates);
     }else if(settingsReady){
@@ -4814,7 +5184,9 @@
     ['#btnExportData','#btnExportReport','#btnExportResolution'].forEach(sel => setDisabled(sel, exportAllowed, 'No tienes permisos para exportar información.'));
     setDisabled('#diagBtn', canPerform('runDiagnostics'), 'No tienes permisos para ejecutar el diagnóstico.');
     const manageTeamsAllowed = canPerform('manageTeams');
-    ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn','#teamCloneBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    renderTeamTemplateToolbar();
+    renderPreferencePresets();
   }
 
   async function apiFetch(url, options = {}){
@@ -5432,13 +5804,29 @@
   }
   function loadStoredPasswordRequest(){
     const stored = readStorageJSON(STORAGE_KEYS.password);
-    if(stored && typeof stored === 'object' && typeof stored.timestamp === 'number'){
-      return stored.timestamp;
+    if(stored && typeof stored === 'object'){
+      const normalized = { ...DEFAULT_PASSWORD_REQUEST };
+      if(typeof stored.status === 'string') normalized.status = stored.status;
+      if(typeof stored.requestedAt === 'number') normalized.requestedAt = stored.requestedAt;
+      if(typeof stored.requestedBy === 'string') normalized.requestedBy = stored.requestedBy;
+      if(typeof stored.approvedAt === 'number') normalized.approvedAt = stored.approvedAt;
+      if(typeof stored.approvedBy === 'string') normalized.approvedBy = stored.approvedBy;
+      if(typeof stored.completedAt === 'number') normalized.completedAt = stored.completedAt;
+      if(typeof stored.completedBy === 'string') normalized.completedBy = stored.completedBy;
+      if(!normalized.requestedAt && typeof stored.timestamp === 'number'){
+        normalized.requestedAt = stored.timestamp;
+      }
+      if(!normalized.status){
+        if(normalized.completedAt) normalized.status = 'completed';
+        else if(normalized.approvedAt) normalized.status = 'approved';
+        else if(normalized.requestedAt) normalized.status = 'requested';
+      }
+      return normalized;
     }
-    if(typeof stored === 'number'){
-      return stored;
+    if(typeof stored === 'number' && stored > 0){
+      return { ...DEFAULT_PASSWORD_REQUEST, status: 'requested', requestedAt: stored };
     }
-    return 0;
+    return { ...DEFAULT_PASSWORD_REQUEST };
   }
   function handleSystemThemeChange(event){
     if((userPreferences.theme || 'system') === 'system'){
@@ -5502,6 +5890,50 @@
   function applyLeadIdPreference(){
     document.documentElement.setAttribute('data-show-lead-id', userPreferences.showLeadId ? 'true' : 'false');
   }
+  function renderPreferencePresets(){
+    const container = el('#prefPresetRecommendations');
+    const list = el('#prefPresetList');
+    if(!container || !list) return;
+    const presets = Array.isArray(INSTITUTIONAL_PRESETS) ? INSTITUTIONAL_PRESETS.filter(Boolean) : [];
+    if(getUserRole() !== 'admin' || !presets.length){
+      container.hidden = true;
+      list.innerHTML = '';
+      return;
+    }
+    list.innerHTML = '';
+    presets.forEach(preset => {
+      const card = document.createElement('div');
+      card.className = 'pref-preset-card';
+      const title = document.createElement('strong');
+      title.textContent = preset.name || 'Preset';
+      card.appendChild(title);
+      if(preset.description){
+        const desc = document.createElement('p');
+        desc.textContent = preset.description;
+        card.appendChild(desc);
+      }
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'btn micro';
+      if(userPreferences.appliedPreset === preset.id){
+        button.innerHTML = '<i class="bi bi-check-circle"></i> Aplicado';
+        button.disabled = true;
+      }else{
+        button.innerHTML = '<i class="bi bi-lightning-charge"></i> Aplicar';
+        button.addEventListener('click', () => applyInstitutionalPreset(preset));
+      }
+      card.appendChild(button);
+      list.appendChild(card);
+    });
+    container.hidden = false;
+    container.removeAttribute('hidden');
+  }
+  function applyInstitutionalPreset(preset){
+    if(!preset || !preset.values) return;
+    const updates = { ...preset.values, appliedPreset: preset.id || '' };
+    updatePreferences(updates);
+    showSettingsMessage(`Se aplicó el preset ${preset.name || 'institucional'}.`, 'success');
+  }
   function updatePreferences(partial){
     userPreferences = { ...userPreferences, ...partial };
     writeStorageJSON(STORAGE_KEYS.preferences, userPreferences);
@@ -5509,6 +5941,7 @@
     applyPreferences();
     if(settingsReady){
       syncPreferencesForm();
+      renderPreferencePresets();
     }
     if(typeof refresh === 'function'){
       try{
@@ -5599,7 +6032,74 @@
     if(summaryRole) summaryRole.textContent = userProfile.role || 'Sin definir';
     const summaryCampus = el('#profileSummaryCampus');
     if(summaryCampus) summaryCampus.textContent = userProfile.campus || 'Sin definir';
+    updateProfileSyncAlert();
   }
+
+  function updateProfileSyncAlert(){
+    const alert = el('#profileSyncAlert');
+    if(!alert) return;
+    if(getUserRole() !== 'admin'){
+      alert.hidden = true;
+      return;
+    }
+    const sourceLabel = userProfile.sourceLabel || 'Directorio maestro';
+    const syncedAt = Number(userProfile.syncedAt) || 0;
+    const sourceAt = Number(userProfile.sourceUpdatedAt) || 0;
+    alert.innerHTML = '';
+    let state = '';
+    const title = document.createElement('strong');
+    const description = document.createElement('span');
+    if(!sourceAt && !syncedAt){
+      state = 'unknown';
+      title.textContent = 'Sin referencia de sincronización';
+      description.textContent = `Vincula este perfil con ${sourceLabel} para garantizar datos vigentes.`;
+    }else if(sourceAt && (!syncedAt || sourceAt > syncedAt)){
+      state = 'stale';
+      title.textContent = 'Datos desactualizados';
+      description.textContent = `Última actualización en ${sourceLabel}: ${formatDateTime(sourceAt)}.`;
+    }else{
+      title.textContent = 'Información sincronizada';
+      description.textContent = `Última verificación local: ${formatDateTime(syncedAt)}.`;
+    }
+    alert.appendChild(title);
+    alert.appendChild(description);
+    if(state === 'stale'){
+      const hint = document.createElement('span');
+      hint.textContent = 'Sincroniza la ficha y alinea los datos críticos con la fuente maestra.';
+      alert.appendChild(hint);
+    }else if(state === 'unknown'){
+      const hint = document.createElement('span');
+      hint.textContent = 'Registra una sincronización cuando valides la información desde la fuente maestra.';
+      alert.appendChild(hint);
+    }
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'btn micro';
+    if(state === ''){
+      button.innerHTML = '<i class="bi bi-clock-history"></i> Registrar nueva sincronización';
+    }else{
+      button.innerHTML = '<i class="bi bi-arrow-repeat"></i> Sincronizar ahora';
+    }
+    button.addEventListener('click', handleProfileSyncNow);
+    alert.appendChild(button);
+    if(state){
+      alert.dataset.state = state;
+    }else{
+      delete alert.dataset.state;
+    }
+    alert.hidden = false;
+  }
+
+  function handleProfileSyncNow(){
+    const now = Date.now();
+    const updates = { syncedAt: now };
+    if(!userProfile.sourceUpdatedAt){
+      updates.sourceUpdatedAt = now;
+    }
+    updateProfileData(updates);
+    showSettingsMessage('Se marcó la información del perfil como sincronizada.', 'success');
+  }
+
   function syncPreferencesForm(){
     const themePref = userPreferences.theme || 'system';
     els('input[name="pref-theme"]').forEach(radio => {
@@ -5633,11 +6133,28 @@
     }
   }
   function updatePasswordInfo(){
-    if(lastPasswordRequest){
-      setPasswordStatus(`Registrada el ${formatDateTime(lastPasswordRequest)}`, 'success');
-    }else{
-      setPasswordStatus('Sin solicitudes registradas.', 'info');
+    const state = passwordRequestState || { ...DEFAULT_PASSWORD_REQUEST };
+    let message = 'Sin solicitudes registradas.';
+    let tone = 'info';
+    if(state.status === 'requested' && state.requestedAt){
+      const parts = [`Pendiente de aprobación desde ${formatDateTime(state.requestedAt)}`];
+      if(state.requestedBy) parts.push(`Responsable: ${state.requestedBy}`);
+      message = parts.join(' · ');
+      tone = 'warning';
+    }else if(state.status === 'approved' && state.approvedAt){
+      const parts = [`Aprobada el ${formatDateTime(state.approvedAt)}`];
+      if(state.approvedBy) parts.push(`Responsable: ${state.approvedBy}`);
+      message = parts.join(' · ');
+      tone = 'info';
+    }else if(state.status === 'completed' && state.completedAt){
+      const parts = [`Completada el ${formatDateTime(state.completedAt)}`];
+      if(state.completedBy) parts.push(`Responsable: ${state.completedBy}`);
+      message = parts.join(' · ');
+      tone = 'success';
     }
+    setPasswordStatus(message, tone);
+    renderPasswordTimeline(state);
+    updatePasswordActionVisibility(state);
   }
   function clearPasswordForm(){
     const current = el('#passwordCurrent');
@@ -5660,6 +6177,93 @@
         statusWrap.removeAttribute('data-tone');
       }
     }
+  }
+  function renderPasswordTimeline(state){
+    const timeline = el('#passwordRequestTimeline');
+    if(!timeline) return;
+    timeline.innerHTML = '';
+    const currentState = state || { ...DEFAULT_PASSWORD_REQUEST };
+    if(!currentState.requestedAt && !currentState.approvedAt && !currentState.completedAt){
+      const empty = document.createElement('span');
+      empty.className = 'security-timeline__meta';
+      empty.textContent = 'Registra una solicitud para iniciar el flujo de aprobación.';
+      timeline.appendChild(empty);
+      return;
+    }
+    const steps = [
+      { key: 'requestedAt', label: 'Solicitud registrada', timestamp: currentState.requestedAt, by: currentState.requestedBy },
+      { key: 'approvedAt', label: 'Aprobación', timestamp: currentState.approvedAt, by: currentState.approvedBy },
+      { key: 'completedAt', label: 'Entrega confirmada', timestamp: currentState.completedAt, by: currentState.completedBy }
+    ];
+    steps.forEach((step, index) => {
+      const item = document.createElement('div');
+      item.className = 'security-timeline__item';
+      let stateTag = 'future';
+      if(step.timestamp){
+        stateTag = 'done';
+      }else if(index === 0){
+        stateTag = 'active';
+      }else if(index === 1 && currentState.requestedAt){
+        stateTag = 'active';
+      }else if(index === 2 && currentState.approvedAt){
+        stateTag = 'active';
+      }
+      item.dataset.state = stateTag;
+      const badge = document.createElement('span');
+      badge.className = 'security-timeline__badge';
+      item.appendChild(badge);
+      const content = document.createElement('div');
+      content.className = 'security-timeline__content';
+      const label = document.createElement('span');
+      label.className = 'security-timeline__label';
+      label.textContent = step.label;
+      content.appendChild(label);
+      const meta = document.createElement('span');
+      meta.className = 'security-timeline__meta';
+      if(step.timestamp){
+        const metaParts = [formatDateTime(step.timestamp)];
+        if(step.by) metaParts.push(`Responsable: ${step.by}`);
+        meta.textContent = metaParts.join(' · ');
+      }else if(stateTag === 'active'){
+        meta.textContent = 'Pendiente de registrar.';
+      }else{
+        meta.textContent = 'En espera del paso previo.';
+      }
+      content.appendChild(meta);
+      item.appendChild(content);
+      timeline.appendChild(item);
+    });
+  }
+
+  function updatePasswordActionVisibility(state){
+    const approveBtn = el('#passwordApproveBtn');
+    const completeBtn = el('#passwordCompleteBtn');
+    const actions = el('#passwordStatusActions');
+    const canApprove = Boolean(state?.requestedAt) && !state?.approvedAt;
+    const canComplete = Boolean(state?.approvedAt) && !state?.completedAt;
+    if(approveBtn) approveBtn.hidden = !canApprove;
+    if(completeBtn) completeBtn.hidden = !canComplete;
+    if(actions){
+      actions.hidden = !canApprove && !canComplete;
+    }
+  }
+
+  function persistPasswordRequestState(){
+    writeStorageJSON(STORAGE_KEYS.password, passwordRequestState);
+  }
+
+  function getCurrentOperatorLabel(){
+    if(currentUser){
+      if(currentUser.name) return currentUser.name;
+      if(currentUser.userId) return currentUser.userId;
+      if(currentUser.email) return currentUser.email;
+    }
+    if(userProfile){
+      if(userProfile.name) return userProfile.name;
+      if(userProfile.userId) return userProfile.userId;
+      if(userProfile.email) return userProfile.email;
+    }
+    return 'Administrador';
   }
   function showSettingsMessage(message, type = 'info'){
     const status = el('#settingsStatus');
@@ -5699,12 +6303,14 @@
     if(settingsReady){
       syncProfileUI();
       syncPreferencesForm();
+      renderPreferencePresets();
       updatePasswordInfo();
       return;
     }
     settingsReady = true;
     syncProfileUI();
     syncPreferencesForm();
+    renderPreferencePresets();
     updatePasswordInfo();
     const profileForm = el('#profileForm');
     if(profileForm){
@@ -5827,8 +6433,14 @@
           showSettingsMessage('La nueva contraseña debe ser distinta a la actual.', 'warning');
           return;
         }
-        lastPasswordRequest = Date.now();
-        writeStorageJSON(STORAGE_KEYS.password, { timestamp: lastPasswordRequest });
+        const requestedAt = Date.now();
+        passwordRequestState = {
+          ...DEFAULT_PASSWORD_REQUEST,
+          status: 'requested',
+          requestedAt,
+          requestedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
         clearPasswordForm();
         updatePasswordInfo();
         showSettingsMessage('Se registró tu solicitud de cambio de contraseña.', 'success');
@@ -5839,6 +6451,57 @@
       passwordClear.addEventListener('click', () => {
         clearPasswordForm();
         showSettingsMessage('Se limpiaron los campos de seguridad.', 'info');
+      });
+    }
+    const passwordApproveBtn = el('#passwordApproveBtn');
+    if(passwordApproveBtn){
+      passwordApproveBtn.addEventListener('click', () => {
+        if(!passwordRequestState?.requestedAt){
+          setPasswordStatus('Registra una solicitud antes de aprobarla.', 'warning');
+          showSettingsMessage('Registra una solicitud antes de aprobarla.', 'warning');
+          return;
+        }
+        if(passwordRequestState.approvedAt){
+          setPasswordStatus('La solicitud ya fue aprobada.', 'info');
+          return;
+        }
+        passwordRequestState = {
+          ...passwordRequestState,
+          status: 'approved',
+          approvedAt: Date.now(),
+          approvedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
+        updatePasswordInfo();
+        showSettingsMessage('Se registró la aprobación de la solicitud.', 'success');
+      });
+    }
+    const passwordCompleteBtn = el('#passwordCompleteBtn');
+    if(passwordCompleteBtn){
+      passwordCompleteBtn.addEventListener('click', () => {
+        if(!passwordRequestState?.requestedAt){
+          setPasswordStatus('Registra una solicitud antes de confirmarla.', 'warning');
+          showSettingsMessage('Registra una solicitud antes de confirmarla.', 'warning');
+          return;
+        }
+        if(!passwordRequestState.approvedAt){
+          setPasswordStatus('Aprueba la solicitud antes de confirmar la entrega.', 'warning');
+          showSettingsMessage('Aprueba la solicitud antes de confirmar la entrega.', 'warning');
+          return;
+        }
+        if(passwordRequestState.completedAt){
+          setPasswordStatus('La entrega ya fue confirmada.', 'info');
+          return;
+        }
+        passwordRequestState = {
+          ...passwordRequestState,
+          status: 'completed',
+          completedAt: Date.now(),
+          completedBy: getCurrentOperatorLabel()
+        };
+        persistPasswordRequestState();
+        updatePasswordInfo();
+        showSettingsMessage('Se confirmó la entrega de credenciales.', 'success');
       });
     }
     const status = el('#settingsStatus');
@@ -7494,10 +8157,26 @@
     }
     initPermissionScopeSelectors();
     renderPermissionReference();
+    renderTeamTemplateToolbar();
     const permRoleSelect = el('#permRole');
     if(permRoleSelect){
-      permRoleSelect.addEventListener('change', ()=> updatePermissionRoleHint(permRoleSelect.value));
+      permRoleSelect.addEventListener('change', () => {
+        const value = permRoleSelect.value;
+        updatePermissionRoleHint(value);
+        applyRoleScopeTemplate(value, { silent: true });
+      });
       updatePermissionRoleHint(permRoleSelect.value);
+    }
+    const permApplyRolePreset = el('#permApplyRolePreset');
+    if(permApplyRolePreset){
+      permApplyRolePreset.addEventListener('click', () => {
+        const roleSelect = el('#permRole');
+        const role = roleSelect ? roleSelect.value : 'asesor';
+        const applied = applyRoleScopeTemplate(role, { force: true, silent: false });
+        if(applied){
+          updatePermissionRoleHint(role);
+        }
+      });
     }
     const permList = el('#permList');
     if(permList){
@@ -7594,6 +8273,10 @@
           startTeamCreation({ resetStatus: true });
         }
       });
+    }
+    const teamCloneBtn = el('#teamCloneBtn');
+    if(teamCloneBtn){
+      teamCloneBtn.addEventListener('click', cloneSelectedTeam);
     }
     const teamDeleteBtn = el('#teamDeleteBtn');
     if(teamDeleteBtn){
