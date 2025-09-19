@@ -72,6 +72,8 @@
       --panel-stage-text: #0f172a;
     }
     html[data-theme="light"] .nav-footer{ border-top:1px solid rgba(15,23,42,0.08); }
+    html[data-theme="light"] .nav-footer__meta{ border-color:rgba(15,23,42,0.08); color:#475569; }
+    html[data-theme="light"] .nav-footer__rights{ color:#475569; }
     html[data-theme="light"] .view-controls .filters label{
       background: rgba(var(--panel-base-rgb),0.12);
       border-color: rgba(var(--panel-base-rgb),0.28);
@@ -252,6 +254,11 @@
       outline:none;
       text-decoration:none;
     }
+    .login-meta{ margin-top:calc(var(--space) * 1.25); padding-top:var(--space-sm); border-top:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; gap:4px; font-size:12px; text-align:center; color:var(--muted); letter-spacing:.35px; }
+    .login-meta__version{ font-weight:700; color:var(--accent); }
+    .login-meta__rights{ font-weight:600; font-size:11px; letter-spacing:.35px; }
+    html[data-theme="light"] .login-meta{ border-color:rgba(15,23,42,0.12); color:#475569; }
+    html[data-theme="light"] .login-meta__rights{ color:#475569; }
     /* Layout */
     .app {
       --sidebar-width: 280px;
@@ -296,6 +303,9 @@
     html[data-theme="light"] .nav-divider{ background:rgba(15,23,42,0.1); }
     .nav-group { display:flex; flex-direction:column; gap:var(--space-sm); }
     .nav-footer { margin-top:auto; padding-top:var(--space); border-top:1px solid rgba(255,255,255,.08); display:flex; flex-direction:column; gap:var(--space-sm); }
+    .nav-footer__meta{ margin-top:var(--space-sm); padding-top:var(--space-xs); border-top:1px solid rgba(255,255,255,0.08); display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); letter-spacing:.3px; }
+    .nav-footer__version{ font-weight:700; color:var(--accent); }
+    .nav-footer__rights{ font-weight:600; font-size:11px; letter-spacing:.35px; }
     .nav a,
     .nav button:not(.menu-toggle) { display:flex; align-items:center; gap:var(--space-sm); padding:10px var(--space-sm); border-radius:12px; color:var(--text); text-decoration:none; opacity:.9; border:1px solid transparent; }
     .nav button.nav-link.is-busy{ opacity:.75; }
@@ -324,6 +334,12 @@
     .badge { padding:2px 8px; border-radius:999px; font-size:12px; background:rgba(0,58,95,.15); color:var(--accent); }
 
     .main { display:flex; flex-direction:column; min-width:0 }
+    .site-footer{ margin-top:auto; padding:calc(var(--space) * 1.5) var(--space) calc(var(--space) * 2.25); border-top:1px solid rgba(255,255,255,0.08); color:var(--muted); font-size:12px; letter-spacing:.3px; }
+    .site-footer__inner{ max-width:1200px; margin:0 auto; width:100%; display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-sm); }
+    .site-footer__version{ font-weight:700; color:var(--accent); }
+    .site-footer__rights{ font-weight:600; font-size:11px; letter-spacing:.35px; }
+    html[data-theme="light"] .site-footer{ border-color:rgba(15,23,42,0.08); color:#475569; }
+    html[data-theme="light"] .site-footer__rights{ color:#475569; }
     .view-section{
       opacity:0;
       transform:translate3d(0,18px,0);
@@ -1072,6 +1088,7 @@
       .column.mobile-collapsible.collapsed .list{ display:none; }
       .column.mobile-collapsible.collapsed .column-toggle-icon{ transform:rotate(-90deg); }
       .column.mobile-collapsible.expanded .column-toggle-icon{ transform:rotate(0deg); }
+      .site-footer__inner{ justify-content:center; text-align:center; gap:var(--space-xs); }
     }
     @media (max-width: 600px){
       .kpi-grid{ grid-template-columns:1fr; }
@@ -1374,6 +1391,10 @@
         <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
         <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
       </div>
+      <footer class="login-meta">
+        <span class="login-meta__version" data-version-format="Versión {version}"></span>
+        <span class="login-meta__rights">ReLead todos los derechos reservados</span>
+      </footer>
     </div>
   </div>
   <div class="loading-overlay hidden" id="globalLoading" role="status" aria-live="polite" aria-hidden="true">
@@ -1428,6 +1449,10 @@
         <div class="nav-footer">
           <button type="button" class="nav-link" id="logoutBtn"><i class="bi bi-box-arrow-right" aria-hidden="true"></i><span>Cerrar sesión</span></button>
           <a href="#" class="nav-link" data-nav="ayuda">❓ <span>Ayuda</span></a>
+          <div class="nav-footer__meta" aria-live="polite">
+            <span class="nav-footer__version" data-version-format="ReLead EDU · {version}"></span>
+            <span class="nav-footer__rights">ReLead todos los derechos reservados</span>
+          </div>
         </div>
       </nav>
     </aside>
@@ -2169,6 +2194,13 @@
         </div>
       </section>
 
+      <footer class="site-footer" aria-label="Información de versión y derechos">
+        <div class="site-footer__inner">
+          <span class="site-footer__version" data-version-format="ReLead EDU · Versión {version}"></span>
+          <span class="site-footer__rights">ReLead todos los derechos reservados</span>
+        </div>
+      </footer>
+
     </main>
   </div>
 
@@ -2180,6 +2212,21 @@
   const appConfig = window.ReLeadConfig || {};
   const API_URL = appConfig.API_URL || 'https://script.google.com/macros/s/AKfycbz_DsHnZdKlQ0a19SELkTqYTUUgXEnvKpn14nCjsGCt1fxTK0vcFxWzL9iraxSFNK3R/exec';
   const REQUEST_TIMEOUT_MS = Number.isFinite(appConfig.REQUEST_TIMEOUT_MS) ? appConfig.REQUEST_TIMEOUT_MS : 45000;
+  const DEFAULT_APP_VERSION = '1.0.0';
+  const rawAppVersion = typeof appConfig.VERSION === 'string' ? appConfig.VERSION.trim() : '';
+  const APP_VERSION = rawAppVersion || DEFAULT_APP_VERSION;
+  const DISPLAY_APP_VERSION = APP_VERSION.startsWith('v') ? APP_VERSION : `v${APP_VERSION}`;
+  window.ReLeadAppVersion = DISPLAY_APP_VERSION;
+
+  function applyVersionLabels(){
+    const nodes = document.querySelectorAll('[data-version-format]');
+    nodes.forEach(node => {
+      const template = node.getAttribute('data-version-format') || '{version}';
+      node.textContent = template.replace('{version}', DISPLAY_APP_VERSION);
+    });
+  }
+
+  applyVersionLabels();
   let leads = [];
   let sheets = [];
   let lastDiagnostics = null;
