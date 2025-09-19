@@ -7,19 +7,19 @@ de soporte que se actualiza con un activador horario.
 
 ## Parámetros
 
-| Parámetro | Tipo | Descripción |
-| --- | --- | --- |
-| `action` | `string` | Debe establecerse en `operationalMetrics`. |
+| Parámetro                  | Tipo     | Descripción                                                                                                                                                                      |
+| -------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `action`                   | `string` | Debe establecerse en `operationalMetrics`.                                                                                                                                       |
 | `bases` / `base` / `sheet` | `string` | Lista separada por comas, punto y coma o saltos de línea con los nombres de base a incluir. Si no se envía, se consultan todas las bases accesibles para el usuario autenticado. |
-| `asesores` / `asesor` | `string` | Lista separada por comas, punto y coma o saltos de línea con los asesores a filtrar. Si se omite, se incluyen todos los asesores detectados por base. |
-| `type` | `string` | Igual que en `handleReport_`; admite `estado`, `etapa` o `detalle`. Valor por defecto: `estado`. |
-| `etapa` | `string` | Filtra las métricas únicamente a la etapa indicada. |
-| `fi` | `string` | Fecha inicial (`Asignación`) en formato ISO 8601. |
-| `ff` | `string` | Fecha final (`Asignación`) en formato ISO 8601. |
-| `callback` | `string` | Opcional para respuestas JSONP. |
+| `asesores` / `asesor`      | `string` | Lista separada por comas, punto y coma o saltos de línea con los asesores a filtrar. Si se omite, se incluyen todos los asesores detectados por base.                            |
+| `type`                     | `string` | Igual que en `handleReport_`; admite `estado`, `etapa` o `detalle`. Valor por defecto: `estado`.                                                                                 |
+| `etapa`                    | `string` | Filtra las métricas únicamente a la etapa indicada.                                                                                                                              |
+| `fi`                       | `string` | Fecha inicial (`Asignación`) en formato ISO 8601.                                                                                                                                |
+| `ff`                       | `string` | Fecha final (`Asignación`) en formato ISO 8601.                                                                                                                                  |
+| `callback`                 | `string` | Opcional para respuestas JSONP.                                                                                                                                                  |
 
 > **Nota:** Los filtros de listas (`bases`, `asesores`) ignoran duplicados y
-valores vacíos.
+> valores vacíos.
 
 ## Estructura de respuesta
 
@@ -94,4 +94,3 @@ Para programar la actualización automática:
 Cada ejecución agrega nuevas filas con las columnas: `Timestamp`, `Base`,
 `Asesor`, `Nivel`, `Metric`, `Valor` y `Total`. Puedes duplicar o limpiar la
 hoja según tus necesidades de retención de datos.
-

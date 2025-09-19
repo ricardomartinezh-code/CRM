@@ -30,4 +30,3 @@ Este documento establece directrices para mantener consistencia visual y narrati
 - **Navegación por teclado:** conserva el orden lógico en el DOM y evita tabindex mayores a `0`. Los botones o enlaces dentro de los KPI deben seguir el orden de lectura.
 - **Estados comunicados por texto:** cuando exista una alerta o estado crítico, no dependas únicamente del color; agrega texto o iconografía que explique el cambio.
 - **Compatibilidad con zoom:** diseña los contenedores para escalar correctamente hasta 200 % sin pérdida de información o colisiones.
-
