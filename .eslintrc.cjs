@@ -54,6 +54,13 @@ module.exports = {
         node: true,
       },
     },
+    {
+      files: ['config/**/*.js', 'js/**/*.js', 'tests/**/*.js'],
+      env: {
+        browser: true,
+        node: true,
+      },
+    },
   ],
   settings: {
     'html/html-extensions': ['.html'],
