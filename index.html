@@ -3006,31 +3006,15 @@
               </div>
             </section>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
-          </div>
-            <section class="calendar-form" aria-labelledby="calendarFormTitle">
-            <h4 id="calendarFormTitle">Agendar seguimiento</h4>
-            <p>Genera un recordatorio de seguimiento en tu Google Calendar con los datos del lead.</p>
-            <div class="calendar-form__grid">
-              <label>Fecha
-                <input type="date" id="calendarDate" />
-              </label>
-              <label>Hora
-                <input type="time" id="calendarTime" />
-              </label>
-              <label>Duración
-                <select id="calendarDuration">
-                  <option value="15">15 minutos</option>
-                  <option value="30" selected>30 minutos</option>
-                  <option value="45">45 minutos</option>
-                  <option value="60">60 minutos</option>
-                </select>
-              </label>
-            </div>
-            <div class="calendar-form__actions">
-              <button class="btn outline" type="button" id="calendarCreateBtn"><i class="bi bi-calendar-event"></i> Agregar a Google Calendar</button>
-              <p class="calendar-form__status" id="calendarStatus"></p>
-            </div>
           </section>
+          <div class="actions" style="margin-top:10px">
+            <button class="btn primary" id="updateBtn">Guardar</button>
+          </div>
+          <div class="actions" style="margin-top:10px">
+              <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
+              <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+              <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
+          </div
         </aside>
       </div>
       <!-- Drawer for mobile details -->
