@@ -5998,6 +5998,7 @@
     const section = document.getElementById(`view-${view}`);
     if(!section) return;
     const sections = els('.view-section');
+    const wasHidden = section.classList.contains('hidden');
     const reduceMotion = document.documentElement.getAttribute('data-motion') === 'reduced'
       || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if(reduceMotion){
@@ -6040,6 +6041,23 @@
           sec.classList.remove('is-visible', 'is-exiting');
         }
       });
+    }
+    if(wasHidden){
+      const scroller = document.scrollingElement || document.documentElement || document.body;
+      const behavior = reduceMotion ? 'auto' : 'smooth';
+      if(scroller){
+        if(typeof scroller.scrollTo === 'function'){
+          scroller.scrollTo({ top: 0, behavior });
+        }else{
+          scroller.scrollTop = 0;
+          if(document.documentElement){
+            document.documentElement.scrollTop = 0;
+          }
+          if(document.body){
+            document.body.scrollTop = 0;
+          }
+        }
+      }
     }
     syncNavigationState(view);
     updateMobileTopbar(section, sourceLink);
