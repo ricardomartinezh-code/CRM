@@ -930,6 +930,18 @@ function handleUpdateLead_(e, user){
   const rowIndex = values.findIndex(r => idx.ID !== undefined && String(r[idx.ID]) === String(id));
   if(rowIndex < 0) return jsonResponse({error:'id no encontrado'}, e);
   const row = values[rowIndex];
+  const prevEtapa = idx.Etapa !== undefined ? row[idx.Etapa] : '';
+  const prevEstado = idx.Estado !== undefined ? row[idx.Estado] : '';
+  const etapaProvided = Object.prototype.hasOwnProperty.call(e.parameter || {}, 'etapa');
+  const estadoProvided = Object.prototype.hasOwnProperty.call(e.parameter || {}, 'estado');
+  const normalize = value => String(value === undefined || value === null ? '' : value).trim().toLowerCase();
+  const etapaChanged = idx.Etapa !== undefined && etapaProvided && normalize(etapa) !== normalize(prevEtapa);
+  const estadoChanged = idx.Estado !== undefined && estadoProvided && normalize(estado) !== normalize(prevEstado);
+  if((etapaChanged || estadoChanged) && !String(comentario || '').trim()){
+    return jsonResponse({
+      error: 'Agrega un comentario con la nota del contacto y la próxima acción antes de actualizar la etapa o el estado.'
+    }, e);
+  }
   if(idx.Etapa !== undefined) row[idx.Etapa] = etapa;
   if(idx.Estado !== undefined) row[idx.Estado] = estado;
   if(idx.Comentario !== undefined) row[idx.Comentario] = comentario;

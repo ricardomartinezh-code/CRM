@@ -1095,6 +1095,33 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
     .panel-quick__comment textarea:focus{ outline:none; box-shadow:0 0 0 3px var(--panel-tone-bright); }
+    .panel-quick__feedback{
+      border-radius:12px;
+      border:1px solid color-mix(in srgb, var(--panel-tone-strong) 45%, rgba(2,6,23,0.55) 55%);
+      background: color-mix(in srgb, var(--panel-tone-soft) 70%, rgba(15,23,42,0.6) 30%);
+      padding:14px 16px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      color:var(--panel-tone-text);
+    }
+    .panel-quick__feedback strong{ font-size:14px; letter-spacing:.3px; }
+    .panel-quick__feedback p{ margin:0; font-size:13px; line-height:1.45; }
+    .panel-quick__feedback[data-tone="error"]{
+      border-color:rgba(239,68,68,0.55);
+      background: color-mix(in srgb, rgba(239,68,68,0.55) 58%, var(--panel-tone-soft) 42%);
+      color:#fecaca;
+    }
+    html[data-theme="light"] .panel-quick__feedback{
+      background: color-mix(in srgb, #ffffff 80%, var(--panel-tone-soft) 20%);
+      border-color: color-mix(in srgb, rgba(148,163,184,0.45) 55%, var(--panel-tone-strong) 45%);
+      color:#1e293b;
+    }
+    html[data-theme="light"] .panel-quick__feedback[data-tone="error"]{
+      background: rgba(254,226,226,0.92);
+      border-color: rgba(239,68,68,0.45);
+      color:#b91c1c;
+    }
     .panel-quick__actions{
       display:flex;
       flex-direction:column;
@@ -1174,6 +1201,22 @@
     .drawer-quick__field textarea{ min-height:96px; resize:vertical; }
     .drawer-quick__field select:focus,
     .drawer-quick__field textarea:focus{ outline:none; box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    .drawer-quick__feedback{
+      border-radius:12px;
+      border:1px solid rgba(239,68,68,0.45);
+      background: rgba(239,68,68,0.18);
+      padding:12px 14px;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color:#fecaca;
+    }
+    .drawer-quick__feedback strong{ font-size:13px; letter-spacing:.2px; }
+    .drawer-quick__feedback p{ margin:0; font-size:12px; line-height:1.45; }
+    html[data-theme="light"] .drawer-quick__feedback{
+      background: rgba(254,226,226,0.92);
+      color:#b91c1c;
+    }
     .drawer-quick__actions{ display:flex; justify-content:flex-end; }
 
     /* Responsive */
@@ -1776,34 +1819,17 @@
             <label class="panel-quick__field panel-quick__comment">Comentario
               <textarea id="txtComentario" class="w100" rows="3"></textarea>
             </label>
-          </div>
-          <label style="display:block;margin-top:10px">Comentario
-            <textarea id="txtComentario" class="w100" rows="3"></textarea>
-          </label>
-          <div class="contact-scripts" id="contactScripts">
-            <div class="contact-scripts__header"><i class="bi bi-journal-text"></i> Guiones comerciales</div>
-            <div class="contact-scripts__grid">
-              <article class="contact-script" data-channel="call">
-                <header><i class="bi bi-telephone"></i> Llamada</header>
-                <textarea readonly data-script-text="call" aria-label="Guion de llamada"></textarea>
-                <div class="contact-script__actions">
-                  <button class="btn outline" type="button" data-script-apply="call"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-                </div>
-              </article>
-              <article class="contact-script" data-channel="whatsapp">
-                <header><i class="bi bi-whatsapp"></i> WhatsApp</header>
-                <textarea readonly data-script-text="whatsapp" aria-label="Guion de WhatsApp"></textarea>
-                <div class="contact-script__actions">
-                  <button class="btn outline" type="button" data-script-apply="whatsapp"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-                </div>
-              </article>
-              <article class="contact-script" data-channel="email">
-                <header><i class="bi bi-envelope"></i> Correo</header>
-                <textarea readonly data-script-text="email" aria-label="Guion de correo"></textarea>
-                <div class="contact-script__actions">
-                  <button class="btn outline" type="button" data-script-apply="email"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-                </div>
-              </article>
+            <div class="panel-quick__feedback hidden" id="panelFeedback" role="alert" aria-live="assertive">
+              <strong id="panelFeedbackTitle"></strong>
+              <p id="panelFeedbackMessage"></p>
+            </div>
+            <div class="panel-quick__actions">
+              <button class="btn primary" id="updateBtn">Guardar actualización</button>
+              <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
+                <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
+                <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
+              </div>
             </div>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
           </div>
@@ -5957,7 +5983,7 @@
       base: sheetName,
       _originalEtapa: etapaVal,
       _originalEstado: estadoVal,
-      _originalComentario: comentarioVal
+      _originalComentario: String(comentarioVal || '').trim()
     };
   }
 
@@ -7701,68 +7727,31 @@
 
     const formSets = [];
     const canEditLead = canPerform('updateLead');
-    let lastLoggedType = '';
-    let lastLoggedAt = 0;
+    const COMMENT_REQUIRED_TITLE = 'Agrega una nota de seguimiento';
+    const COMMENT_REQUIRED_BODY = 'Describe brevemente la conversación y la próxima acción antes de guardar los cambios.';
 
-    const syncSaveAvailability = () => {
-      if(!canEditLead) return;
-      const hasComment = Boolean((r.comentario || '').trim());
-      formSets.forEach(set => {
-        if(set.updateBtn){
-          set.updateBtn.disabled = !hasComment;
-          if(!hasComment){
-            set.updateBtn.title = 'Agrega un comentario antes de guardar.';
-          }else{
-            set.updateBtn.removeAttribute('title');
-          }
-        }
-      });
+    const clearFormMessage = controls => {
+      if(!controls || !controls.feedbackEl) return;
+      controls.feedbackEl.classList.add('hidden');
+      controls.feedbackEl.removeAttribute('data-tone');
+      if(controls.feedbackTitleEl) controls.feedbackTitleEl.textContent = '';
+      if(controls.feedbackMessageEl) controls.feedbackMessageEl.textContent = '';
     };
 
-    const updateCommentValue = (value, sourceInput = null) => {
-      const text = value || '';
-      r.comentario = text;
-      formSets.forEach(set => {
-        if(set.comentarioInput && set.comentarioInput !== sourceInput){
-          set.comentarioInput.value = text;
-        }
-      });
-      syncSaveAvailability();
-    };
-
-    const appendCommentNote = note => {
-      if(!note) return;
-      const current = r.comentario || '';
-      const trimmed = current.trim();
-      const nextValue = trimmed ? `${trimmed}\n${note}` : note;
-      updateCommentValue(nextValue);
-    };
-
-    const broadcastScriptStatus = message => {
-      ['contactScriptStatus','drawerContactScriptStatus'].forEach(id => {
-        const target = document.getElementById(id);
-        if(!target) return;
-        target.textContent = message || '';
-        target.classList.toggle('hidden', !message);
-      });
-    };
-
-    const registerContactNote = type => {
-      const note = createContactNote(type, r);
-      appendCommentNote(note);
-      lastLoggedType = type || '';
-      lastLoggedAt = Date.now();
-      broadcastScriptStatus(`${CONTACT_CHANNEL_LABELS[type] || 'Contacto'} registrado. Completa los detalles y guarda el lead.`);
-    };
-
-    const maybeRegisterContactNote = type => {
-      if(!type) return;
-      const now = Date.now();
-      if(type === lastLoggedType && now - lastLoggedAt < 1000){
-        return;
+    const showFormMessage = (controls, tone, title, message) => {
+      if(!controls || !controls.feedbackEl) return;
+      if(tone){
+        controls.feedbackEl.setAttribute('data-tone', tone);
+      }else{
+        controls.feedbackEl.removeAttribute('data-tone');
       }
-      registerContactNote(type);
+      controls.feedbackEl.classList.remove('hidden');
+      if(controls.feedbackTitleEl) controls.feedbackTitleEl.textContent = title || '';
+      if(controls.feedbackMessageEl) controls.feedbackMessageEl.textContent = message || '';
     };
+
+    const clearAllMessages = () => { formSets.forEach(clearFormMessage); };
+    const broadcastMessage = (tone, title, message) => { formSets.forEach(set => showFormMessage(set, tone, title, message)); };
 
     const applyFormState = controls => {
       if(!controls) return;
@@ -7795,9 +7784,11 @@
         alert('No tienes permisos para actualizar leads.');
         return;
       }
+      clearAllMessages();
       const etapaChanged = r.etapa !== r._originalEtapa;
       const estadoChanged = r.estado !== r._originalEstado;
-      const comentarioChanged = (r.comentario || '') !== (r._originalComentario || '');
+      const comentarioActual = (r.comentario || '').trim();
+      const comentarioChanged = comentarioActual !== (r._originalComentario || '').trim();
       if(!etapaChanged && !estadoChanged && !comentarioChanged){
         alert('No hay cambios para guardar');
         return;
@@ -7813,13 +7804,21 @@
         return;
       }
       const registrarToque = etapaChanged || estadoChanged;
+      if(registrarToque && !comentarioActual){
+        broadcastMessage('error', COMMENT_REQUIRED_TITLE, COMMENT_REQUIRED_BODY);
+        const currentSet = formSets.find(set => set.updateBtn === button);
+        if(currentSet?.comentarioInput){
+          currentSet.comentarioInput.focus();
+        }
+        return;
+      }
       const params = new URLSearchParams({
         action: 'updateLead',
         id: r.id,
         sheet: state.sheet,
         etapa: etapaBackend(r.etapa),
         estado: r.estado,
-        comentario: r.comentario || '',
+        comentario: comentarioActual,
         registrarToque: registrarToque ? 'true' : 'false'
       });
       if(registrarToque){
@@ -7846,14 +7845,15 @@
         }
         r._originalEtapa = r.etapa;
         r._originalEstado = r.estado;
-        r._originalComentario = r.comentario || '';
+        r._originalComentario = (r.comentario || '').trim();
         updateDetailState();
         refreshForms();
         alert('Actualizado');
         refresh();
       }catch(err){
         console.error('Error al actualizar', err);
-        alert('Error al actualizar');
+        const message = resolveErrorMessage(err, 'No se pudo actualizar el lead.');
+        broadcastMessage('error', 'No se pudo actualizar el lead', message);
       }finally{
         buttons.forEach(btn => { btn.disabled = false; });
         isSaving = false;
@@ -7864,7 +7864,13 @@
       if(!controls) return;
       if(controls.comentarioInput){
         controls.comentarioInput.oninput = () => {
-          updateCommentValue(controls.comentarioInput.value, controls.comentarioInput);
+          r.comentario = controls.comentarioInput.value;
+          clearAllMessages();
+          formSets.forEach(set=>{
+            if(set !== controls && set.comentarioInput){
+              set.comentarioInput.value = r.comentario || '';
+            }
+          });
         };
       }
       if(controls.etapaSelect){
@@ -7872,6 +7878,7 @@
           r.etapa = controls.etapaSelect.value;
           const nextEstado = (estadosByEtapa[r.etapa] || [''])[0] || '';
           r.estado = nextEstado;
+          clearAllMessages();
           updateDetailState();
           formSets.forEach(set => {
             if(set.etapaSelect){
@@ -7893,6 +7900,7 @@
       if(controls.estadoSelect){
         controls.estadoSelect.onchange = () => {
           r.estado = controls.estadoSelect.value;
+          clearAllMessages();
           updateDetailState();
           formSets.forEach(set => {
             if(set !== controls && set.estadoSelect){
@@ -7919,6 +7927,7 @@
       }
       formSets.push(controls);
       applyFormState(controls);
+      clearFormMessage(controls);
       if(!canEditLead){
         if(controls.etapaSelect) controls.etapaSelect.disabled = true;
         if(controls.estadoSelect) controls.estadoSelect.disabled = true;
@@ -7965,7 +7974,10 @@
       etapaSelect: el('#selEtapa'),
       estadoSelect: el('#selEstado'),
       comentarioInput: el('#txtComentario'),
-      updateBtn: el('#updateBtn')
+      updateBtn: el('#updateBtn'),
+      feedbackEl: el('#panelFeedback'),
+      feedbackTitleEl: el('#panelFeedbackTitle'),
+      feedbackMessageEl: el('#panelFeedbackMessage')
     });
 
     const phone = parsePhone(basePhone);
@@ -8032,44 +8044,28 @@
           <div class="muted">Etapa</div><div id="drawerEtapaVal">${r.etapa || '—'}</div>
           <div class="muted">Estado</div><div id="drawerEstadoVal">${r.estado || '—'}</div>
         </div>
-        <div class="actions">
-          ${hasCallLink?`<a class="btn" id="drawerActCall" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
-          ${hasWaLink?`<a class="btn" id="drawerActWa" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
-          ${hasMailLink?`<a class="btn" id="drawerActMail" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
-        </div>
-        <label style="display:block;margin-top:12px">Etapa
-          <select id="drawerEtapa" class="w100"></select>
-        </label>
-        <label style="display:block;margin-top:12px">Estado
-          <select id="drawerEstado" class="w100"></select>
-        </label>
-        <label style="display:block;margin-top:12px">Comentario
-          <textarea id="drawerComentario" class="w100" rows="3"></textarea>
-        </label>
-        <div class="contact-scripts" id="drawerContactScripts">
-          <div class="contact-scripts__header"><i class="bi bi-journal-text"></i> Guiones comerciales</div>
-          <div class="contact-scripts__grid">
-            <article class="contact-script" data-channel="call">
-              <header><i class="bi bi-telephone"></i> Llamada</header>
-              <textarea readonly data-script-text="call" aria-label="Guion de llamada en móvil"></textarea>
-              <div class="contact-script__actions">
-                <button class="btn outline" type="button" data-script-apply="call"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-              </div>
-            </article>
-            <article class="contact-script" data-channel="whatsapp">
-              <header><i class="bi bi-whatsapp"></i> WhatsApp</header>
-              <textarea readonly data-script-text="whatsapp" aria-label="Guion de WhatsApp en móvil"></textarea>
-              <div class="contact-script__actions">
-                <button class="btn outline" type="button" data-script-apply="whatsapp"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-              </div>
-            </article>
-            <article class="contact-script" data-channel="email">
-              <header><i class="bi bi-envelope"></i> Correo</header>
-              <textarea readonly data-script-text="email" aria-label="Guion de correo en móvil"></textarea>
-              <div class="contact-script__actions">
-                <button class="btn outline" type="button" data-script-apply="email"><i class="bi bi-clipboard-check"></i> Copiar y registrar</button>
-              </div>
-            </article>
+        <section class="drawer-quick" aria-label="Actualiza y contacta">
+          <p class="drawer-quick__hint">Actualiza etapa y estado antes de abrir un nuevo contacto.</p>
+          <div class="drawer-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
+            ${hasCallLink?`<a class="btn" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
+            ${hasWaLink?`<a class="btn" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
+            ${hasMailLink?`<a class="btn" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
+          </div>
+          <label class="drawer-quick__field">Etapa
+            <select id="drawerEtapa" class="w100"></select>
+          </label>
+          <label class="drawer-quick__field">Estado
+            <select id="drawerEstado" class="w100"></select>
+          </label>
+          <label class="drawer-quick__field">Comentario
+            <textarea id="drawerComentario" class="w100" rows="3"></textarea>
+          </label>
+          <div class="drawer-quick__feedback hidden" id="drawerFeedback" role="alert" aria-live="assertive">
+            <strong id="drawerFeedbackTitle"></strong>
+            <p id="drawerFeedbackMessage"></p>
+          </div>
+          <div class="drawer-quick__actions">
+            <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
           </div>
           <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
         </div>
@@ -8080,7 +8076,10 @@
         etapaSelect: el('#drawerEtapa'),
         estadoSelect: el('#drawerEstado'),
         comentarioInput: el('#drawerComentario'),
-        updateBtn: el('#drawerUpdateBtn')
+        updateBtn: el('#drawerUpdateBtn'),
+        feedbackEl: el('#drawerFeedback'),
+        feedbackTitleEl: el('#drawerFeedbackTitle'),
+        feedbackMessageEl: el('#drawerFeedbackMessage')
       });
       const drawerCall = document.getElementById('drawerActCall');
       if(drawerCall){
