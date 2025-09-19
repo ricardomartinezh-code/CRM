@@ -4,12 +4,26 @@
   "description": "Static site deployment for ReLead-EDU",
   "scripts": {
     "build": "echo 'Skipping build step'",
-    "start": "serve -s . -l ${PORT:-3000}"
+    "start": "serve -s . -l ${PORT:-3000}",
+    "lint": "eslint \"**/*.{js,gs,html}\"",
+    "lint:fix": "eslint \"**/*.{js,gs,html}\" --fix",
+    "format": "prettier --check .",
+    "format:write": "prettier --write ."
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
   "dependencies": {
     "serve": "14.2.1"
+  },
+  "main": "index.js",
+  "type": "commonjs",
+  "devDependencies": {
+    "@google/eslint-plugin-apps-script": "file:packages/eslint-plugin-apps-script",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-html": "file:packages/eslint-plugin-html",
+    "eslint-plugin-import": "^2.32.0",
+    "prettier": "^3.6.2"
   }
 }

@@ -1,0 +1,7 @@
+{
+  "name": "eslint-plugin-html",
+  "version": "0.1.0",
+  "description": "Minimal HTML <script> processor for ESLint",
+  "main": "index.js",
+  "license": "MIT"
+}
