@@ -179,6 +179,10 @@
       align-items:stretch;
       justify-content:center;
       padding:calc(var(--space) * 2) clamp(var(--space), 5vw, calc(var(--space) * 4));
+      padding-top:calc(var(--space) * 2 + constant(safe-area-inset-top));
+      padding-top:calc(var(--space) * 2 + env(safe-area-inset-top));
+      padding-bottom:calc(var(--space) * 2 + constant(safe-area-inset-bottom));
+      padding-bottom:calc(var(--space) * 2 + env(safe-area-inset-bottom));
       overflow-y:auto;
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
@@ -1196,10 +1200,13 @@
     .table-wrap { background: var(--card); border:1px solid rgba(255,255,255,.08); border-radius: 16px; overflow:auto }
     table { width:100%; border-collapse: collapse; font-size:14px }
     thead th { position: sticky; top:0; background: linear-gradient(180deg, var(--card), var(--card-2)); text-align:left; padding:12px; border-bottom:1px solid rgba(255,255,255,.12); cursor:pointer }
+    thead th.is-sorted{ color: var(--accent); }
+    thead th.is-sorted::after{ content: attr(data-sort-dir); margin-left:6px; font-size:12px; }
     thead .filter-row th{ padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.12); }
     .col-filter{ width:100%; padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:var(--card-2); color:var(--text); }
     tbody td { padding:12px; border-bottom: 1px dashed rgba(255,255,255,.08) }
     tbody tr:hover { background: rgba(0,58,95,.06) }
+    .table-empty{ text-align:center; padding:24px 12px; color:var(--muted); font-style:italic; }
     .preview-box{ color: var(--text); font-size:14px; }
     .preview-box .table-wrap{ margin-top:8px; }
     .preview-summary{ color: var(--muted); font-size:13px; margin-bottom:6px; }
@@ -1277,6 +1284,39 @@
     html[data-theme="light"] .modal-footer{ border-top-color: rgba(15,23,42,0.08); }
     .modal-footnote{ margin-top:8px; font-size:12px; color:var(--muted); }
     body.modal-open{ overflow:hidden; }
+    .template-modal{ width:min(880px, 100%); }
+    .template-modal__grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap:var(--space); align-items:flex-start; }
+    .template-modal__section{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .template-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
+    .template-list__item{ display:flex; align-items:flex-start; gap:10px; justify-content:space-between; width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.1); padding:10px 12px; background:var(--card-2); color:var(--text); text-align:left; cursor:pointer; transition: transform .18s ease, box-shadow .18s ease; }
+    .template-list__item:hover, .template-list__item:focus-visible{ transform:translateY(-1px); box-shadow:0 12px 28px rgba(5,12,28,0.32); outline:none; }
+    .template-list__meta{ font-size:12px; opacity:0.7; margin-top:4px; }
+    .template-list__empty{ font-size:12px; color:var(--muted); padding:10px 12px; border-radius:12px; border:1px dashed rgba(255,255,255,0.18); background:rgba(148,163,184,0.08); text-align:center; }
+    .template-list__actions{ display:flex; gap:6px; }
+    .template-list__actions button{ border:none; background:color-mix(in srgb, rgba(255,255,255,0.08) 60%, var(--panel-base-soft) 40%); color:var(--text); border-radius:10px; padding:6px 10px; cursor:pointer; font-size:12px; transition: background .18s ease; }
+    .template-list__actions button:hover, .template-list__actions button:focus-visible{ background:color-mix(in srgb, rgba(255,255,255,0.12) 50%, var(--panel-base-bright) 50%); outline:none; }
+    .template-field{ display:flex; flex-direction:column; gap:6px; }
+    .template-field input,
+    .template-field textarea{ width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.18); padding:10px 12px; background:var(--card-2); color:var(--text); font:inherit; }
+    .template-field textarea{ resize:vertical; min-height:120px; }
+    .template-field input:focus,
+    .template-field textarea:focus{ outline:none; box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.35); border-color:rgba(var(--panel-base-rgb),0.45); }
+    .template-hint{ margin:0; font-size:12px; color:var(--muted); }
+    .template-hint code{ background:rgba(148,163,184,0.16); padding:2px 6px; border-radius:8px; font-size:11px; }
+    .template-modal__actions{ display:flex; flex-wrap:wrap; gap:8px; justify-content:flex-end; }
+    .template-form{ margin-top:var(--space); padding:var(--space); border-radius:16px; border:1px solid rgba(255,255,255,0.12); background:color-mix(in srgb, var(--card-2) 80%, rgba(15,23,42,0.22) 20%); display:flex; flex-direction:column; gap:var(--space-sm); }
+    .template-form.hidden{ display:none; }
+    html[data-theme="light"] .template-list__item{ background:#ffffff; border-color:rgba(15,23,42,0.08); }
+    html[data-theme="light"] .template-list__empty{ background:#f8fafc; border-color:rgba(15,23,42,0.16); color:#475569; }
+    html[data-theme="light"] .template-list__actions button{ background:rgba(15,23,42,0.08); color:#0f172a; }
+    html[data-theme="light"] .template-list__actions button:hover, html[data-theme="light"] .template-list__actions button:focus-visible{ background:rgba(37,99,235,0.16); }
+    html[data-theme="light"] .template-field input,
+    html[data-theme="light"] .template-field textarea{ background:#ffffff; border-color:rgba(15,23,42,0.12); color:#0f172a; }
+    html[data-theme="light"] .template-form{ background:#ffffff; border-color:rgba(15,23,42,0.12); }
+    @media (max-width: 720px){
+      .template-modal__grid{ grid-template-columns:1fr; }
+      .template-modal__actions{ justify-content:flex-start; }
+    }
     /* Details panel */
     .panel {
       position: relative;
@@ -1301,8 +1341,8 @@
       line-height:1.6;
     }
     .panel.show { opacity:1; transform: translateY(0) scale(1); }
-    .panel-header { margin-bottom:20px; }
-    .panel-title { margin:0; display:flex; align-items:flex-start; gap:14px; font-size:26px; line-height:1.05; }
+    .panel-header { margin-bottom:20px; display:flex; align-items:flex-start; gap:12px; justify-content:space-between; }
+    .panel-title { margin:0; display:flex; align-items:flex-start; gap:14px; font-size:26px; line-height:1.05; flex:1 1 auto; }
     .panel-title span:first-child{ font-weight:800; font-size:1.04em; letter-spacing:.4px; flex:1 1 auto; min-width:0; }
     .panel[data-etapa] .panel-title span:first-child{ color:var(--panel-tone-text); text-shadow:none; }
     html[data-theme="light"] .panel{
@@ -1795,6 +1835,70 @@
       box-shadow: 0 12px 26px rgba(15,23,42,0.16);
       color: var(--panel-tone-text);
     }
+    .panel-favorite{
+      margin-top:6px;
+      border:none;
+      background:color-mix(in srgb, var(--panel-tone-soft) 70%, rgba(15,23,42,0.4) 30%);
+      color:var(--panel-tone-text);
+      border-radius:12px;
+      padding:8px 10px;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      transition: transform .18s ease, box-shadow .18s ease, background .18s ease;
+    }
+    .panel-favorite i{ font-size:18px; }
+    .panel-favorite:hover, .panel-favorite:focus-visible{
+      transform:translateY(-1px);
+      box-shadow:0 10px 24px rgba(5,12,28,0.35);
+      outline:none;
+    }
+    .panel-favorite[aria-pressed="true"]{ background:rgba(255,215,0,0.16); color:#fde68a; }
+    html[data-theme="light"] .panel-favorite{ background:color-mix(in srgb, #ffffff 85%, var(--panel-tone-bright) 15%); color:#1f2937; }
+    html[data-theme="light"] .panel-favorite[aria-pressed="true"]{ background:#fef3c7; color:#b45309; }
+    .quick-access{
+      margin-top:12px;
+      padding:16px;
+      border-radius:16px;
+      border:1px solid color-mix(in srgb, var(--panel-tone-strong) 35%, rgba(15,23,42,0.55) 65%);
+      background:color-mix(in srgb, var(--panel-tone-soft) 75%, rgba(15,23,42,0.4) 25%);
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .quick-access__header h4{ margin:0; font-size:16px; font-weight:700; }
+    .quick-access__header p{ margin:4px 0 0; font-size:13px; color:var(--panel-tone-text); opacity:0.7; }
+    .quick-access__group{ display:flex; flex-direction:column; gap:8px; }
+    .quick-access__label{ font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:var(--panel-tone-text); opacity:0.8; }
+    .quick-access__list{ display:flex; flex-wrap:wrap; gap:8px; }
+    .quick-access__item{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-start;
+      gap:2px;
+      min-width:140px;
+      border-radius:12px;
+      border:1px solid color-mix(in srgb, var(--panel-tone-bright) 40%, rgba(15,23,42,0.5) 60%);
+      padding:10px 12px;
+      background:color-mix(in srgb, var(--panel-tone-soft) 82%, rgba(15,23,42,0.45) 18%);
+      color:var(--panel-tone-text);
+      font-size:13px;
+      text-align:left;
+      cursor:pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    .quick-access__item:hover, .quick-access__item:focus-visible{
+      transform:translateY(-1px);
+      box-shadow:0 12px 28px rgba(5,12,28,0.32);
+      outline:none;
+    }
+    .quick-access__item-name{ font-weight:700; font-size:13px; }
+    .quick-access__item-meta{ font-size:12px; opacity:0.75; display:flex; gap:4px; flex-wrap:wrap; }
+    .quick-access__empty{ margin:0; font-size:12px; color:var(--panel-tone-text); opacity:0.6; }
+    html[data-theme="light"] .quick-access{ background:color-mix(in srgb, #ffffff 85%, var(--panel-tone-soft) 15%); border-color:color-mix(in srgb, var(--panel-tone-strong) 28%, #cbd5f5 72%); }
+    html[data-theme="light"] .quick-access__item{ background:#ffffff; border-color:color-mix(in srgb, var(--panel-tone-strong) 22%, #dbeafe 78%); }
+    html[data-theme="light"] .quick-access__item:hover, html[data-theme="light"] .quick-access__item:focus-visible{ box-shadow:0 12px 26px rgba(15,23,42,0.18); }
 
     .panel-overlay { position: fixed; inset: 0; display:flex; justify-content:center; align-items:center; padding:40px; background: var(--bg-soft); opacity:0; pointer-events:none; transition: opacity .24s ease; z-index: 60; }
     .panel-overlay.open { opacity:1; pointer-events:auto; }
@@ -1991,6 +2095,24 @@
     .hidden{ display:none !important }
     .small{ font-size:12px; line-height:1.5 }
     .settings-card{ display:flex; flex-direction:column; gap:var(--space); }
+    .integration-layout{ display:flex; flex-direction:column; gap:var(--space); }
+    .integration-grid{ display:grid; gap:var(--space); grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
+    .integration-card{ background:var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:calc(var(--space)*0.9); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); display:flex; flex-direction:column; gap:var(--space-sm); position:relative; overflow:hidden; }
+    html[data-theme="light"] .integration-card{ border-color:rgba(15,23,42,0.08); box-shadow:inset 0 1px 0 rgba(255,255,255,0.8); }
+    .integration-card__header{ display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-sm); }
+    .integration-card__title{ font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:var(--space-xs); }
+    .integration-tag{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; background:rgba(var(--panel-base-rgb),0.16); color:var(--panel-stage-text); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+    html[data-theme="light"] .integration-tag{ background:rgba(var(--panel-base-rgb),0.12); color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 82%, #0f172a 18%); }
+    .integration-card__status{ font-weight:600; display:flex; align-items:center; gap:6px; }
+    .integration-status--connected{ color:var(--ok); }
+    .integration-status--beta{ color:var(--warn); }
+    .integration-card__body{ color:var(--muted); font-size:0.95rem; display:flex; flex-direction:column; gap:var(--space-sm); }
+    .integration-card__actions{ display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; }
+    .integration-card__meta{ font-size:0.8rem; color:var(--muted); }
+    .integration-help{ background:rgba(var(--panel-base-rgb),0.14); border-radius:var(--radius); padding:calc(var(--space)*0.9); border:1px solid rgba(var(--panel-base-rgb),0.28); box-shadow:0 12px 30px rgba(var(--panel-base-rgb),0.18); }
+    html[data-theme="light"] .integration-help{ background:color-mix(in srgb, var(--card) 84%, var(--panel-base-soft) 16%); border-color:rgba(var(--panel-base-rgb),0.24); box-shadow:0 16px 34px rgba(var(--panel-base-rgb),0.12); }
+    .integration-help h4{ margin:0 0 var(--space-sm); font-size:1.05rem; }
+    .integration-help ul{ margin:0; padding-left:20px; display:grid; gap:6px; }
     .settings-profile{ display:flex; flex-wrap:wrap; gap:var(--space); align-items:flex-start; }
     .profile-avatar{ display:flex; flex-direction:column; gap:var(--space-sm); align-items:flex-start; }
     .avatar-frame{ width:var(--avatar-size); height:var(--avatar-size); border-radius:50%; border:2px dashed rgba(255,255,255,0.2); background:var(--card-2); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; text-transform:uppercase; position:relative; overflow:hidden; box-shadow: inset 0 2px 6px rgba(2,12,29,0.35); }
@@ -2034,7 +2156,20 @@
     .security-timeline__label{ font-weight:600; color:var(--text); }
     .security-timeline__meta{ font-size:11px; color:var(--muted); }
     .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-    .settings-preferences{ display:grid; gap:var(--space); }
+    .settings-preferences{ display:flex; flex-direction:column; gap:var(--space); }
+    .pref-layout{ display:grid; gap:var(--space); }
+    .pref-column{ display:grid; gap:var(--space-sm); }
+    .pref-select-grid{ display:grid; gap:var(--space-sm); }
+    .pref-toggles{ border:1px solid rgba(var(--panel-base-rgb),0.28); border-radius:var(--radius); padding:var(--space-sm); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:var(--space-sm); }
+    html[data-theme="light"] .pref-toggles{ background:rgba(var(--panel-base-rgb),0.12); border-color:rgba(var(--panel-base-rgb),0.22); }
+    .pref-toggles legend{ margin:0; padding:0 var(--space-xs); font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--text); }
+    .pref-toggle-grid{ display:grid; gap:var(--space-sm); }
+    .pref-column--toggles .settings-group.switch{ justify-content:space-between; }
+    @media (min-width: 920px){
+      .pref-layout{ grid-template-columns: minmax(0,1fr) minmax(0,420px); align-items:start; }
+      .pref-select-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .pref-toggle-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
     .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
     .pref-presets[hidden]{ display:none; }
     .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
@@ -2067,7 +2202,6 @@
     .settings-summary[data-state="error"]{ border-color:rgba(239,68,68,0.45); color:#ef4444; background:rgba(239,68,68,0.12); }
     .settings-summary[data-state="warning"]{ border-color:rgba(245,158,11,0.45); color:#f59e0b; background:rgba(245,158,11,0.12); }
     .settings-summary.fade{ opacity:0.45; }
-    .settings-preferences > *:not(.pref-actions){ max-width:420px; }
     .profile-avatar .muted{ max-width:240px; }
     .permissions-grid{ display:grid; grid-template-columns: minmax(220px, 320px) minmax(0,1fr); gap:var(--space); align-items:flex-start; }
     .permissions-panel{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space); background: var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
@@ -2150,6 +2284,26 @@
     .permission-rules li{ line-height:1.5; }
     .permission-scope-note{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
     .permission-scope-values{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+    .assignment-grid{ display:flex; flex-direction:column; gap:var(--space); }
+    .assignment-body{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-mode{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-targets{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .assignment-actions{ display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; justify-content:space-between; }
+    .assignment-status{ font-size:13px; color:var(--muted); transition:color .2s ease; }
+    .assignment-status[data-tone="success"]{ color:var(--ok); }
+    .assignment-status[data-tone="warning"]{ color:var(--warn); }
+    .assignment-status[data-tone="error"]{ color:var(--bad); }
+    .assignment-buttons{ display:flex; gap:var(--space-sm); flex-shrink:0; }
+    .assignment-summary{ font-size:13px; color:var(--muted); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:var(--space-sm); min-height:24px; }
+    .assignment-rules{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-rules h4{ margin:0; font-size:15px; display:flex; align-items:center; gap:8px; }
+    .assignment-rules__list{ margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .assignment-filters{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+    html[data-theme="light"] .assignment-summary{ background:rgba(15,23,42,0.05); border-color:rgba(15,23,42,0.08); }
+    @media (max-width:700px){
+      .assignment-buttons{ width:100%; justify-content:flex-end; }
+      .assignment-actions{ align-items:stretch; }
+    }
     .permissions-switch{ display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.02); cursor:pointer; transition:border-color .2s ease, box-shadow .2s ease; }
     .permissions-switch input{ appearance:none; width:44px; height:24px; border-radius:999px; border:1px solid rgba(255,255,255,0.25); background:rgba(15,23,42,0.55); position:relative; cursor:pointer; transition: background .2s ease, border-color .2s ease; }
     .permissions-switch input::before{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(15,23,42,0.25); transform:translateX(0); transition: transform .2s ease; }
@@ -2409,6 +2563,113 @@
       </div>
     </div>
   </div>
+  <div class="modal-overlay" id="whatsappTemplateModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card template-modal" role="document">
+      <button type="button" class="modal-close" id="waModalClose" aria-label="Cerrar selección de plantillas">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Enviar por WhatsApp</h2>
+        <p>Elige una plantilla, personaliza el mensaje y envíalo sin salir de la plataforma.</p>
+      </div>
+      <div class="modal-body">
+        <div class="template-modal__grid">
+          <section class="template-modal__section">
+            <h3>Plantillas guardadas</h3>
+            <ul class="template-list" id="waTemplateList" role="list"></ul>
+            <button type="button" class="btn outline" id="waCreateTemplate"><i class="bi bi-plus-lg"></i> Nueva plantilla</button>
+          </section>
+          <section class="template-modal__section">
+            <label class="template-field">
+              <span>Mensaje a enviar</span>
+              <textarea id="waMessage" rows="6"></textarea>
+            </label>
+            <p class="template-hint">Usa <code>{{nombre}}</code> en tus plantillas para insertar automáticamente el nombre del lead.</p>
+            <div class="template-modal__actions">
+              <button type="button" class="btn" id="waCancelBtn">Cancelar</button>
+              <button type="button" class="btn primary" id="waSendBtn"><i class="bi bi-whatsapp"></i> Enviar por WhatsApp</button>
+            </div>
+          </section>
+        </div>
+        <form class="template-form hidden" id="waTemplateForm">
+          <input type="hidden" id="waTemplateId" />
+          <label class="template-field">
+            <span>Nombre de la plantilla</span>
+            <input type="text" id="waTemplateName" maxlength="80" required />
+          </label>
+          <label class="template-field">
+            <span>Mensaje</span>
+            <textarea id="waTemplateContent" rows="5" required></textarea>
+          </label>
+          <div class="template-modal__actions">
+            <button type="submit" class="btn primary" id="waTemplateSave">Guardar</button>
+            <button type="button" class="btn" id="waTemplateCancel">Cerrar</button>
+            <button type="button" class="btn danger" id="waTemplateDelete">Eliminar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="emailTemplateModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card template-modal" role="document">
+      <button type="button" class="modal-close" id="emailModalClose" aria-label="Cerrar selección de plantillas de correo">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <h2>Enviar correo</h2>
+        <p>Selecciona una plantilla, personaliza el saludo y el enlace a tu WhatsApp.</p>
+      </div>
+      <div class="modal-body">
+        <div class="template-modal__grid">
+          <section class="template-modal__section">
+            <h3>Plantillas guardadas</h3>
+            <ul class="template-list" id="emailTemplateList" role="list"></ul>
+            <button type="button" class="btn outline" id="emailCreateTemplate"><i class="bi bi-plus-lg"></i> Nueva plantilla</button>
+          </section>
+          <section class="template-modal__section">
+            <label class="template-field">
+              <span>Asunto</span>
+              <input type="text" id="emailSubject" maxlength="140" />
+            </label>
+            <label class="template-field">
+              <span>Mensaje</span>
+              <textarea id="emailBody" rows="8"></textarea>
+            </label>
+            <label class="template-field">
+              <span>WhatsApp del asesor</span>
+              <input type="tel" id="advisorWhatsapp" inputmode="tel" placeholder="521XXXXXXXXXX" />
+            </label>
+            <p class="template-hint">Puedes usar <code>{{nombre}}</code> y <code>{{whatsapp}}</code> en tus plantillas para personalizar automáticamente.</p>
+            <div class="template-modal__actions">
+              <button type="button" class="btn" id="emailCancelBtn">Cancelar</button>
+              <button type="button" class="btn" id="emailMailtoBtn"><i class="bi bi-envelope"></i> Usar mailto</button>
+              <button type="button" class="btn primary" id="emailGmailBtn"><i class="bi bi-google"></i> Abrir en Gmail</button>
+            </div>
+          </section>
+        </div>
+        <form class="template-form hidden" id="emailTemplateForm">
+          <input type="hidden" id="emailTemplateId" />
+          <label class="template-field">
+            <span>Nombre de la plantilla</span>
+            <input type="text" id="emailTemplateName" maxlength="80" required />
+          </label>
+          <label class="template-field">
+            <span>Asunto</span>
+            <input type="text" id="emailTemplateSubject" maxlength="140" required />
+          </label>
+          <label class="template-field">
+            <span>Mensaje</span>
+            <textarea id="emailTemplateBody" rows="6" required></textarea>
+          </label>
+          <div class="template-modal__actions">
+            <button type="submit" class="btn primary" id="emailTemplateSave">Guardar</button>
+            <button type="button" class="btn" id="emailTemplateCancel">Cerrar</button>
+            <button type="button" class="btn danger" id="emailTemplateDelete">Eliminar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
   <div class="app hidden" id="app">
     <!-- Sidebar -->
     <aside class="sidebar" id="sidebar" aria-label="Navegación principal" aria-hidden="false">
@@ -2450,6 +2711,7 @@
           <a href="#" class="nav-link" data-nav="exportar"><i class="bi bi-box-arrow-up"></i><span>Exportar</span></a>
           <a href="#" class="nav-link" data-nav="sistema"><i class="bi bi-cpu"></i><span>Sistema</span></a>
           <a href="#" class="nav-link" data-nav="permisos"><i class="bi bi-shield-lock"></i><span>Permisos</span></a>
+          <a href="#" class="nav-link" data-nav="integraciones"><i class="bi bi-plug"></i><span>Integraciones</span></a>
           <a href="#" class="nav-link" data-nav="configuracion"><i class="bi bi-gear"></i><span>Configuración</span></a>
         </div>
         <div class="nav-footer">
@@ -2533,9 +2795,6 @@
             <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="q" type="search" placeholder="ID, nombre o teléfono… (Ctrl /)" aria-label="ID" />
           </div>
-          <div class="actions">
-            <div class="btn primary" title="Buscar" id="searchBtn"><i class="bi bi-search"></i> Buscar</div>
-          </div>
         </div>
       </header>
 
@@ -2576,11 +2835,58 @@
           </div>
         </div>
         <div class="panel-section">
-          <h3>Leads</h3>
+          <div class="row between align-center" style="gap:var(--space-sm)">
+            <h3>Leads</h3>
+            <div class="seg" role="toolbar" aria-label="Formato de visualización">
+              <button type="button" data-view-mode="board" aria-pressed="true" title="Ver como tablero">
+                <i class="bi bi-kanban"></i> Tablero
+              </button>
+              <button type="button" data-view-mode="table" aria-pressed="false" title="Ver como tabla">
+                <i class="bi bi-table"></i> Tabla
+              </button>
+            </div>
+          </div>
           <section class="content">
             <!-- Kanban -->
             <div id="viewKanban" class="board" role="region" aria-label="Lead Board">
               <!-- Column templates -->
+            </div>
+            <div id="tableWrap" class="table-wrap hidden" role="region" aria-label="Tabla de leads">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-sort="id">ID</th>
+                    <th data-sort="nombre">Nombre</th>
+                    <th data-sort="matricula">Matrícula</th>
+                    <th data-sort="correo">Correo</th>
+                    <th data-sort="telefono">Teléfono</th>
+                    <th data-sort="campus">Plantel</th>
+                    <th data-sort="modalidad">Modalidad</th>
+                    <th data-sort="programa">Programa</th>
+                    <th data-sort="etapa">Etapa</th>
+                    <th data-sort="estado">Estado</th>
+                    <th data-sort="asesor">Asesor</th>
+                    <th data-sort="comentario">Comentario</th>
+                    <th data-sort="asignacion">Asignación</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="id" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="nombre" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="matricula" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="correo" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="telefono" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="campus" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="modalidad" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="programa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="etapa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="estado" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asesor" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="comentario" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asignacion" /></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
             </div>
           </section>
           <div id="paginator" class="pagination"></div>
@@ -2594,6 +2900,9 @@
               <span id="d-nombre">Selecciona un lead</span>
               <span class="stage-pill is-empty" id="d-etapa">—</span>
             </h3>
+            <button type="button" class="panel-favorite" id="favoriteToggle" aria-pressed="false" aria-label="Agregar a favoritos">
+              <i class="bi bi-star" aria-hidden="true"></i>
+            </button>
           </div>
           <div class="kv">
             <div class="kv-label" id="lab-matricula">Matrícula</div><div id="d-matricula">—</div>
@@ -2659,11 +2968,27 @@
             <div class="panel-quick__actions">
               <button class="btn primary" id="updateBtn">Guardar actualización</button>
               <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
-                <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
-                <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-                <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
+                <a class="btn contact-btn contact-call" data-contact="call" href="#"><i class="bi bi-telephone"></i> Llamar</a>
+                <a class="btn contact-btn contact-wa" data-contact="whatsapp" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                <a class="btn contact-btn contact-mail" data-contact="email" href="#"><i class="bi bi-envelope"></i> Email</a>
               </div>
             </div>
+            <section class="quick-access" id="quickAccessPanel" aria-label="Accesos rápidos de leads">
+              <header class="quick-access__header">
+                <h4>Recientes y favoritos</h4>
+                <p>Accede a los leads clave que has abierto recientemente o marcado como favoritos.</p>
+              </header>
+              <div class="quick-access__group" id="favoriteGroup">
+                <div class="quick-access__label">Favoritos</div>
+                <div class="quick-access__list" id="favoriteLeads" role="list"></div>
+                <p class="quick-access__empty" id="favoriteEmpty">Marca un lead con la estrella para guardarlo aquí.</p>
+              </div>
+              <div class="quick-access__group" id="recentGroup">
+                <div class="quick-access__label">Recientes</div>
+                <div class="quick-access__list" id="recentLeads" role="list"></div>
+                <p class="quick-access__empty" id="recentEmpty">Los leads que abras aparecerán en esta lista.</p>
+              </div>
+            </section>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
           </div>
             <section class="calendar-form" aria-labelledby="calendarFormTitle">
@@ -2939,10 +3264,6 @@
                 </div>
               </form>
             </div>
-            <div class="permissions-reference">
-              <div class="permissions-card" id="permissionMatrix"></div>
-              <div class="permissions-card" id="permissionRules"></div>
-            </div>
           </div>
           <div class="panel-section">
             <h3><span aria-hidden="true">👥</span> Equipos</h3>
@@ -3025,6 +3346,230 @@
               </form>
             </div>
           </div>
+          <div class="panel-section">
+            <h3><span aria-hidden="true">🔄</span> Asignación</h3>
+            <p class="muted small">Reasigna leads manualmente en la base activa seleccionando un caso individual, varios registros o un segmento completo.</p>
+            <div class="assignment-grid">
+              <div class="assignment-header">
+                <div class="segmented" role="radiogroup" aria-label="Modo de reasignación">
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="single" checked>
+                    <span>Individual</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="multiple">
+                    <span>Varios</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="segment">
+                    <span>Segmento</span>
+                  </label>
+                </div>
+              </div>
+              <div class="assignment-body">
+                <div class="assignment-mode" data-mode="single">
+                  <label class="field-with-hint">
+                    <span>Lead a reasignar</span>
+                    <input type="text" id="assignmentSingleInput" list="assignmentLeadOptions" placeholder="ID, matrícula, correo o nombre" autocomplete="off">
+                    <span class="field-hint">Empieza a escribir y selecciona una coincidencia del listado.</span>
+                    <datalist id="assignmentLeadOptions"></datalist>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="multiple">
+                  <label class="field-with-hint">
+                    <span>Leads seleccionados</span>
+                    <textarea id="assignmentBulkInput" rows="4" placeholder="Pega IDs o matrículas separados por comas, saltos de línea o espacios."></textarea>
+                    <span class="field-hint">Los duplicados se omiten automáticamente.</span>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="segment">
+                  <div class="assignment-filters" role="group" aria-label="Filtros del segmento">
+                    <label>
+                      <span>Asesor actual</span>
+                      <select id="assignmentFilterAsesor">
+                        <option value="">Todos</option>
+                        <option value="__unassigned__">Solo sin asesor</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Etapa</span>
+                      <select id="assignmentFilterEtapa">
+                        <option value="">Todas</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Estado</span>
+                      <select id="assignmentFilterEstado" disabled>
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Plantel</span>
+                      <select id="assignmentFilterCampus">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Programa</span>
+                      <select id="assignmentFilterPrograma">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Asignados desde</span>
+                      <input type="date" id="assignmentFilterStart">
+                    </label>
+                    <label>
+                      <span>Asignados hasta</span>
+                      <input type="date" id="assignmentFilterEnd">
+                    </label>
+                    <label>
+                      <span>Límite</span>
+                      <input type="number" id="assignmentFilterLimit" min="1" max="500" placeholder="Ej. 50">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="assignment-targets">
+                <label class="field-with-hint">
+                  <span>Base de trabajo</span>
+                  <select id="assignmentBaseSelect"></select>
+                  <span class="field-hint">Solo se procesarán leads de la base seleccionada.</span>
+                </label>
+                <label class="field-with-hint">
+                  <span>Asesor destino</span>
+                  <input type="text" id="assignmentTargetInput" list="assignmentTargetOptions" placeholder="Nombre o ID" autocomplete="off">
+                  <span class="field-hint">Sugiere asesores activos, pero puedes capturar cualquier nombre válido.</span>
+                  <datalist id="assignmentTargetOptions"></datalist>
+                </label>
+              </div>
+              <div class="assignment-actions">
+                <div class="assignment-status" id="assignmentStatus" role="status" aria-live="polite">Selecciona el modo de reasignación y completa los datos.</div>
+                <div class="assignment-buttons">
+                  <button type="button" class="btn outline" id="assignmentPreviewBtn"><i class="bi bi-search"></i> Calcular selección</button>
+                  <button type="button" class="btn primary" id="assignmentExecuteBtn" disabled><i class="bi bi-arrow-repeat"></i> Reasignar leads</button>
+                </div>
+              </div>
+              <div class="assignment-summary" id="assignmentSummary" aria-live="polite"></div>
+              <div class="assignment-rules">
+                <h4><i class="bi bi-list-check"></i> Reglas de asignación</h4>
+                <ul id="assignmentRulesList" class="assignment-rules__list"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="panel-section">
+            <h3><span aria-hidden="true">📊</span> Referencia de permisos</h3>
+            <div class="permissions-reference">
+              <div class="permissions-card" id="permissionMatrix"></div>
+              <div class="permissions-card" id="permissionRules"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-integraciones" class="view-section hidden" data-mobile-title="Integraciones">
+        <div class="card" style="margin:18px">
+          <div class="panel-section">
+            <h3><span aria-hidden="true">🔗</span> Integraciones disponibles</h3>
+            <p class="muted">Conecta los servicios que usas a diario para centralizar conversaciones, llamadas y flujos operativos sin salir de ReLead EDU. Cada vínculo se realiza con tus credenciales personales y puede revocarse en cualquier momento.</p>
+          </div>
+          <div class="panel-section integration-layout">
+            <div class="integration-grid" role="list">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-whatsapp-title"><i class="bi bi-whatsapp" aria-hidden="true"></i> <span>WhatsApp Web personal</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
+                  </div>
+                  <span class="integration-tag">Sesión manual</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Escanea el código QR desde tu teléfono para responder mensajes desde el panel de leads sin perder el historial institucional.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
+                    <button type="button" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
+                  </div>
+                  <p class="integration-card__meta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-aircall-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-aircall-title"><i class="bi bi-telephone" aria-hidden="true"></i> <span>Aircall Workspace</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-plug" aria-hidden="true"></i> <span>Pendiente de vincular</span></div>
+                  </div>
+                  <span class="integration-tag">VoIP</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Sincroniza tus llamadas y listas de contactos para marcar con un clic y registrar notas desde el tablero.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-cloud-upload"></i> Conectar workspace</button>
+                    <a href="https://dashboard.aircall.io/" target="_blank" rel="noreferrer" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir Aircall</a>
+                  </div>
+                  <p class="integration-card__meta">Requiere permisos de administrador en tu organización de Aircall para autorizar la aplicación.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-gmail-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-gmail-title"><i class="bi bi-envelope-at" aria-hidden="true"></i> <span>Gmail institucional</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <span>Autorización requerida</span></div>
+                  </div>
+                  <span class="integration-tag">OAuth</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Autoriza tu buzón institucional para enviar correos de seguimiento y registrar plantillas sin salir del panel.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-unlock"></i> Vincular cuenta</button>
+                    <button type="button" class="btn"><i class="bi bi-arrow-clockwise"></i> Revisar autorizaciones</button>
+                  </div>
+                  <p class="integration-card__meta">Tu token se almacena cifrado y puedes revocarlo desde la consola de seguridad de Google Workspace.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-neotel-title"><i class="bi bi-broadcast" aria-hidden="true"></i> <span>Neotel</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-bezier" aria-hidden="true"></i> <span>Programa beta</span></div>
+                  </div>
+                  <span class="integration-tag">Beta cerrada</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Activa la marcación automática y el registro de llamadas proveniente de la plataforma Neotel para agilizar la gestión.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-rocket"></i> Solicitar acceso</button>
+                    <button type="button" class="btn outline"><i class="bi bi-card-checklist"></i> Ver requisitos</button>
+                  </div>
+                  <p class="integration-card__meta">La integración está disponible sólo para equipos piloto. Recibirás instrucciones personalizadas al aprobarse tu solicitud.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-siie-title"><i class="bi bi-mortarboard" aria-hidden="true"></i> <span>SIIE UNIDEP</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> <span>En pruebas internas</span></div>
+                  </div>
+                  <span class="integration-tag">Beta</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Sincroniza expedientes académicos desde <a href="https://siie-unidep.csweb.mx/" target="_blank" rel="noreferrer">siie-unidep.csweb.mx</a> para validar inscripciones y estatus de seguimiento.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-gear-wide-connected"></i> Configurar sandbox</button>
+                    <button type="button" class="btn"><i class="bi bi-clipboard-check"></i> Registrar credenciales</button>
+                  </div>
+                  <p class="integration-card__meta">Asegúrate de contar con un usuario de pruebas. Los datos reales permanecerán protegidos hasta el despliegue general.</p>
+                </div>
+              </article>
+            </div>
+            <aside class="integration-help" aria-label="Recomendaciones de seguridad">
+              <h4><span aria-hidden="true">🛡️</span> Buenas prácticas al vincular servicios</h4>
+              <ul>
+                <li>Verifica que estés utilizando una red confiable antes de autorizar cualquier cuenta institucional.</li>
+                <li>Cierra las sesiones abiertas en dispositivos compartidos y revoca accesos desde los portales oficiales tras cada guardia.</li>
+                <li>Coordina con el área de TI la activación de factores de autenticación adicionales para servicios críticos.</li>
+              </ul>
+            </aside>
+          </div>
         </div>
       </section>
 
@@ -3074,6 +3619,10 @@
             </div>
           </div>
           <div class="panel-section">
+            <h3><span aria-hidden="true">📝</span> Estado</h3>
+            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
+          </div>
+          <div class="panel-section">
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
@@ -3109,76 +3658,89 @@
           <div class="panel-section">
             <h3><span aria-hidden="true">🎨</span> Preferencias</h3>
             <div class="settings-preferences">
-              <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
-                <legend id="themeOptionsLabel">Tema</legend>
-                <div class="segmented" role="radiogroup" aria-label="Tema">
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="light" />
-                    <span>Claro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="dark" />
-                    <span>Oscuro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="system" />
-                    <span>Sistema</span>
-                  </label>
+              <div class="pref-layout">
+                <div class="pref-column pref-column--controls">
+                  <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
+                    <legend id="themeOptionsLabel">Tema</legend>
+                    <div class="segmented" role="radiogroup" aria-label="Tema">
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="light" />
+                        <span>Claro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="dark" />
+                        <span>Oscuro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="system" />
+                        <span>Sistema</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                  <div class="pref-select-grid">
+                    <label class="settings-group">
+                      <span>Idioma</span>
+                      <select id="prefLanguage">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Densidad</span>
+                      <select id="prefDensity">
+                        <option value="comfortable">Cómoda</option>
+                        <option value="compact">Compacta</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Diseño del tablero</span>
+                      <select id="prefBoardDensity">
+                        <option value="standard">Estándar</option>
+                        <option value="compact">Compacto</option>
+                        <option value="expanded">Amplio</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Color de acento</span>
+                      <select id="prefAccent">
+                        <option value="blue">Azul institucional</option>
+                        <option value="green">Verde</option>
+                        <option value="purple">Morado</option>
+                        <option value="orange">Ámbar</option>
+                        <option value="teal">Turquesa</option>
+                        <option value="pink">Magenta</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
-              </fieldset>
-              <label class="settings-group">
-                <span>Idioma</span>
-                <select id="prefLanguage">
-                  <option value="es">Español</option>
-                  <option value="en">English</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Densidad</span>
-                <select id="prefDensity">
-                  <option value="comfortable">Cómoda</option>
-                  <option value="compact">Compacta</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Diseño del tablero</span>
-                <select id="prefBoardDensity">
-                  <option value="standard">Estándar</option>
-                  <option value="compact">Compacto</option>
-                  <option value="expanded">Amplio</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Color de acento</span>
-                <select id="prefAccent">
-                  <option value="blue">Azul institucional</option>
-                  <option value="green">Verde</option>
-                  <option value="purple">Morado</option>
-                  <option value="orange">Ámbar</option>
-                  <option value="teal">Turquesa</option>
-                  <option value="pink">Magenta</option>
-                </select>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefEco" />
-                <span>Modo eco</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefMotion" />
-                <span>Reducir animaciones</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefLargeText" />
-                <span>Texto amplio</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefHighContrast" />
-                <span>Contraste alto</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefShowLeadId" />
-                <span>Mostrar ID en tarjetas del tablero</span>
-              </label>
+                <div class="pref-column pref-column--toggles">
+                  <fieldset class="pref-toggles" aria-labelledby="prefToggleLegend">
+                    <legend id="prefToggleLegend">Ajustes rápidos</legend>
+                    <div class="pref-toggle-grid">
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefEco" />
+                        <span>Modo eco</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefMotion" />
+                        <span>Reducir animaciones</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefLargeText" />
+                        <span>Texto amplio</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefHighContrast" />
+                        <span>Contraste alto</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefShowLeadId" />
+                        <span>Mostrar ID en tarjetas del tablero</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
               <div class="pref-presets" id="prefPresetRecommendations" hidden>
                 <p class="pref-presets__title">Recomendaciones institucionales</p>
                 <div class="pref-presets__list" id="prefPresetList"></div>
@@ -3187,10 +3749,6 @@
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
             </div>
-          </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">📝</span> Estado</h3>
-            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
           </div>
         </div>
       </section>
@@ -3685,8 +4243,14 @@
     profile: 'pulseProfile',
     preferences: 'pulsePreferences',
     password: 'pulsePasswordRequest',
-    leadTags: 'pulseLeadTags',
-    reassignments: 'pulseAutoReassign'
+
+    favorites: 'pulseLeadFavorites',
+    recents: 'pulseLeadRecents',
+    whatsappTemplates: 'pulseWhatsappTemplates',
+    whatsappLastTemplate: 'pulseWhatsappLastTemplate',
+    emailTemplates: 'pulseEmailTemplates',
+    emailLastTemplate: 'pulseEmailLastTemplate',
+    advisorWhatsapp: 'pulseAdvisorWhatsapp'
   };
   const DEFAULT_PASSWORD_REQUEST = {
     status: 'idle',
@@ -3741,6 +4305,7 @@
     exportar: ['admin','coordinador','viewer'],
     sistema: ['admin','coordinador','viewer'],
     permisos: ['admin'],
+    integraciones: ['admin','coordinador','asesor','viewer'],
     configuracion: ['admin','coordinador','asesor','viewer'],
     ayuda: ['admin','coordinador','asesor','viewer']
   };
@@ -3752,7 +4317,8 @@
     manageDuplicates: ['admin'],
     repairSheetStructure: ['admin'],
     syncActivos: ['admin','coordinador'],
-    manageTeams: ['admin']
+    manageTeams: ['admin'],
+    reassignLeads: ['admin']
   };
   const ROLE_LABELS = {
     admin: 'Administrador',
@@ -3786,6 +4352,13 @@
       'Exportaciones deben ser auditadas (registro de usuario, filtros y fecha).',
       'Cambios masivos y eliminación de duplicados requieren confirmación adicional.',
       'La selección de “Todas” en Bases o “Todos” en Planteles equivale a acceso global sin restricciones.'
+    ],
+    assignmentRules: [
+      'Solo perfiles con permisos de administración pueden reasignar leads manualmente.',
+      'Se respetan los permisos de base y plantel del usuario que ejecuta la reasignación.',
+      'La base seleccionada define el universo de búsqueda; no se modifican otras hojas.',
+      'Al reasignar se actualiza el asesor destino y la fecha de asignación del lead.',
+      'Los leads que ya pertenecen al asesor destino se omiten para evitar duplicar movimientos.'
     ],
     bases: {
       values: ['Todas','Planteles','Regresos','Reciclados','Rescatados'],
@@ -4160,6 +4733,8 @@
     return '';
   }
   // —— Estado UI ——
+  const ALL_SHEETS_VALUE = '__ALL__';
+
   const createInitialState = () => ({
     query:"",
     sheet:"",
@@ -4171,12 +4746,63 @@
     colFilters:Object.fromEntries(columns.map(k=>[k,''])),
     mobileColumns:{},
     columnLimits:{},
-    columnLimitSignature:''
+    columnLimitSignature:'',
+    viewMode:'board'
   });
   let state = createInitialState();
   const boardMobileQuery = window.matchMedia('(max-width: 700px)');
   const COLUMN_INITIAL_BATCH = 60;
   const COLUMN_BATCH_SIZE = 40;
+  const VIEW_MODES = new Set(['board','table']);
+
+  function normalizeViewMode(mode){
+    return VIEW_MODES.has(mode) ? mode : 'board';
+  }
+
+  function updateViewModeUI(){
+    const board = el('#viewKanban');
+    const table = el('#tableWrap');
+    if(board){
+      board.classList.toggle('hidden', state.viewMode !== 'board');
+    }
+    if(table){
+      table.classList.toggle('hidden', state.viewMode !== 'table');
+    }
+    els('[data-view-mode]').forEach(btn => {
+      if(!(btn instanceof HTMLElement)) return;
+      const btnMode = normalizeViewMode(btn.dataset.viewMode);
+      const isActive = btnMode === state.viewMode;
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      btn.classList.toggle('is-active', isActive);
+    });
+  }
+
+  function setViewMode(mode){
+    const normalized = normalizeViewMode(mode);
+    if(state.viewMode === normalized) return;
+    state.viewMode = normalized;
+    state.page = 0;
+    updateViewModeUI();
+    refresh();
+  }
+
+  function updateSortIndicators(){
+    const sortState = state.sort || {};
+    const { key, dir } = sortState;
+    els('th[data-sort]').forEach(th => {
+      const sortKey = th.dataset.sort;
+      if(key && sortKey === key){
+        th.setAttribute('aria-sort', dir === -1 ? 'descending' : 'ascending');
+        th.classList.add('is-sorted');
+        th.dataset.sortDir = dir === -1 ? '↓' : '↑';
+      }else{
+        th.removeAttribute('aria-sort');
+        th.classList.remove('is-sorted');
+        delete th.dataset.sortDir;
+      }
+    });
+  }
+
   const ensureColumnLimitState = () => {
     if(!state.columnLimits || typeof state.columnLimits !== 'object'){
       state.columnLimits = {};
@@ -4738,6 +5364,695 @@
     }
   }
 
+  function renderAssignmentRules(){
+    const list = el('#assignmentRulesList');
+    if(!list) return;
+    list.innerHTML = '';
+    const rules = Array.isArray(PERMISSION_REFERENCE.assignmentRules) ? PERMISSION_REFERENCE.assignmentRules.filter(Boolean) : [];
+    if(!rules.length){
+      const item = document.createElement('li');
+      item.textContent = 'Define las reglas de asignación en la configuración.';
+      list.appendChild(item);
+      return;
+    }
+    rules.forEach(rule => {
+      const item = document.createElement('li');
+      item.textContent = rule;
+      list.appendChild(item);
+    });
+  }
+
+  const normalizeAssignmentKey = value => {
+    const text = String(value || '').trim();
+    if(!text) return '';
+    const lower = text.toLowerCase();
+    if(lower.includes('sistema') || lower === 'sin asignar' || lower === 'sinasesor') return '';
+    return text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  };
+
+  const normalizePlainKey = value => String(value || '').trim().toLowerCase();
+  const normalizeDigits = value => String(value || '').replace(/\D/g, '');
+
+  const assignmentIsUnassigned = value => !normalizeAssignmentKey(value);
+
+  function setAssignmentStatus(message, tone = 'info'){
+    const statusEl = el('#assignmentStatus');
+    if(!statusEl) return;
+    statusEl.textContent = message ? String(message).trim() : '';
+    if(tone){
+      statusEl.dataset.tone = tone;
+    }else{
+      statusEl.removeAttribute('data-tone');
+    }
+  }
+
+  function setAssignmentSummary(message){
+    const summaryEl = el('#assignmentSummary');
+    if(!summaryEl) return;
+    summaryEl.textContent = message ? String(message).trim() : '';
+  }
+
+  function getAssignmentBase(){
+    const select = el('#assignmentBaseSelect');
+    if(select && select.value){
+      return select.value;
+    }
+    return state.sheet || '';
+  }
+
+  function populateAssignmentBaseOptions(){
+    const select = el('#assignmentBaseSelect');
+    if(!select) return;
+    const options = sheets.length ? sheets.slice() : (state.sheet ? [state.sheet] : []);
+    const unique = Array.from(new Set(options.filter(Boolean)));
+    const pieces = ['<option value="">Selecciona una base</option>'];
+    unique.forEach(name => {
+      const label = sheetDisplayName(name) || name;
+      pieces.push(`<option value="${escapeHtml(name)}">${escapeHtml(label)}</option>`);
+    });
+    select.innerHTML = pieces.join('');
+    if(state.sheet && unique.includes(state.sheet)){
+      select.value = state.sheet;
+    }else if(unique.length === 1){
+      select.value = unique[0];
+    }
+  }
+
+  function normalizeAssignmentToken(raw){
+    const value = String(raw || '').trim();
+    if(!value) return '';
+    const split = value.split(/[·|\-–]/);
+    return (split[0] || value).trim();
+  }
+
+  function matchAssignmentField(field, token){
+    const fieldValue = String(field || '').trim();
+    if(!fieldValue) return false;
+    const plainField = normalizePlainKey(fieldValue);
+    const plainToken = normalizePlainKey(token);
+    if(plainField && plainField === plainToken) return true;
+    const digitsField = normalizeDigits(fieldValue);
+    if(digitsField && digitsField === normalizeDigits(token)) return true;
+    const keyField = normalizeAssignmentKey(fieldValue);
+    const keyToken = normalizeAssignmentKey(token);
+    if(keyField && keyField === keyToken) return true;
+    return false;
+  }
+
+  function findAssignmentLeadByToken(leads, token){
+    const cleaned = normalizeAssignmentToken(token);
+    if(!cleaned) return null;
+    const matches = leads.filter(lead => {
+      if(!lead) return false;
+      if(matchAssignmentField(lead.id, cleaned)) return true;
+      if(matchAssignmentField(lead.matricula, cleaned)) return true;
+      if(matchAssignmentField(lead.correo, cleaned)) return true;
+      if(matchAssignmentField(lead.telefono, cleaned)) return true;
+      if(matchAssignmentField(lead.telefonoNormalizado, cleaned)) return true;
+      if(matchAssignmentField(lead.nombre, cleaned)) return true;
+      return false;
+    });
+    if(!matches.length) return null;
+    if(matches.length === 1) return matches[0];
+    const direct = matches.find(lead => matchAssignmentField(lead.id, cleaned));
+    if(direct) return direct;
+    return matches[0];
+  }
+
+  const parseAssignmentDate = value => {
+    if(value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    const text = String(value || '').trim();
+    if(!text) return null;
+    const iso = /^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T00:00:00` : text.replace(' ', 'T');
+    const date = new Date(iso);
+    if(Number.isNaN(date.getTime())) return null;
+    return date;
+  };
+
+  async function ensureAssignmentBaseData(base, options = {}){
+    const { force = false } = options;
+    if(!base) return [];
+    if(!force){
+      if(state.sheet === base && leads.length){
+        assignmentCache.set(base, leads.slice());
+        return assignmentCache.get(base);
+      }
+      if(assignmentCache.has(base)){
+        return assignmentCache.get(base);
+      }
+    }
+    const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(base)}`, { dedupeKey: `assignment:${base}`, label: 'Reasignación' });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const dataset = Array.isArray(data) ? data.map(raw => normalizeLeadRecord(raw, base)) : [];
+    assignmentCache.set(base, dataset);
+    return dataset;
+  }
+
+  function populateAssignmentLeadOptions(base){
+    const datalist = el('#assignmentLeadOptions');
+    if(!datalist) return;
+    const dataset = assignmentCache.get(base) || [];
+    const slice = dataset.slice(0, 200);
+    const options = slice.map(lead => {
+      const primary = lead.id || lead.matricula || lead.correo || '';
+      if(!primary) return '';
+      const labelParts = [];
+      if(lead.nombre) labelParts.push(lead.nombre);
+      if(lead.asesor) labelParts.push(displayAsesorName(lead.asesor));
+      const label = labelParts.length ? `${primary} · ${labelParts.join(' · ')}` : primary;
+      return `<option value="${escapeHtml(primary)}" label="${escapeHtml(label)}"></option>`;
+    }).filter(Boolean);
+    datalist.innerHTML = options.join('');
+  }
+
+  function populateAssignmentTargetOptions(){
+    const targetInput = el('#assignmentTargetInput');
+    const datalist = el('#assignmentTargetOptions');
+    if(!targetInput || !datalist) return;
+    const suggestions = new Set();
+    const addSuggestion = value => {
+      const text = String(value || '').trim();
+      if(!text) return;
+      suggestions.add(text);
+    };
+    permissionUsers.forEach(user => {
+      if(!user || user.active === false) return;
+      addSuggestion(user.name || user.userId || user.email);
+    });
+    leads.forEach(lead => addSuggestion(displayAsesorName(lead.asesor)));
+    const options = Array.from(suggestions).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    datalist.innerHTML = options.map(option => `<option value="${escapeHtml(option)}"></option>`).join('');
+  }
+
+  function populateAssignmentFilters(base){
+    const dataset = assignmentCache.get(base) || [];
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const selected = asesorSelect.value;
+      const asesores = new Set();
+      dataset.forEach(lead => {
+        const name = displayAsesorName(lead.asesor);
+        if(!assignmentIsUnassigned(name)) asesores.add(name);
+      });
+      const sorted = Array.from(asesores).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      asesorSelect.innerHTML = '<option value="">Todos</option><option value="__unassigned__">Solo sin asesor</option>' +
+        sorted.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+      if(selected && Array.from(asesorSelect.options || []).some(opt => opt.value === selected)){
+        asesorSelect.value = selected;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      const previous = etapaSelect.value;
+      etapaSelect.innerHTML = '<option value="">Todas</option>' + etapasUI.map(step => `<option value="${escapeHtml(step)}">${escapeHtml(step)}</option>`).join('');
+      if(previous && etapasUI.includes(previous)){
+        etapaSelect.value = previous;
+      }
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      const previous = campusSelect.value;
+      const campuses = new Set();
+      dataset.forEach(lead => {
+        const campus = String(lead.campus || '').trim();
+        if(campus) campuses.add(campus);
+      });
+      const sorted = Array.from(campuses).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      campusSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(campus => `<option value="${escapeHtml(campus)}">${escapeHtml(campus)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        campusSelect.value = previous;
+      }
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      const previous = programaSelect.value;
+      const programas = new Set();
+      dataset.forEach(lead => {
+        const programa = String(lead.programa || '').trim();
+        if(programa) programas.add(programa);
+      });
+      const sorted = Array.from(programas).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      programaSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(programa => `<option value="${escapeHtml(programa)}">${escapeHtml(programa)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        programaSelect.value = previous;
+      }
+    }
+    updateAssignmentEstadoOptions();
+  }
+
+  function updateAssignmentEstadoOptions(){
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(!estadoSelect) return;
+    const etapaSelect = el('#assignmentFilterEtapa');
+    const etapa = etapaSelect ? etapaSelect.value : '';
+    let states = [];
+    if(etapa){
+      states = estadosByEtapa[etapa] || [];
+    }else{
+      const base = getAssignmentBase();
+      const dataset = assignmentCache.get(base) || [];
+      const set = new Set();
+      dataset.forEach(lead => {
+        const value = String(lead.estado || '').trim();
+        if(value) set.add(value);
+      });
+      states = Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    }
+    const previous = estadoSelect.value;
+    estadoSelect.innerHTML = '<option value="">Todos</option>' + states.map(state => `<option value="${escapeHtml(state)}">${escapeHtml(state)}</option>`).join('');
+    estadoSelect.disabled = states.length === 0;
+    if(previous && states.includes(previous)){
+      estadoSelect.value = previous;
+    }
+  }
+
+  function collectAssignmentFilters(){
+    const filters = {
+      asesor: '',
+      asesorDisplay: '',
+      unassigned: false,
+      etapa: '',
+      estado: '',
+      campus: '',
+      programa: '',
+      start: '',
+      end: '',
+      startDate: null,
+      endDate: null,
+      limit: 0
+    };
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const value = asesorSelect.value;
+      if(value === '__unassigned__'){
+        filters.unassigned = true;
+      }else if(value){
+        filters.asesor = normalizeAssignmentKey(value);
+        filters.asesorDisplay = value;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      filters.etapa = etapaSelect.value || '';
+    }
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(estadoSelect){
+      filters.estado = estadoSelect.value || '';
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      filters.campus = campusSelect.value || '';
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      filters.programa = programaSelect.value || '';
+    }
+    const startInput = el('#assignmentFilterStart');
+    if(startInput && startInput.value){
+      filters.start = startInput.value;
+      const date = parseAssignmentDate(startInput.value);
+      if(date){
+        date.setHours(0, 0, 0, 0);
+        filters.startDate = date;
+      }
+    }
+    const endInput = el('#assignmentFilterEnd');
+    if(endInput && endInput.value){
+      filters.end = endInput.value;
+      const date = parseAssignmentDate(endInput.value);
+      if(date){
+        date.setHours(23, 59, 59, 999);
+        filters.endDate = date;
+      }
+    }
+    const limitInput = el('#assignmentFilterLimit');
+    if(limitInput){
+      const value = Number(limitInput.value);
+      if(Number.isFinite(value) && value > 0){
+        filters.limit = Math.min(500, Math.max(1, Math.floor(value)));
+      }
+    }
+    return filters;
+  }
+
+  function parseBulkTokens(input){
+    return String(input || '')
+      .split(/[\s,;\n]+/)
+      .map(token => token.trim())
+      .filter(Boolean);
+  }
+
+  function collectAssignmentSelection(leads, target){
+    const normalizedTarget = normalizeAssignmentKey(target);
+    const result = {
+      leads: [],
+      unmatched: [],
+      skipped: { alreadyAssigned: 0 },
+      filters: null
+    };
+    if(assignmentMode === 'single'){
+      const input = el('#assignmentSingleInput');
+      const query = input ? input.value : '';
+      if(!query){
+        result.unmatched.push('Sin identificador');
+        return result;
+      }
+      const lead = findAssignmentLeadByToken(leads, query);
+      if(lead){
+        if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+          result.skipped.alreadyAssigned++;
+        }else{
+          result.leads.push(lead);
+        }
+      }else{
+        result.unmatched.push(query.trim());
+      }
+      return result;
+    }
+    if(assignmentMode === 'multiple'){
+      const input = el('#assignmentBulkInput');
+      const raw = input ? input.value : '';
+      const tokens = parseBulkTokens(raw);
+      if(!tokens.length){
+        result.unmatched.push('Sin identificadores');
+        return result;
+      }
+      const seen = new Set();
+      tokens.forEach(token => {
+        const key = normalizePlainKey(token);
+        if(!key || seen.has(key)) return;
+        seen.add(key);
+        const lead = findAssignmentLeadByToken(leads, token);
+        if(lead){
+          if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+            result.skipped.alreadyAssigned++;
+          }else{
+            result.leads.push(lead);
+          }
+        }else{
+          result.unmatched.push(token);
+        }
+      });
+      return result;
+    }
+    const filters = collectAssignmentFilters();
+    result.filters = filters;
+    let filtered = leads.filter(lead => {
+      if(!lead || !lead.id) return false;
+      const asesorKey = normalizeAssignmentKey(lead.asesor);
+      if(filters.unassigned){
+        if(asesorKey) return false;
+      }else if(filters.asesor && asesorKey !== filters.asesor){
+        return false;
+      }
+      if(filters.etapa && etapaLabel(lead.etapa) !== filters.etapa) return false;
+      if(filters.estado && normalizePlainKey(lead.estado) !== normalizePlainKey(filters.estado)) return false;
+      if(filters.campus){
+        const campus = String(lead.campus || '').trim();
+        if(campus !== filters.campus) return false;
+      }
+      if(filters.programa){
+        const programa = String(lead.programa || '').trim();
+        if(programa !== filters.programa) return false;
+      }
+      if(filters.startDate || filters.endDate){
+        const date = parseAssignmentDate(lead.asignacion);
+        if(filters.startDate && (!date || date < filters.startDate)) return false;
+        if(filters.endDate && (!date || date > filters.endDate)) return false;
+      }
+      return true;
+    });
+    if(filters.limit && filters.limit > 0){
+      filtered = filtered.slice(0, filters.limit);
+    }
+    filtered.forEach(lead => {
+      if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+        result.skipped.alreadyAssigned++;
+      }else{
+        result.leads.push(lead);
+      }
+    });
+    return result;
+  }
+
+  function updateAssignmentPreviewSummary(selection, target){
+    if(!selection){
+      setAssignmentSummary('');
+      setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+      return;
+    }
+    const count = selection.leads.length;
+    const unmatchedCount = selection.unmatched?.length || 0;
+    const skippedCount = selection.skipped?.alreadyAssigned || 0;
+    const parts = [];
+    if(count){
+      parts.push(`${count} lead${count === 1 ? '' : 's'} listos para reasignar.`);
+    }
+    if(skippedCount){
+      parts.push(`${skippedCount} ya estaban asignados al asesor destino${target ? ` (${target})` : ''}.`);
+    }
+    if(unmatchedCount){
+      const details = selection.unmatched.slice(0, 5).map(value => value.trim()).filter(Boolean);
+      const hint = details.length ? ` (${details.join(', ')})` : '';
+      parts.push(`${unmatchedCount} sin coincidencia${hint}.`);
+    }
+    if(selection.filters && assignmentMode === 'segment'){
+      const filterParts = [];
+      if(selection.filters.asesorDisplay){ filterParts.push(`Asesor actual: ${selection.filters.asesorDisplay}`); }
+      if(selection.filters.unassigned){ filterParts.push('Solo sin asesor'); }
+      if(selection.filters.etapa){ filterParts.push(`Etapa: ${selection.filters.etapa}`); }
+      if(selection.filters.estado){ filterParts.push(`Estado: ${selection.filters.estado}`); }
+      if(selection.filters.campus){ filterParts.push(`Plantel: ${selection.filters.campus}`); }
+      if(selection.filters.programa){ filterParts.push(`Programa: ${selection.filters.programa}`); }
+      if(selection.filters.start){ filterParts.push(`Desde ${selection.filters.start}`); }
+      if(selection.filters.end){ filterParts.push(`Hasta ${selection.filters.end}`); }
+      if(selection.filters.limit){ filterParts.push(`Límite: ${selection.filters.limit}`); }
+      if(filterParts.length){
+        parts.push(`Filtros aplicados: ${filterParts.join(' · ')}.`);
+      }
+    }
+    setAssignmentSummary(parts.join(' '));
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.disabled = count <= 0;
+    }
+    if(count > 0){
+      setAssignmentStatus(`Selecciona “Reasignar leads” para mover ${count} registro${count === 1 ? '' : 's'}.`, 'success');
+    }else if(skippedCount){
+      setAssignmentStatus('Todos los registros encontrados ya están asignados al asesor destino.', 'warning');
+    }else{
+      setAssignmentStatus('No se encontraron leads listos para reasignar con los criterios proporcionados.', 'warning');
+    }
+  }
+
+  function setAssignmentModeUI(mode){
+    const normalized = ['single', 'multiple', 'segment'].includes(mode) ? mode : 'single';
+    assignmentMode = normalized;
+    const containers = document.querySelectorAll('.assignment-mode');
+    containers.forEach(container => {
+      const containerMode = container?.dataset?.mode || '';
+      if(containerMode === normalized){
+        container.classList.remove('hidden');
+      }else{
+        container.classList.add('hidden');
+      }
+    });
+    if(normalized !== 'segment'){
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentPreview(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    const base = getAssignmentBase();
+    if(!base){
+      setAssignmentStatus('Selecciona una base para continuar.', 'warning');
+      return;
+    }
+    const targetInput = el('#assignmentTargetInput');
+    const target = targetInput ? targetInput.value.trim() : '';
+    if(!target){
+      setAssignmentStatus('Ingresa el asesor destino antes de calcular la selección.', 'warning');
+      if(targetInput) targetInput.focus();
+      return;
+    }
+    setAssignmentStatus(`Calculando selección en ${sheetDisplayName(base) || base}…`, 'info');
+    try{
+      const dataset = await ensureAssignmentBaseData(base);
+      populateAssignmentLeadOptions(base);
+      populateAssignmentFilters(base);
+      const selection = collectAssignmentSelection(dataset, target);
+      assignmentPreview = {
+        base,
+        target,
+        mode: assignmentMode,
+        leadIds: selection.leads.map(lead => lead.id).filter(Boolean),
+        unmatched: selection.unmatched || [],
+        skipped: selection.skipped || {},
+        filters: selection.filters ? {
+          asesorDisplay: selection.filters.asesorDisplay || '',
+          unassigned: selection.filters.unassigned,
+          etapa: selection.filters.etapa || '',
+          estado: selection.filters.estado || '',
+          campus: selection.filters.campus || '',
+          programa: selection.filters.programa || '',
+          start: selection.filters.start || '',
+          end: selection.filters.end || '',
+          limit: selection.filters.limit || 0
+        } : null
+      };
+      updateAssignmentPreviewSummary(selection, target);
+    }catch(err){
+      console.error('Error al calcular la selección', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo calcular la selección.'), 'error');
+      setAssignmentSummary('');
+      assignmentPreview = null;
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentExecute(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    if(!assignmentPreview || !Array.isArray(assignmentPreview.leadIds)){
+      setAssignmentStatus('Calcula una selección antes de ejecutar la reasignación.', 'warning');
+      return;
+    }
+    if(!assignmentPreview.leadIds.length){
+      setAssignmentStatus('No hay leads listos para reasignar.', 'warning');
+      return;
+    }
+    const confirmMessage = `Se reasignarán ${assignmentPreview.leadIds.length} lead${assignmentPreview.leadIds.length === 1 ? '' : 's'} a ${assignmentPreview.target}. ¿Deseas continuar?`;
+    if(!confirm(confirmMessage)) return;
+    const executeBtn = el('#assignmentExecuteBtn');
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn) previewBtn.disabled = true;
+    if(executeBtn) setButtonBusy(executeBtn, true, 'Reasignando…');
+    setAssignmentStatus('Reasignando leads…', 'info');
+    try{
+      const payload = {
+        action: 'reassignLeads',
+        sheet: assignmentPreview.base,
+        target: assignmentPreview.target,
+        mode: assignmentPreview.mode,
+        leadIds: assignmentPreview.leadIds
+      };
+      if(assignmentPreview.mode === 'segment' && assignmentPreview.filters){
+        payload.filters = assignmentPreview.filters;
+      }
+      const res = await apiFetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const response = await res.json().catch(() => ({}));
+      if(response && response.error){
+        throw new Error(response.error);
+      }
+      const reassigned = Number(response?.reassigned) || assignmentPreview.leadIds.length;
+      const skipped = Number(response?.skippedAlreadyAssigned) || 0;
+      const messageParts = [];
+      messageParts.push(`Leads reasignados: ${reassigned}`);
+      if(skipped){
+        messageParts.push(`Sin cambios (ya asignados): ${skipped}`);
+      }
+      if(Array.isArray(response?.unmatched) && response.unmatched.length){
+        messageParts.push(`Sin coincidencia: ${response.unmatched.length}`);
+      }
+      const summaryMessage = messageParts.join(' · ');
+      setAssignmentStatus(response?.message || 'Reasignación completada.', 'success');
+      setAssignmentSummary(summaryMessage);
+      assignmentCache.delete(assignmentPreview.base);
+      if(assignmentPreview.base === state.sheet){
+        await withGlobalLoading('Actualizando leads…', () => loadLeads());
+        populateAsesores();
+        populateCampuses();
+        refresh();
+      }else{
+        await ensureAssignmentBaseData(assignmentPreview.base, { force: true });
+      }
+      populateAssignmentLeadOptions(assignmentPreview.base);
+      populateAssignmentFilters(assignmentPreview.base);
+      assignmentPreview = null;
+      const singleInput = el('#assignmentSingleInput');
+      if(singleInput) singleInput.value = '';
+      const bulkInput = el('#assignmentBulkInput');
+      if(bulkInput) bulkInput.value = '';
+    }catch(err){
+      console.error('Error al reasignar leads', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo completar la reasignación.'), 'error');
+    }finally{
+      if(executeBtn) setButtonBusy(executeBtn, false);
+      if(previewBtn) previewBtn.disabled = false;
+    }
+  }
+
+  function bindAssignmentEvents(){
+    setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+    const modeRadios = document.querySelectorAll('input[name="assignmentMode"]');
+    modeRadios.forEach(radio => {
+      radio.addEventListener('change', event => {
+        if(event?.target?.checked){
+          setAssignmentModeUI(event.target.value);
+          setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+          setAssignmentSummary('');
+          assignmentPreview = null;
+          const executeBtn = el('#assignmentExecuteBtn');
+          if(executeBtn) executeBtn.disabled = true;
+        }
+      });
+    });
+    const baseSelect = el('#assignmentBaseSelect');
+    if(baseSelect){
+      baseSelect.addEventListener('change', async () => {
+        const base = getAssignmentBase();
+        setAssignmentStatus(base ? `Base seleccionada: ${sheetDisplayName(base) || base}.` : 'Selecciona una base para continuar.', 'info');
+        setAssignmentSummary('');
+        assignmentPreview = null;
+        if(base){
+          try{
+            await ensureAssignmentBaseData(base);
+            populateAssignmentLeadOptions(base);
+            populateAssignmentFilters(base);
+          }catch(err){
+            console.error('Error al cargar base para asignación', err);
+            setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+          }
+        }
+      });
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      etapaSelect.addEventListener('change', () => {
+        updateAssignmentEstadoOptions();
+      });
+    }
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn){
+      previewBtn.addEventListener('click', handleAssignmentPreview);
+    }
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.addEventListener('click', handleAssignmentExecute);
+    }
+  }
+
   function updatePermissionRoleHint(role){
     const key = String(role || '').trim().toLowerCase();
     const hint = el('#permRoleHint');
@@ -5081,6 +6396,7 @@
       const users = Array.isArray(data?.users) ? data.users.slice() : [];
       permissionUsers = users.sort(comparePermissionUsers);
       updateTeamMemberOptions();
+      populateAssignmentTargetOptions();
       permissionsLoaded = true;
       const previousSelection = preserveSelection ? selectedPermissionUserId : '';
       if(permissionUsers.length){
@@ -5206,6 +6522,7 @@
         }
         permissionUsers.sort(comparePermissionUsers);
         updateTeamMemberOptions();
+        populateAssignmentTargetOptions();
         populatePermissionForm(savedUser, { focus: false, renderList: false });
         renderPermissionList();
         setPermissionStatus(mode === 'create' ? 'Usuario creado correctamente.' : 'Permisos actualizados.', 'success');
@@ -6384,6 +7701,7 @@
     const section = document.getElementById(`view-${view}`);
     if(!section) return;
     const sections = els('.view-section');
+    const wasHidden = section.classList.contains('hidden');
     const reduceMotion = document.documentElement.getAttribute('data-motion') === 'reduced'
       || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if(reduceMotion){
@@ -6426,6 +7744,23 @@
           sec.classList.remove('is-visible', 'is-exiting');
         }
       });
+    }
+    if(wasHidden){
+      const scroller = document.scrollingElement || document.documentElement || document.body;
+      const behavior = reduceMotion ? 'auto' : 'smooth';
+      if(scroller){
+        if(typeof scroller.scrollTo === 'function'){
+          scroller.scrollTo({ top: 0, behavior });
+        }else{
+          scroller.scrollTop = 0;
+          if(document.documentElement){
+            document.documentElement.scrollTop = 0;
+          }
+          if(document.body){
+            document.body.scrollTop = 0;
+          }
+        }
+      }
     }
     syncNavigationState(view);
     updateMobileTopbar(section, sourceLink);
@@ -6481,6 +7816,8 @@
     setDisabled('#diagBtn', canPerform('runDiagnostics'), 'No tienes permisos para ejecutar el diagnóstico.');
     const manageTeamsAllowed = canPerform('manageTeams');
     ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn','#teamCloneBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    const reassignAllowed = canPerform('reassignLeads');
+    ['#assignmentPreviewBtn','#assignmentExecuteBtn'].forEach(sel => setDisabled(sel, reassignAllowed, 'No tienes permisos para reasignar leads.'));
     renderTeamTemplateToolbar();
     renderPreferencePresets();
   }
@@ -6717,22 +8054,33 @@
     selects.forEach(select => {
       if(!select) return;
       const previous = select.value;
-      select.innerHTML = sheets
-        .map(s => {
-          const label = sheetDisplayName(s) || s;
-          return `<option value="${s}">${label}</option>`;
-        })
-        .join('');
-      if(state.sheet && sheets.includes(state.sheet)){
-        select.value = state.sheet;
-      }else if(sheets.length){
-        select.value = sheets[0] || '';
-      }else{
-        select.value = '';
+      const isMainSelector = select.id === 'sheetSelect';
+      const optionParts = sheets.map(s => {
+        const label = sheetDisplayName(s) || s;
+        return `<option value="${s}">${label}</option>`;
+      });
+      if(isMainSelector){
+        optionParts.unshift(`<option value="${ALL_SHEETS_VALUE}">Todos</option>`);
       }
-      if(!select.value && previous && sheets.includes(previous)){
-        select.value = previous;
+      select.innerHTML = optionParts.join('');
+      let targetValue = '';
+      if(isMainSelector){
+        if(state.sheet === ALL_SHEETS_VALUE){
+          targetValue = ALL_SHEETS_VALUE;
+        }else if(state.sheet && sheets.includes(state.sheet)){
+          targetValue = state.sheet;
+        }
+      }else if(state.sheet && sheets.includes(state.sheet)){
+        targetValue = state.sheet;
       }
+      if(!targetValue){
+        if(previous && sheets.includes(previous)){
+          targetValue = previous;
+        }else if(sheets.length){
+          targetValue = sheets[0] || '';
+        }
+      }
+      select.value = targetValue;
     });
   }
 
@@ -6760,10 +8108,8 @@
         .map(name => (typeof name === 'string' ? name.trim() : ''))
         .filter(Boolean);
       sheets = parsedSheets.filter(isLeadSheetName);
-      if(state.sheet && !sheets.includes(state.sheet)){
-        state.sheet = sheets[0] || '';
-      }
-      if(!state.sheet){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
     }catch(err){
@@ -6848,6 +8194,42 @@
     };
   }
 
+  function filterLeadsByPlantel(list){
+    const entries = Array.isArray(list) ? list : [];
+    const planteles = getAllowedPlanteles();
+    if(planteles.hasGlobalAccess || !planteles.length){
+      return entries;
+    }
+    const allowedSet = new Set(planteles.map(normalizePlantelKey));
+    return entries.filter(item => {
+      const campus = item?.campus || '';
+      if(!campus) return true;
+      return allowedSet.has(normalizePlantelKey(campus));
+    });
+  }
+
+  async function fetchLeadsForSheet(sheetName){
+    if(!sheetName) return [];
+    try{
+      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(sheetName)}`, { dedupeKey: `getLeads:${sheetName}` });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if(Array.isArray(data)){
+        const mapped = data.map(raw => normalizeLeadRecord(raw, sheetName));
+        return filterLeadsByPlantel(mapped);
+      }
+      if(data && data.error){
+        throw new Error(data.error);
+      }
+    }catch(err){
+      if(!(err && err.code === 'UNAUTHORIZED')){
+        console.error('Error al cargar leads', sheetName, err);
+      }
+      if(err && err.code === 'UNAUTHORIZED') throw err;
+    }
+    return [];
+  }
+
   async function loadLeads(){
     if(!authToken){
       leads = [];
@@ -6858,19 +8240,16 @@
       return;
     }
     try{
-      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(state.sheet)}`, { dedupeKey: `getLeads:${state.sheet}` });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if(Array.isArray(data)){
-        let mapped = data.map(raw => normalizeLeadRecord(raw, state.sheet));
-        const planteles = getAllowedPlanteles();
-        if(!planteles.hasGlobalAccess && planteles.length){
-          const allowedSet = new Set(planteles.map(normalizePlantelKey));
-          mapped = mapped.filter(item => {
-            const campus = item.campus || '';
-            if(!campus) return true;
-            return allowedSet.has(normalizePlantelKey(campus));
-          });
+      if(state.sheet === ALL_SHEETS_VALUE){
+        const sheetNames = sheets.filter(Boolean);
+        const results = [];
+        for(const sheetName of sheetNames){
+          try{
+            const list = await fetchLeadsForSheet(sheetName);
+            results.push(...list);
+          }catch(err){
+            if(err && err.code === 'UNAUTHORIZED') throw err;
+          }
         }
         leads = mapped;
         autoReassignmentPlan = buildAutoReassignmentPlan(leads);
@@ -6881,11 +8260,15 @@
         throw new Error(data.error);
       }else{
         leads = [];
+        syncQuickAccessWithLeads();
       }
+      state.columnLimits = {};
+      state.columnLimitSignature = '';
     }catch(err){
       if(err && err.code === 'UNAUTHORIZED') return;
       console.error('Error al cargar leads', err);
       leads = [];
+      syncQuickAccessWithLeads();
     }
   }
 
@@ -7068,6 +8451,891 @@
     }catch(err){
       console.warn('No se pudo eliminar', key, err);
     }
+  }
+  function readStorageValue(key){
+    try{
+      return localStorage.getItem(key) || '';
+    }catch(err){
+      console.warn('No se pudo leer', key, err);
+      return '';
+    }
+  }
+  function writeStorageValue(key, value){
+    try{
+      if(value === undefined || value === null || value === ''){
+        localStorage.removeItem(key);
+      }else{
+        localStorage.setItem(key, String(value));
+      }
+    }catch(err){
+      console.warn('No se pudo guardar', key, err);
+    }
+  }
+  const QUICK_ACCESS_FAVORITES_LIMIT = 20;
+  const QUICK_ACCESS_RECENTS_LIMIT = 10;
+  const WHATSAPP_TEMPLATE_LIMIT = 30;
+  const EMAIL_TEMPLATE_LIMIT = 30;
+  const CUSTOM_TEMPLATE_KEY = '__custom__';
+  let quickAccessFavorites = loadQuickAccessList(STORAGE_KEYS.favorites);
+  let quickAccessRecents = loadQuickAccessList(STORAGE_KEYS.recents);
+  let quickAccessInitialized = false;
+  let currentLeadRecord = null;
+  let whatsappTemplates = loadWhatsappTemplates();
+  let whatsappLastTemplateId = readStorageValue(STORAGE_KEYS.whatsappLastTemplate) || '';
+  let emailTemplates = loadEmailTemplates();
+  let emailLastTemplateId = readStorageValue(STORAGE_KEYS.emailLastTemplate) || '';
+  let advisorWhatsappNumber = readStorageValue(STORAGE_KEYS.advisorWhatsapp) || '';
+  let whatsappTemplateFormEditingId = '';
+  let emailTemplateFormEditingId = '';
+  const whatsappModalState = { lead: null, digits: '', defaultMessage: '', onSend: null, selectedId: '' };
+  const emailModalState = { lead: null, email: '', defaultSubject: '', defaultBody: '', mailtoFallback: '', onSend: null, selectedId: '' };
+  let whatsappModalReady = false;
+  let emailModalReady = false;
+
+  function normalizeLeadId(value){
+    return String(value || '').trim();
+  }
+
+  function loadQuickAccessList(key){
+    const stored = readStorageJSON(key);
+    if(!Array.isArray(stored)) return [];
+    return stored
+      .map(entry => ({
+        id: normalizeLeadId(entry.id),
+        nombre: String(entry.nombre || '').trim(),
+        etapa: String(entry.etapa || '').trim(),
+        campus: String(entry.campus || '').trim(),
+        programa: String(entry.programa || '').trim(),
+        base: String(entry.base || '').trim(),
+        updatedAt: Number(entry.updatedAt) || 0
+      }))
+      .filter(entry => entry.id);
+  }
+
+  function saveQuickAccessList(key, list, limit){
+    if(!Array.isArray(list)) return;
+    const trimmed = list.slice(0, limit);
+    writeStorageJSON(key, trimmed);
+  }
+
+  function summarizeLeadForQuickAccess(lead){
+    if(!lead) return null;
+    const id = normalizeLeadId(lead.id);
+    if(!id) return null;
+    const etapa = etapaGroup(lead.etapa);
+    return {
+      id,
+      nombre: String(lead.nombre || '').trim(),
+      etapa,
+      campus: String(lead.campus || '').trim(),
+      programa: String(lead.programa || '').trim(),
+      base: String(lead.base || state.sheet || '').trim(),
+      updatedAt: Date.now()
+    };
+  }
+
+  function isLeadFavorite(id){
+    if(!id) return false;
+    return quickAccessFavorites.some(entry => entry.id === id);
+  }
+
+  function updateQuickAccessUI(){
+    if(!quickAccessInitialized) return;
+    const favoritesContainer = el('#favoriteLeads');
+    const favoritesEmpty = el('#favoriteEmpty');
+    renderQuickAccessList(favoritesContainer, favoritesEmpty, quickAccessFavorites);
+    const recentsContainer = el('#recentLeads');
+    const recentsEmpty = el('#recentEmpty');
+    renderQuickAccessList(recentsContainer, recentsEmpty, quickAccessRecents);
+    updateFavoriteToggleState();
+  }
+
+  function renderQuickAccessList(container, emptyEl, list){
+    if(!container) return;
+    container.innerHTML = '';
+    if(!Array.isArray(list) || !list.length){
+      if(emptyEl) emptyEl.classList.remove('hidden');
+      return;
+    }
+    if(emptyEl) emptyEl.classList.add('hidden');
+    list.forEach(entry => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'quick-access__item';
+      button.dataset.leadId = entry.id;
+      if(entry.base) button.dataset.leadBase = entry.base;
+      const metaParts = [entry.etapa || '', entry.campus || '', entry.programa || ''].filter(Boolean);
+      button.innerHTML = `<span class="quick-access__item-name">${escapeHtml(entry.nombre || 'Sin nombre')}</span>`+
+        (metaParts.length ? `<span class="quick-access__item-meta">${escapeHtml(metaParts.join(' · '))}</span>` : '');
+      container.appendChild(button);
+    });
+  }
+
+  function updateFavoriteToggleState(){
+    const button = el('#favoriteToggle');
+    if(!button) return;
+    const leadId = currentLeadRecord ? normalizeLeadId(currentLeadRecord.id) : '';
+    if(!leadId){
+      button.disabled = true;
+      button.setAttribute('aria-pressed', 'false');
+      button.title = 'Agrega un lead a favoritos';
+      button.innerHTML = '<i class="bi bi-star" aria-hidden="true"></i>';
+      return;
+    }
+    button.disabled = false;
+    const favored = isLeadFavorite(leadId);
+    button.setAttribute('aria-pressed', favored ? 'true' : 'false');
+    button.title = favored ? 'Quitar de favoritos' : 'Agregar a favoritos';
+    const icon = favored ? 'bi-star-fill' : 'bi-star';
+    button.innerHTML = `<i class="bi ${icon}" aria-hidden="true"></i>`;
+  }
+
+  function rememberRecentLead(lead){
+    const summary = summarizeLeadForQuickAccess(lead);
+    if(!summary) return;
+    quickAccessRecents = quickAccessRecents.filter(entry => entry.id !== summary.id);
+    summary.updatedAt = Date.now();
+    quickAccessRecents.unshift(summary);
+    if(quickAccessRecents.length > QUICK_ACCESS_RECENTS_LIMIT){
+      quickAccessRecents = quickAccessRecents.slice(0, QUICK_ACCESS_RECENTS_LIMIT);
+    }
+    saveQuickAccessList(STORAGE_KEYS.recents, quickAccessRecents, QUICK_ACCESS_RECENTS_LIMIT);
+    updateQuickAccessUI();
+  }
+
+  function setLeadFavorite(lead, shouldAdd){
+    const summary = summarizeLeadForQuickAccess(lead);
+    if(!summary) return;
+    quickAccessFavorites = quickAccessFavorites.filter(entry => entry.id !== summary.id);
+    if(shouldAdd){
+      quickAccessFavorites.unshift(summary);
+      if(quickAccessFavorites.length > QUICK_ACCESS_FAVORITES_LIMIT){
+        quickAccessFavorites = quickAccessFavorites.slice(0, QUICK_ACCESS_FAVORITES_LIMIT);
+      }
+    }
+    saveQuickAccessList(STORAGE_KEYS.favorites, quickAccessFavorites, QUICK_ACCESS_FAVORITES_LIMIT);
+    updateQuickAccessUI();
+  }
+
+  async function openQuickAccessLead(entry){
+    if(!entry || !entry.id) return;
+    const targetBase = entry.base ? entry.base : state.sheet;
+    if(targetBase && targetBase !== state.sheet){
+      try{
+        await withGlobalLoading('Cargando leads…', async () => {
+          state.sheet = targetBase;
+          syncSheetSelectorsUI();
+          await loadLeads();
+        });
+        syncQuickAccessWithLeads();
+        populateAsesores();
+        populateCampuses();
+        refresh();
+      }catch(err){
+        console.error('No se pudo cambiar la base para el acceso rápido', err);
+      }
+    }
+    const lead = leads.find(item => normalizeLeadId(item.id) === entry.id);
+    if(lead){
+      openDetails(lead);
+      return;
+    }
+    alert('No encontramos este lead en la base actual. Verifica si sigue disponible.');
+  }
+
+  function initQuickAccessUI(){
+    if(quickAccessInitialized) return;
+    const favoritesContainer = el('#favoriteLeads');
+    if(favoritesContainer){
+      favoritesContainer.addEventListener('click', event => {
+        const button = event.target.closest('.quick-access__item');
+        if(!button) return;
+        const id = button.dataset.leadId || '';
+        const base = button.dataset.leadBase || '';
+        openQuickAccessLead({ id, base });
+      });
+    }
+    const recentsContainer = el('#recentLeads');
+    if(recentsContainer){
+      recentsContainer.addEventListener('click', event => {
+        const button = event.target.closest('.quick-access__item');
+        if(!button) return;
+        const id = button.dataset.leadId || '';
+        const base = button.dataset.leadBase || '';
+        openQuickAccessLead({ id, base });
+      });
+    }
+    const toggle = el('#favoriteToggle');
+    if(toggle){
+      toggle.addEventListener('click', () => {
+        if(!currentLeadRecord) return;
+        const leadId = normalizeLeadId(currentLeadRecord.id);
+        if(!leadId) return;
+        const shouldAdd = !isLeadFavorite(leadId);
+        setLeadFavorite(currentLeadRecord, shouldAdd);
+      });
+    }
+    quickAccessInitialized = true;
+    updateQuickAccessUI();
+  }
+
+  function syncQuickAccessWithLeads(){
+    if(!Array.isArray(leads) || !leads.length) return;
+    const map = new Map();
+    leads.forEach(lead => {
+      const id = normalizeLeadId(lead.id);
+      if(id) map.set(id, lead);
+    });
+    let favChanged = false;
+    quickAccessFavorites = quickAccessFavorites.map(entry => {
+      const lead = map.get(entry.id);
+      if(!lead) return entry;
+      const summary = summarizeLeadForQuickAccess(lead);
+      if(!summary) return entry;
+      const updated = { ...entry, ...summary, updatedAt: entry.updatedAt || summary.updatedAt };
+      if(entry.nombre !== updated.nombre || entry.etapa !== updated.etapa || entry.campus !== updated.campus || entry.programa !== updated.programa || entry.base !== updated.base){
+        favChanged = true;
+      }
+      return updated;
+    });
+    if(favChanged){
+      saveQuickAccessList(STORAGE_KEYS.favorites, quickAccessFavorites, QUICK_ACCESS_FAVORITES_LIMIT);
+    }
+    let recChanged = false;
+    quickAccessRecents = quickAccessRecents.map(entry => {
+      const lead = map.get(entry.id);
+      if(!lead) return entry;
+      const summary = summarizeLeadForQuickAccess(lead);
+      if(!summary) return entry;
+      const updated = { ...entry, ...summary, updatedAt: entry.updatedAt || summary.updatedAt };
+      if(entry.nombre !== updated.nombre || entry.etapa !== updated.etapa || entry.campus !== updated.campus || entry.programa !== updated.programa || entry.base !== updated.base){
+        recChanged = true;
+      }
+      return updated;
+    });
+    if(recChanged){
+      saveQuickAccessList(STORAGE_KEYS.recents, quickAccessRecents, QUICK_ACCESS_RECENTS_LIMIT);
+    }
+    updateQuickAccessUI();
+  }
+
+  function generateTemplateId(prefix){
+    const base = prefix || 'tpl';
+    return `${base}_${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  }
+
+  function loadWhatsappTemplates(){
+    const stored = readStorageJSON(STORAGE_KEYS.whatsappTemplates);
+    if(!Array.isArray(stored)) return [];
+    return stored
+      .map(item => {
+        const id = item && item.id ? String(item.id).trim() : generateTemplateId('wa');
+        const name = item && item.name !== undefined ? String(item.name).trim() : '';
+        const message = item && (item.message !== undefined ? String(item.message) : String(item.body || '')).trim();
+        if(!id) return null;
+        return {
+          id,
+          name: name || 'Plantilla sin nombre',
+          message
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function saveWhatsappTemplates(list){
+    whatsappTemplates = Array.isArray(list) ? list.slice(0, WHATSAPP_TEMPLATE_LIMIT) : [];
+    writeStorageJSON(STORAGE_KEYS.whatsappTemplates, whatsappTemplates);
+  }
+
+  function loadEmailTemplates(){
+    const stored = readStorageJSON(STORAGE_KEYS.emailTemplates);
+    if(!Array.isArray(stored)) return [];
+    return stored
+      .map(item => {
+        const id = item && item.id ? String(item.id).trim() : generateTemplateId('email');
+        const name = item && item.name !== undefined ? String(item.name).trim() : '';
+        const subject = item && item.subject !== undefined ? String(item.subject).trim() : '';
+        const body = item && item.body !== undefined ? String(item.body).trim() : '';
+        if(!id) return null;
+        return {
+          id,
+          name: name || 'Plantilla sin nombre',
+          subject,
+          body
+        };
+      })
+      .filter(Boolean);
+  }
+
+  function saveEmailTemplates(list){
+    emailTemplates = Array.isArray(list) ? list.slice(0, EMAIL_TEMPLATE_LIMIT) : [];
+    writeStorageJSON(STORAGE_KEYS.emailTemplates, emailTemplates);
+  }
+
+  function resetWhatsappTemplateForm(){
+    const form = el('#waTemplateForm');
+    if(!form) return;
+    form.classList.add('hidden');
+    form.reset();
+    whatsappTemplateFormEditingId = '';
+  }
+
+  function renderWhatsappTemplateList(selectedId){
+    const list = el('#waTemplateList');
+    if(!list) return;
+    list.innerHTML = '';
+    if(!whatsappTemplates.length){
+      list.innerHTML = '<li class="template-list__empty">No tienes plantillas guardadas.</li>';
+      return;
+    }
+    whatsappTemplates.forEach(template => {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'template-list__item';
+      button.dataset.templateId = template.id;
+      const preview = template.message ? `<div class="template-list__meta">${escapeHtml(template.message.slice(0, 120))}</div>` : '';
+      button.innerHTML = `<div><strong>${escapeHtml(template.name)}</strong>${preview}</div>`;
+      li.appendChild(button);
+      const actions = document.createElement('div');
+      actions.className = 'template-list__actions';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.dataset.action = 'edit';
+      editBtn.dataset.templateId = template.id;
+      editBtn.textContent = 'Editar';
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.dataset.action = 'delete';
+      deleteBtn.dataset.templateId = template.id;
+      deleteBtn.textContent = 'Eliminar';
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+      li.appendChild(actions);
+      list.appendChild(li);
+    });
+    if(selectedId){
+      selectWhatsappTemplate(selectedId);
+    }
+  }
+
+  function selectWhatsappTemplate(templateId){
+    const messageInput = el('#waMessage');
+    if(!messageInput) return;
+    const template = whatsappTemplates.find(item => item.id === templateId);
+    if(!template){
+      whatsappModalState.selectedId = '';
+      return;
+    }
+    messageInput.value = template.message || '';
+    whatsappModalState.selectedId = template.id;
+  }
+
+  function startWhatsappTemplateEdit(templateId){
+    const form = el('#waTemplateForm');
+    const nameInput = el('#waTemplateName');
+    const contentInput = el('#waTemplateContent');
+    if(!form || !nameInput || !contentInput) return;
+    const template = whatsappTemplates.find(item => item.id === templateId);
+    whatsappTemplateFormEditingId = template ? template.id : '';
+    if(template){
+      nameInput.value = template.name || '';
+      contentInput.value = template.message || '';
+    }else{
+      nameInput.value = '';
+      contentInput.value = '';
+    }
+    form.classList.remove('hidden');
+    nameInput.focus();
+  }
+
+  function initWhatsAppModal(){
+    if(whatsappModalReady) return;
+    const overlay = el('#whatsappTemplateModal');
+    const closeBtn = el('#waModalClose');
+    const cancelBtn = el('#waCancelBtn');
+    const sendBtn = el('#waSendBtn');
+    const createBtn = el('#waCreateTemplate');
+    const list = el('#waTemplateList');
+    const form = el('#waTemplateForm');
+    const formCancel = el('#waTemplateCancel');
+    const formDelete = el('#waTemplateDelete');
+    if(overlay){
+      overlay.addEventListener('click', event => {
+        if(event.target === overlay) hideWhatsAppModal();
+      });
+    }
+    if(closeBtn) closeBtn.addEventListener('click', hideWhatsAppModal);
+    if(cancelBtn) cancelBtn.addEventListener('click', hideWhatsAppModal);
+    if(sendBtn) sendBtn.addEventListener('click', handleWhatsappSend);
+    if(createBtn) createBtn.addEventListener('click', () => {
+      startWhatsappTemplateEdit('');
+    });
+    if(list){
+      list.addEventListener('click', event => {
+        const target = event.target.closest('button');
+        if(!target) return;
+        const id = target.dataset.templateId || '';
+        const action = target.dataset.action || '';
+        if(action === 'edit'){
+          startWhatsappTemplateEdit(id);
+          return;
+        }
+        if(action === 'delete'){
+          whatsappTemplateFormEditingId = id;
+          handleWhatsappTemplateDelete();
+          return;
+        }
+        selectWhatsappTemplate(id);
+        whatsappLastTemplateId = id;
+      });
+    }
+    if(form) form.addEventListener('submit', handleWhatsappTemplateSave);
+    if(formCancel) formCancel.addEventListener('click', resetWhatsappTemplateForm);
+    if(formDelete) formDelete.addEventListener('click', handleWhatsappTemplateDelete);
+    whatsappModalReady = true;
+  }
+
+  function hideWhatsAppModal(){
+    const overlay = el('#whatsappTemplateModal');
+    if(overlay){
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('modal-open');
+    resetWhatsappTemplateForm();
+    whatsappModalState.lead = null;
+    whatsappModalState.digits = '';
+    whatsappModalState.defaultMessage = '';
+    whatsappModalState.onSend = null;
+    whatsappModalState.selectedId = '';
+  }
+
+  function showWhatsAppModal(options){
+    initWhatsAppModal();
+    const overlay = el('#whatsappTemplateModal');
+    const messageInput = el('#waMessage');
+    if(!overlay || !messageInput) return;
+    const digits = String(options?.digits || '').replace(/\D/g, '');
+    if(!digits){
+      alert('No hay un número válido de WhatsApp para este lead.');
+      return;
+    }
+    whatsappModalState.lead = options?.lead || null;
+    whatsappModalState.digits = digits;
+    whatsappModalState.defaultMessage = options?.defaultMessage || '';
+    whatsappModalState.onSend = typeof options?.onSend === 'function' ? options.onSend : null;
+    whatsappModalState.selectedId = '';
+    resetWhatsappTemplateForm();
+    renderWhatsappTemplateList(whatsappLastTemplateId && whatsappLastTemplateId !== CUSTOM_TEMPLATE_KEY ? whatsappLastTemplateId : '');
+    if(whatsappLastTemplateId === CUSTOM_TEMPLATE_KEY && whatsappModalState.defaultMessage){
+      messageInput.value = whatsappModalState.defaultMessage;
+    }else if(whatsappLastTemplateId && whatsappLastTemplateId !== CUSTOM_TEMPLATE_KEY){
+      selectWhatsappTemplate(whatsappLastTemplateId);
+    }else{
+      messageInput.value = whatsappModalState.defaultMessage || '';
+    }
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    messageInput.focus();
+  }
+
+  function handleWhatsappTemplateSave(event){
+    event.preventDefault();
+    const nameInput = el('#waTemplateName');
+    const contentInput = el('#waTemplateContent');
+    if(!nameInput || !contentInput) return;
+    const name = nameInput.value.trim();
+    const content = contentInput.value.trim();
+    if(!content){
+      alert('Ingresa el contenido de la plantilla.');
+      return;
+    }
+    let savedId = whatsappTemplateFormEditingId;
+    if(whatsappTemplateFormEditingId){
+      const existing = whatsappTemplates.find(item => item.id === whatsappTemplateFormEditingId);
+      if(existing){
+        existing.name = name || existing.name;
+        existing.message = content;
+      }
+    }else{
+      const id = generateTemplateId('wa');
+      whatsappTemplates.unshift({ id, name: name || 'Plantilla sin nombre', message: content });
+      savedId = id;
+    }
+    saveWhatsappTemplates(whatsappTemplates);
+    resetWhatsappTemplateForm();
+    renderWhatsappTemplateList(savedId);
+    if(savedId){
+      whatsappLastTemplateId = savedId;
+      writeStorageValue(STORAGE_KEYS.whatsappLastTemplate, savedId);
+    }
+  }
+
+  function handleWhatsappTemplateDelete(){
+    if(!whatsappTemplateFormEditingId) return;
+    if(!confirm('¿Eliminar la plantilla seleccionada?')) return;
+    whatsappTemplates = whatsappTemplates.filter(item => item.id !== whatsappTemplateFormEditingId);
+    saveWhatsappTemplates(whatsappTemplates);
+    if(whatsappLastTemplateId === whatsappTemplateFormEditingId){
+      whatsappLastTemplateId = '';
+      writeStorageValue(STORAGE_KEYS.whatsappLastTemplate, '');
+    }
+    resetWhatsappTemplateForm();
+    renderWhatsappTemplateList('');
+  }
+
+  function handleWhatsappSend(){
+    const messageInput = el('#waMessage');
+    if(!messageInput) return;
+    const digits = whatsappModalState.digits;
+    if(!digits){
+      alert('No hay un número válido de WhatsApp para este lead.');
+      return;
+    }
+    const leadName = String(whatsappModalState.lead?.nombre || '').trim();
+    let message = messageInput.value.trim();
+    if(!message){
+      message = whatsappModalState.defaultMessage || '';
+    }
+    if(leadName){
+      if(message.includes('{{nombre}}')){
+        message = message.replace(/\{\{nombre\}\}/gi, leadName);
+      }else{
+        message = `${leadName} ${message}`.trim();
+      }
+    }
+    if(!message){
+      alert('Escribe un mensaje para enviar.');
+      return;
+    }
+    const url = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener');
+    const templateKey = whatsappModalState.selectedId || CUSTOM_TEMPLATE_KEY;
+    whatsappLastTemplateId = templateKey;
+    writeStorageValue(STORAGE_KEYS.whatsappLastTemplate, templateKey);
+    if(typeof whatsappModalState.onSend === 'function'){
+      whatsappModalState.onSend();
+    }
+    hideWhatsAppModal();
+  }
+
+  function resetEmailTemplateForm(){
+    const form = el('#emailTemplateForm');
+    if(!form) return;
+    form.classList.add('hidden');
+    form.reset();
+    emailTemplateFormEditingId = '';
+  }
+
+  function renderEmailTemplateList(selectedId){
+    const list = el('#emailTemplateList');
+    if(!list) return;
+    list.innerHTML = '';
+    if(!emailTemplates.length){
+      list.innerHTML = '<li class="template-list__empty">No tienes plantillas guardadas.</li>';
+      return;
+    }
+    emailTemplates.forEach(template => {
+      const li = document.createElement('li');
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'template-list__item';
+      button.dataset.templateId = template.id;
+      const preview = template.body ? `<div class="template-list__meta">${escapeHtml(template.body.slice(0, 120))}</div>` : '';
+      button.innerHTML = `<div><strong>${escapeHtml(template.name)}</strong>${preview}</div>`;
+      li.appendChild(button);
+      const actions = document.createElement('div');
+      actions.className = 'template-list__actions';
+      const editBtn = document.createElement('button');
+      editBtn.type = 'button';
+      editBtn.dataset.action = 'edit';
+      editBtn.dataset.templateId = template.id;
+      editBtn.textContent = 'Editar';
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.dataset.action = 'delete';
+      deleteBtn.dataset.templateId = template.id;
+      deleteBtn.textContent = 'Eliminar';
+      actions.appendChild(editBtn);
+      actions.appendChild(deleteBtn);
+      li.appendChild(actions);
+      list.appendChild(li);
+    });
+    if(selectedId){
+      selectEmailTemplate(selectedId);
+    }
+  }
+
+  function selectEmailTemplate(templateId){
+    const subjectInput = el('#emailSubject');
+    const bodyInput = el('#emailBody');
+    if(!subjectInput || !bodyInput) return;
+    const template = emailTemplates.find(item => item.id === templateId);
+    if(!template){
+      emailModalState.selectedId = '';
+      return;
+    }
+    subjectInput.value = template.subject || '';
+    bodyInput.value = template.body || '';
+    emailModalState.selectedId = template.id;
+  }
+
+  function startEmailTemplateEdit(templateId){
+    const form = el('#emailTemplateForm');
+    const nameInput = el('#emailTemplateName');
+    const subjectInput = el('#emailTemplateSubject');
+    const bodyInput = el('#emailTemplateBody');
+    if(!form || !nameInput || !subjectInput || !bodyInput) return;
+    const template = emailTemplates.find(item => item.id === templateId);
+    emailTemplateFormEditingId = template ? template.id : '';
+    if(template){
+      nameInput.value = template.name || '';
+      subjectInput.value = template.subject || '';
+      bodyInput.value = template.body || '';
+    }else{
+      nameInput.value = '';
+      subjectInput.value = '';
+      bodyInput.value = '';
+    }
+    form.classList.remove('hidden');
+    nameInput.focus();
+  }
+
+  function initEmailModal(){
+    if(emailModalReady) return;
+    const overlay = el('#emailTemplateModal');
+    const closeBtn = el('#emailModalClose');
+    const cancelBtn = el('#emailCancelBtn');
+    const gmailBtn = el('#emailGmailBtn');
+    const mailtoBtn = el('#emailMailtoBtn');
+    const createBtn = el('#emailCreateTemplate');
+    const list = el('#emailTemplateList');
+    const form = el('#emailTemplateForm');
+    const formCancel = el('#emailTemplateCancel');
+    const formDelete = el('#emailTemplateDelete');
+    const advisorInput = el('#advisorWhatsapp');
+    if(overlay){
+      overlay.addEventListener('click', event => {
+        if(event.target === overlay) hideEmailModal();
+      });
+    }
+    if(closeBtn) closeBtn.addEventListener('click', hideEmailModal);
+    if(cancelBtn) cancelBtn.addEventListener('click', hideEmailModal);
+    if(gmailBtn) gmailBtn.addEventListener('click', () => handleEmailSend('gmail'));
+    if(mailtoBtn) mailtoBtn.addEventListener('click', () => handleEmailSend('mailto'));
+    if(createBtn) createBtn.addEventListener('click', () => startEmailTemplateEdit(''));
+    if(list){
+      list.addEventListener('click', event => {
+        const target = event.target.closest('button');
+        if(!target) return;
+        const id = target.dataset.templateId || '';
+        const action = target.dataset.action || '';
+        if(action === 'edit'){
+          startEmailTemplateEdit(id);
+          return;
+        }
+        if(action === 'delete'){
+          emailTemplateFormEditingId = id;
+          handleEmailTemplateDelete();
+          return;
+        }
+        selectEmailTemplate(id);
+        emailLastTemplateId = id;
+      });
+    }
+    if(form) form.addEventListener('submit', handleEmailTemplateSave);
+    if(formCancel) formCancel.addEventListener('click', resetEmailTemplateForm);
+    if(formDelete) formDelete.addEventListener('click', handleEmailTemplateDelete);
+    if(advisorInput){
+      advisorInput.addEventListener('blur', () => {
+        const normalized = normalizeWhatsappDigits(advisorInput.value);
+        advisorWhatsappNumber = normalized;
+        writeStorageValue(STORAGE_KEYS.advisorWhatsapp, normalized);
+        advisorInput.value = normalized;
+      });
+    }
+    emailModalReady = true;
+  }
+
+  function hideEmailModal(){
+    const overlay = el('#emailTemplateModal');
+    if(overlay){
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('modal-open');
+    resetEmailTemplateForm();
+    emailModalState.lead = null;
+    emailModalState.email = '';
+    emailModalState.defaultSubject = '';
+    emailModalState.defaultBody = '';
+    emailModalState.mailtoFallback = '';
+    emailModalState.onSend = null;
+    emailModalState.selectedId = '';
+  }
+
+  function showEmailModal(options){
+    initEmailModal();
+    const overlay = el('#emailTemplateModal');
+    const subjectInput = el('#emailSubject');
+    const bodyInput = el('#emailBody');
+    const advisorInput = el('#advisorWhatsapp');
+    if(!overlay || !subjectInput || !bodyInput) return;
+    const email = String(options?.email || '').trim();
+    if(!email){
+      alert('No hay un correo válido para este lead.');
+      return;
+    }
+    emailModalState.lead = options?.lead || null;
+    emailModalState.email = email;
+    emailModalState.defaultSubject = options?.defaultSubject || '';
+    emailModalState.defaultBody = options?.defaultBody || '';
+    emailModalState.mailtoFallback = options?.mailtoFallback || '';
+    emailModalState.onSend = typeof options?.onSend === 'function' ? options.onSend : null;
+    emailModalState.selectedId = '';
+    resetEmailTemplateForm();
+    renderEmailTemplateList(emailLastTemplateId && emailLastTemplateId !== CUSTOM_TEMPLATE_KEY ? emailLastTemplateId : '');
+    if(emailLastTemplateId === CUSTOM_TEMPLATE_KEY){
+      subjectInput.value = emailModalState.defaultSubject || '';
+      bodyInput.value = emailModalState.defaultBody || '';
+    }else if(emailLastTemplateId){
+      selectEmailTemplate(emailLastTemplateId);
+    }else{
+      subjectInput.value = emailModalState.defaultSubject || '';
+      bodyInput.value = emailModalState.defaultBody || '';
+    }
+    if(advisorInput){
+      advisorInput.value = advisorWhatsappNumber;
+    }
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    subjectInput.focus();
+  }
+
+  function handleEmailTemplateSave(event){
+    event.preventDefault();
+    const nameInput = el('#emailTemplateName');
+    const subjectInput = el('#emailTemplateSubject');
+    const bodyInput = el('#emailTemplateBody');
+    if(!nameInput || !subjectInput || !bodyInput) return;
+    const name = nameInput.value.trim();
+    const subject = subjectInput.value.trim();
+    const body = bodyInput.value.trim();
+    if(!subject || !body){
+      alert('Completa asunto y mensaje para guardar la plantilla.');
+      return;
+    }
+    let savedId = emailTemplateFormEditingId;
+    if(emailTemplateFormEditingId){
+      const existing = emailTemplates.find(item => item.id === emailTemplateFormEditingId);
+      if(existing){
+        existing.name = name || existing.name;
+        existing.subject = subject;
+        existing.body = body;
+      }
+    }else{
+      const id = generateTemplateId('email');
+      emailTemplates.unshift({ id, name: name || 'Plantilla sin nombre', subject, body });
+      savedId = id;
+    }
+    saveEmailTemplates(emailTemplates);
+    resetEmailTemplateForm();
+    renderEmailTemplateList(savedId);
+    if(savedId){
+      emailLastTemplateId = savedId;
+      writeStorageValue(STORAGE_KEYS.emailLastTemplate, savedId);
+    }
+  }
+
+  function handleEmailTemplateDelete(){
+    if(!emailTemplateFormEditingId) return;
+    if(!confirm('¿Eliminar la plantilla seleccionada?')) return;
+    emailTemplates = emailTemplates.filter(item => item.id !== emailTemplateFormEditingId);
+    saveEmailTemplates(emailTemplates);
+    if(emailLastTemplateId === emailTemplateFormEditingId){
+      emailLastTemplateId = '';
+      writeStorageValue(STORAGE_KEYS.emailLastTemplate, '');
+    }
+    resetEmailTemplateForm();
+    renderEmailTemplateList('');
+  }
+
+  function handleEmailSend(mode){
+    const subjectInput = el('#emailSubject');
+    const bodyInput = el('#emailBody');
+    const advisorInput = el('#advisorWhatsapp');
+    if(!subjectInput || !bodyInput) return;
+    const email = emailModalState.email;
+    if(!email){
+      alert('No hay un correo válido para este lead.');
+      return;
+    }
+    let subject = subjectInput.value.trim() || emailModalState.defaultSubject || '';
+    let body = bodyInput.value.trim() || emailModalState.defaultBody || '';
+    const leadName = String(emailModalState.lead?.nombre || '').trim();
+    const advisorRaw = advisorInput ? advisorInput.value : advisorWhatsappNumber;
+    const advisorDigits = normalizeWhatsappDigits(advisorRaw);
+    advisorWhatsappNumber = advisorDigits;
+    if(advisorInput) advisorInput.value = advisorDigits;
+    writeStorageValue(STORAGE_KEYS.advisorWhatsapp, advisorDigits);
+    const whatsappLink = advisorDigits ? `https://wa.me/${advisorDigits}` : '';
+    if(leadName){
+      if(subject.includes('{{nombre}}')){
+        subject = subject.replace(/\{\{nombre\}\}/gi, leadName);
+      }
+      if(body.includes('{{nombre}}')){
+        body = body.replace(/\{\{nombre\}\}/gi, leadName);
+      }else{
+        const greeting = `Hola ${leadName},`;
+        body = body ? `${greeting}\n\n${body}` : greeting;
+      }
+    }
+    if(whatsappLink){
+      if(subject.includes('{{whatsapp}}')){
+        subject = subject.replace(/\{\{whatsapp\}\}/gi, whatsappLink);
+      }
+      if(body.includes('{{whatsapp}}')){
+        body = body.replace(/\{\{whatsapp\}\}/gi, whatsappLink);
+      }else{
+        body = `${body}\n\nContáctame también por WhatsApp: ${whatsappLink}`.trim();
+      }
+    }else{
+      subject = subject.replace(/\{\{whatsapp\}\}/gi, '').trim();
+      body = body.replace(/\{\{whatsapp\}\}/gi, '').trim();
+    }
+    if(!subject || !body){
+      alert('Completa asunto y mensaje para enviar el correo.');
+      return;
+    }
+    const encodedSubject = encodeURIComponent(subject);
+    const encodedBody = encodeURIComponent(body);
+    if(mode === 'gmail'){
+      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodedSubject}&body=${encodedBody}`;
+      window.open(gmailUrl, '_blank', 'noopener');
+    }else{
+      const mailtoUrl = `mailto:${encodeURIComponent(email)}?subject=${encodedSubject}&body=${encodedBody}`;
+      window.location.href = mailtoUrl;
+    }
+    const templateKey = emailModalState.selectedId || CUSTOM_TEMPLATE_KEY;
+    emailLastTemplateId = templateKey;
+    writeStorageValue(STORAGE_KEYS.emailLastTemplate, templateKey);
+    if(typeof emailModalState.onSend === 'function'){
+      emailModalState.onSend();
+    }
+    hideEmailModal();
+  }
+
+  function normalizeWhatsappDigits(value){
+    const text = String(value || '').trim();
+    if(!text) return '';
+    const parsed = parsePhone(text);
+    if(parsed && parsed.wa){
+      return parsed.wa.replace(/\D/g, '');
+    }
+    return text.replace(/\D/g, '');
   }
   function clearLegacyThemeKey(){
     try{
@@ -8311,6 +10579,102 @@
     return `${timestamp} · ${channel}: contacto registrado.`;
   }
 
+  const MOBILE_CALL_USER_AGENT = /android|iphone|ipad|ipod|iemobile|opera mini|blackberry|silk/i;
+
+  function isMobileCallEnvironment(){
+    if(typeof navigator === 'undefined') return false;
+    const ua = navigator.userAgent || navigator.vendor || '';
+    return MOBILE_CALL_USER_AGENT.test(ua);
+  }
+
+  function normalizeE164(value){
+    if(!value) return '';
+    const digits = String(value).trim();
+    if(!digits) return '';
+    return digits.startsWith('+') ? digits : `+${digits.replace(/^\+/, '')}`;
+  }
+
+  function openAircallLink(options = {}){
+    const normalized = normalizeE164(options.e164 || '');
+    const fallbackUrl = options.fallbackUrl || '';
+    const telUrl = options.telUrl || '';
+    const hasTel = Boolean(telUrl);
+    const hasFallback = Boolean(fallbackUrl);
+    const launchFallback = () => {
+      if(hasFallback){
+        window.open(fallbackUrl, '_blank', 'noopener');
+      }else if(hasTel){
+        window.location.href = telUrl;
+      }
+    };
+    if(isMobileCallEnvironment()){
+      if(hasTel){
+        window.location.href = telUrl;
+        return;
+      }
+      if(hasFallback){
+        window.open(fallbackUrl, '_blank', 'noopener');
+      }
+      return;
+    }
+    if(!normalized){
+      launchFallback();
+      return;
+    }
+    const protocolUrl = `aircall://call?number=${encodeURIComponent(normalized)}`;
+    let iframe = null;
+    let didFallback = false;
+    const cleanup = () => {
+      if(iframe && iframe.parentNode){
+        iframe.parentNode.removeChild(iframe);
+      }
+      iframe = null;
+    };
+    const triggerFallback = () => {
+      if(didFallback) return;
+      didFallback = true;
+      cleanup();
+      launchFallback();
+    };
+    const blurHandler = () => {
+      didFallback = true;
+      clearTimeout(timerId);
+      cleanup();
+      window.removeEventListener('blur', blurHandler);
+    };
+    const timerId = setTimeout(() => {
+      window.removeEventListener('blur', blurHandler);
+      triggerFallback();
+    }, 1800);
+    window.addEventListener('blur', blurHandler, { once: true });
+    try{
+      iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.onload = () => {
+        clearTimeout(timerId);
+        window.removeEventListener('blur', blurHandler);
+        cleanup();
+      };
+      iframe.onerror = () => {
+        clearTimeout(timerId);
+        window.removeEventListener('blur', blurHandler);
+        triggerFallback();
+      };
+      iframe.src = protocolUrl;
+      document.body.appendChild(iframe);
+    }catch(err){
+      clearTimeout(timerId);
+      window.removeEventListener('blur', blurHandler);
+      triggerFallback();
+    }
+    setTimeout(() => {
+      window.removeEventListener('blur', blurHandler);
+      cleanup();
+    }, 4000);
+  }
+
   async function copyToClipboard(text){
     if(!text) return false;
     try{
@@ -8639,9 +11003,25 @@
   // —— Render Tabla ——
   function renderTabla(rows){
     const tbody = el('#tbody');
-
+    if(!tbody) return;
     tbody.innerHTML = '';
+    if(!Array.isArray(rows) || !rows.length){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = columns.length;
+      td.className = 'table-empty';
+      td.textContent = 'No hay leads que cumplan los filtros seleccionados.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+    const formatValue = value => {
+      if(value === undefined || value === null || value === '') return '—';
+      return escapeHtml(String(value));
+    };
     rows.forEach(r => {
+      const etapaLabel = r.etapa || '—';
+      const etapaClass = etapaLabel === 'Inscrito' ? 'ok' : etapaLabel === 'Descartado' ? 'bad' : '';
       const tr = document.createElement('tr');
       const tagBadges = renderLeadTagBadges(r);
       const reassignBadge = renderAutoReassignBadge(r);
@@ -8661,6 +11041,8 @@
         <td>${r.asignacion}</td>
       `;
       tr.addEventListener('click', ()=>openDetails(r));
+      tr.addEventListener('keypress', e=>{ if(e.key === 'Enter'){ openDetails(r); } });
+      tr.tabIndex = 0;
       tbody.appendChild(tr);
     });
   }
@@ -8670,6 +11052,9 @@
     detailLeadContext = r;
     el('#d-nombre').textContent = r.nombre || '—';
     const basePhone = r.telefono || r.telefonoNormalizado || '';
+    currentLeadRecord = r;
+    updateFavoriteToggleState();
+    rememberRecentLead(r);
     const showField = (val,labelId,valueId,fmt)=>{
       const has = Boolean(val);
       const labelEl = el('#'+labelId);
@@ -8727,6 +11112,24 @@
     }else{
       hidePanelOverlay();
     }
+
+    let contactScripts = buildContactScripts(r);
+
+    const registerContactNote = type => {
+      const note = createContactNote(type, r);
+      if(!note) return;
+      const existing = String(r.comentario || '').trim();
+      const lines = existing ? existing.split(/\n+/).map(line => line.trim()).filter(Boolean) : [];
+      if(lines.includes(note)) return;
+      lines.push(note);
+      r.comentario = lines.join('\n');
+      formSets.forEach(set => {
+        if(set.comentarioInput){
+          set.comentarioInput.value = r.comentario;
+        }
+      });
+      syncSaveAvailability();
+    };
 
     const formSets = [];
     const canEditLead = canPerform('updateLead');
@@ -8815,10 +11218,15 @@
         }
         return;
       }
+      const targetSheet = state.sheet === ALL_SHEETS_VALUE ? (r.base || '') : state.sheet;
+      if(!targetSheet){
+        alert('No se pudo determinar la base del lead.');
+        return;
+      }
       const params = new URLSearchParams({
         action: 'updateLead',
         id: r.id,
-        sheet: state.sheet,
+        sheet: targetSheet,
         etapa: etapaBackend(r.etapa),
         estado: r.estado,
         comentario: comentarioActual,
@@ -8948,7 +11356,7 @@
     };
 
     const applyContactScripts = () => {
-      const scripts = buildContactScripts(r);
+      contactScripts = buildContactScripts(r);
       broadcastScriptStatus('');
       ['contactScripts','drawerContactScripts'].forEach(id => {
         const container = document.getElementById(id);
@@ -8956,15 +11364,15 @@
         CONTACT_SCRIPT_TYPES.forEach(type => {
           const textEl = container.querySelector(`[data-script-text="${type}"]`);
           if(textEl){
-            textEl.value = scripts[type] || 'No hay guion disponible para este lead.';
+            textEl.value = contactScripts[type] || 'No hay guion disponible para este lead.';
           }
           const actionBtn = container.querySelector(`[data-script-apply="${type}"]`);
           if(actionBtn){
-            actionBtn.disabled = !scripts[type];
+            actionBtn.disabled = !contactScripts[type];
             actionBtn.onclick = async event => {
               event.preventDefault();
-              if(!scripts[type]) return;
-              const copied = await copyToClipboard(scripts[type]);
+              if(!contactScripts[type]) return;
+              const copied = await copyToClipboard(contactScripts[type]);
               registerContactNote(type);
               broadcastScriptStatus(copied ? `${CONTACT_CHANNEL_LABELS[type]} copiado. Completa la nota y guarda el lead.` : `${CONTACT_CHANNEL_LABELS[type]} registrado. Copia el guion manualmente si lo necesitas.`);
             };
@@ -8987,43 +11395,141 @@
     const phoneDigits = phone.intl || phone.digits;
     const waDigits = phone.wa || phoneDigits;
     const phoneDisplay = fmtPhone(basePhone);
-    const callHref = r.callUrl || (phoneDigits && phoneDigits.length >= 10 ? `https://dashboard.aircall.io/call/${phoneDigits}` : '');
-    const waHref = r.whatsappUrl || (waDigits && waDigits.length >= 10 ? `https://wa.me/${waDigits}` : '');
-    const mailHref = r.emailUrl || (r.correo ? `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(r.correo)}&su=Seguimiento%20UNIDEP&body=Hola%20${encodeURIComponent(r.nombre)}%2C%20` : '');
+    const normalizedIntl = phoneDigits ? `+${String(phoneDigits).replace(/^\+/, '')}` : '';
+    const e164Number = normalizedIntl || '';
+    const telUrl = phone.local
+      ? (phone.local.length === 10 ? `tel:+52${phone.local}` : `tel:${phone.local}`)
+      : (phoneDigits ? `tel:${normalizedIntl || phoneDigits}` : '');
+    const callFallbackUrl = r.callUrl || (phoneDigits && phoneDigits.length >= 10 ? `https://dashboard.aircall.io/call/${phoneDigits}` : '');
+    const waHref = r.whatsappUrl || (waDigits && waDigits.length >= 8 ? `https://wa.me/${waDigits}` : '');
+    const mailtoHref = r.correo ? `mailto:${encodeURIComponent(r.correo)}` : '';
     const hasPhoneValue = Boolean(phoneDisplay);
-    const hasCallLink = Boolean(callHref);
-    const hasWaLink = Boolean(waHref);
-    const hasMailLink = Boolean(mailHref);
-    const actCall = el('#act-call');
-    const actWa = el('#act-wa');
-    const actMail = el('#act-mail');
-    if(actCall){
-      actCall.classList.toggle('hidden', !hasCallLink);
-      if(hasCallLink){
-        actCall.href = callHref;
-        actCall.onclick = () => { maybeRegisterContactNote('call'); };
-      }else{
-        actCall.onclick = null;
-      }
-    }
-    if(actWa){
-      actWa.classList.toggle('hidden', !hasWaLink);
-      if(hasWaLink){
-        actWa.href = waHref;
-        actWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
-      }else{
-        actWa.onclick = null;
-      }
-    }
-    if(actMail){
-      actMail.classList.toggle('hidden', !hasMailLink);
-      if(hasMailLink){
-        actMail.href = mailHref;
-        actMail.onclick = () => { maybeRegisterContactNote('email'); };
-      }else{
-        actMail.onclick = null;
-      }
-    }
+    const hasCallLink = Boolean(e164Number || callFallbackUrl || telUrl);
+    const hasWaLink = Boolean(waDigits && waDigits.length >= 8);
+    const hasMailLink = Boolean(r.correo);
+
+    const emailScript = contactScripts.email || '';
+    const emailLines = emailScript.split('\n');
+    const subjectLine = emailLines.length ? emailLines[0] : '';
+    const defaultEmailSubject = subjectLine && /^\s*Asunto:/i.test(subjectLine)
+      ? subjectLine.replace(/^\s*Asunto:\s*/i, '').trim()
+      : `Seguimiento UNIDEP ${r.programa || 'tu inscripción'}`;
+    const defaultEmailBody = emailLines.length > 1 ? emailLines.slice(1).join('\n').trim() : '';
+
+    const assignContactHandlers = (nodes, handler, linkOptions) => {
+      nodes.forEach(anchor => {
+        if(!anchor) return;
+        let hrefValue = '';
+        let targetValue = '';
+        let relValue = '';
+        let datasetValues = null;
+        if(typeof linkOptions === 'string'){
+          hrefValue = linkOptions;
+        }else if(linkOptions && typeof linkOptions === 'object'){
+          hrefValue = linkOptions.href || '';
+          targetValue = linkOptions.target || '';
+          relValue = linkOptions.rel || '';
+          datasetValues = linkOptions.dataset || null;
+        }
+        if(hrefValue){
+          anchor.href = hrefValue;
+        }else{
+          anchor.removeAttribute('href');
+        }
+        if(targetValue){
+          anchor.target = targetValue;
+        }else{
+          anchor.removeAttribute('target');
+        }
+        if(relValue){
+          anchor.rel = relValue;
+        }else{
+          anchor.removeAttribute('rel');
+        }
+        if(datasetValues && typeof datasetValues === 'object'){
+          Object.entries(datasetValues).forEach(([key, value]) => {
+            const dataKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+            if(value === undefined || value === null || value === ''){
+              delete anchor.dataset[key];
+              anchor.removeAttribute(`data-${dataKey}`);
+            }else{
+              anchor.dataset[key] = value;
+            }
+          });
+        }
+        if(handler){
+          anchor.classList.remove('hidden');
+          anchor.onclick = handler;
+        }else{
+          anchor.classList.add('hidden');
+          anchor.onclick = null;
+        }
+      });
+    };
+
+    const callHandler = hasCallLink ? event => {
+      event.preventDefault();
+      registerContactNote('call');
+      openAircallLink({ e164: e164Number, fallbackUrl: callFallbackUrl, telUrl });
+    } : null;
+
+    const whatsappHandler = hasWaLink ? event => {
+      event.preventDefault();
+      showWhatsAppModal({
+        lead: r,
+        digits: waDigits,
+        defaultMessage: contactScripts.whatsapp || '',
+        onSend: () => registerContactNote('whatsapp')
+      });
+    } : null;
+
+    const emailHandler = hasMailLink ? event => {
+      event.preventDefault();
+      showEmailModal({
+        lead: r,
+        email: r.correo,
+        defaultSubject: defaultEmailSubject,
+        defaultBody: defaultEmailBody,
+        mailtoFallback: mailtoHref,
+        onSend: () => registerContactNote('email')
+      });
+    } : null;
+
+    const applyPanelContactButtons = () => {
+      const panelEl = el('#panelOverlay .panel');
+      if(!panelEl) return;
+      const callButtons = Array.from(panelEl.querySelectorAll('[data-contact="call"]'));
+      const waButtons = Array.from(panelEl.querySelectorAll('[data-contact="whatsapp"]'));
+      const mailButtons = Array.from(panelEl.querySelectorAll('[data-contact="email"]'));
+      assignContactHandlers(callButtons, callHandler, {
+        href: callFallbackUrl || telUrl || '#',
+        dataset: {
+          fallbackHref: callFallbackUrl || '',
+          telHref: telUrl || ''
+        }
+      });
+      assignContactHandlers(waButtons, whatsappHandler, waHref || '#');
+      assignContactHandlers(mailButtons, emailHandler, mailtoHref || '#');
+    };
+
+    const applyDrawerContactButtons = () => {
+      const drawerContainer = document.getElementById('drawerContent');
+      if(!drawerContainer) return;
+      const callButtons = Array.from(drawerContainer.querySelectorAll('[data-drawer-contact="call"]'));
+      const waButtons = Array.from(drawerContainer.querySelectorAll('[data-drawer-contact="whatsapp"]'));
+      const mailButtons = Array.from(drawerContainer.querySelectorAll('[data-drawer-contact="email"]'));
+      assignContactHandlers(callButtons, callHandler, {
+        href: callFallbackUrl || telUrl || '#',
+        dataset: {
+          fallbackHref: callFallbackUrl || '',
+          telHref: telUrl || ''
+        }
+      });
+      assignContactHandlers(waButtons, whatsappHandler, waHref || '#');
+      assignContactHandlers(mailButtons, emailHandler, mailtoHref || '#');
+    };
+
+    applyPanelContactButtons();
 
     if (window.matchMedia('(max-width: 1200px)').matches){
       const drawer = el('#drawer');
@@ -9050,9 +11556,9 @@
         <section class="drawer-quick" aria-label="Actualiza y contacta">
           <p class="drawer-quick__hint">Actualiza etapa y estado antes de abrir un nuevo contacto.</p>
           <div class="drawer-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
-            ${hasCallLink?`<a class="btn" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
-            ${hasWaLink?`<a class="btn" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
-            ${hasMailLink?`<a class="btn" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
+            ${hasCallLink?`<a class="btn" id="drawerActCall" data-drawer-contact="call" href="#"><i class='bi bi-telephone'></i> Llamar</a>`:''}
+            ${hasWaLink?`<a class="btn" id="drawerActWa" data-drawer-contact="whatsapp" href="#"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
+            ${hasMailLink?`<a class="btn" id="drawerActMail" data-drawer-contact="email" href="#"><i class='bi bi-envelope'></i> Email</a>`:''}
           </div>
           <label class="drawer-quick__field">Etapa
             <select id="drawerEtapa" class="w100"></select>
@@ -9075,6 +11581,7 @@
         <div class="actions" style="margin-top:12px">
           <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar</button>
         </div>`;
+      applyDrawerContactButtons();
       registerForm({
         etapaSelect: el('#drawerEtapa'),
         estadoSelect: el('#drawerEstado'),
@@ -9084,18 +11591,6 @@
         feedbackTitleEl: el('#drawerFeedbackTitle'),
         feedbackMessageEl: el('#drawerFeedbackMessage')
       });
-      const drawerCall = document.getElementById('drawerActCall');
-      if(drawerCall){
-        drawerCall.onclick = () => { maybeRegisterContactNote('call'); };
-      }
-      const drawerWa = document.getElementById('drawerActWa');
-      if(drawerWa){
-        drawerWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
-      }
-      const drawerMail = document.getElementById('drawerActMail');
-      if(drawerMail){
-        drawerMail.onclick = () => { maybeRegisterContactNote('email'); };
-      }
     }
     applyContactScripts();
     syncSaveAvailability();
@@ -10404,7 +12899,6 @@
     // Buscar (Ctrl+/)
     const q = el('#q');
     q.addEventListener('input', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
-    el('#searchBtn').addEventListener('click', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
     window.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey) && e.key === '/'){ e.preventDefault(); q.focus(); } })
 
     const appShell = el('#app');
@@ -10532,6 +13026,21 @@
     }
     initPermissionScopeSelectors();
     renderPermissionReference();
+    renderAssignmentRules();
+    populateAssignmentBaseOptions();
+    populateAssignmentTargetOptions();
+    bindAssignmentEvents();
+    setAssignmentModeUI(assignmentMode);
+    const initialAssignmentBase = getAssignmentBase();
+    if(initialAssignmentBase){
+      ensureAssignmentBaseData(initialAssignmentBase).then(() => {
+        populateAssignmentLeadOptions(initialAssignmentBase);
+        populateAssignmentFilters(initialAssignmentBase);
+      }).catch(err => {
+        console.error('Error al preparar la asignación inicial', err);
+        setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+      });
+    }
     renderTeamTemplateToolbar();
     const permRoleSelect = el('#permRole');
     if(permRoleSelect){
@@ -10682,6 +13191,7 @@
     const importSheetSel = el('#importBaseSelect');
 
     const ensureSheetSelection = () => {
+      if(state.sheet === ALL_SHEETS_VALUE) return;
       if(!sheets.includes(state.sheet)){
         state.sheet = sheets[0] || '';
       }
@@ -10691,7 +13201,8 @@
       const select = event?.currentTarget;
       if(!select) return;
       const selected = select.value;
-      if(!selected || !sheets.includes(selected)){
+      const isAll = selected === ALL_SHEETS_VALUE;
+      if(!isAll && (!selected || !sheets.includes(selected))){
         syncSheetSelectorsUI();
         return;
       }
@@ -10788,15 +13299,49 @@
 
     // Filtros por columna
     els('input[data-col]').forEach(inp=>{
+      const colKey = inp.dataset.col;
+      if(colKey && state.colFilters && typeof state.colFilters[colKey] === 'string'){
+        inp.value = state.colFilters[colKey];
+      }
       inp.addEventListener('input', ()=>{
-        state.colFilters[inp.dataset.col] = inp.value.trim().toLowerCase();
+        const key = inp.dataset.col;
+        if(!key) return;
+        state.colFilters[key] = inp.value.trim().toLowerCase();
         state.page=0;
         refresh();
       });
     });
 
+    els('[data-view-mode]').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        setViewMode(btn.dataset.viewMode);
+      });
+    });
+
+    els('th[data-sort]').forEach(th => {
+      th.tabIndex = 0;
+      th.addEventListener('click', ()=>{
+        const key = th.dataset.sort;
+        if(!key) return;
+        if(state.sort && state.sort.key === key){
+          state.sort = { key, dir: state.sort.dir === 1 ? -1 : 1 };
+        }else{
+          state.sort = { key, dir: 1 };
+        }
+        state.page = 0;
+        refresh();
+      });
+      th.addEventListener('keypress', e => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          th.click();
+        }
+      });
+    });
+
     // Configuración y preferencias
     initSettings();
+    initQuickAccessUI();
 
     // Panel emergente
     const panelClose = el('#panelClose');
@@ -10932,7 +13477,8 @@
   async function initializeApp(){
     try{
       await withGlobalLoading('Sincronizando bases…', () => loadSheets());
-      if(!state.sheet || !sheets.includes(state.sheet)){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
       syncSheetSelectorsUI();
@@ -12507,7 +15053,7 @@
   async function requestImport(confirmFlag, override){
     const payload = {
       action: 'importLeads',
-      sheet: override?.sheet || state.sheet,
+      sheet: override?.sheet || (state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet),
       rows: Array.isArray(override?.rows) ? override.rows : importData,
       confirm: confirmFlag === true
     };
@@ -13011,13 +15557,14 @@
   if(execBtn) execBtn.addEventListener('click', async()=>{
     if(!canPerform('importData')){ alert('No tienes permisos para importar datos.'); return; }
     if(!importData.length){ alert('No hay datos verificados'); return; }
-    if(!state.sheet){ alert('Selecciona una base antes de importar.'); return; }
+    const activeSheet = state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet;
+    if(!activeSheet){ alert('Selecciona una base antes de importar.'); return; }
     setButtonBusy(execBtn, true, 'Verificando...');
     try{
-      const result = await requestImport(false);
+      const result = await requestImport(false, { sheet: activeSheet });
       if(result?.requiresConfirmation){
         pendingImportPayload = {
-          sheet: state.sheet,
+          sheet: activeSheet,
           rows: importData.map(row => ({ ...row }))
         };
         pendingImportSummary = {
