@@ -2492,9 +2492,11 @@
             </label>
             <div class="login-actions">
               <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
+              <button type="button" class="btn outline w100" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
             </div>
           </form>
           <p class="login-message login-error hidden" id="loginError" role="alert"></p>
+          <p class="login-message login-info hidden" id="connectionStatus" role="status" aria-live="polite"></p>
           <p class="login-hint" id="loginHint">¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.</p>
         </div>
         <div id="loginReset" class="hidden" aria-hidden="true">
@@ -7381,6 +7383,26 @@
     }
   }
 
+  function setConnectionStatus(message, tone){
+    const status = document.getElementById('connectionStatus');
+    if(!status) return;
+    status.classList.remove('login-error','login-success','login-info');
+    const text = message ? String(message).trim() : '';
+    if(text){
+      const toneClass = tone === 'error' ? 'login-error' : tone === 'success' ? 'login-success' : 'login-info';
+      status.textContent = text;
+      status.classList.add('login-message', toneClass);
+      status.classList.remove('hidden');
+      status.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+      status.setAttribute('aria-live', tone === 'error' ? 'assertive' : 'polite');
+    }else{
+      status.textContent = '';
+      status.classList.add('hidden');
+      status.removeAttribute('role');
+      status.setAttribute('aria-live', 'polite');
+    }
+  }
+
   function setResetBusy(busy){
     const btn = document.getElementById('resetSubmit');
     if(btn){
@@ -7397,10 +7419,78 @@
     }
   }
 
+  async function checkAppsScriptConnection(){
+    const button = document.getElementById('connectionCheckBtn');
+    const now = typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? () => performance.now()
+      : () => Date.now();
+    setConnectionStatus('Verificando comunicación con Apps Script…', 'info');
+    setButtonBusy(button, true, 'Verificando…');
+    const startedAt = now();
+    try{
+      const response = await fetch(API_URL, { method: 'GET', cache: 'no-store' });
+      const elapsed = Math.max(0, Math.round(now() - startedAt));
+      let rawText = '';
+      let data = null;
+      try{
+        const clone = response.clone();
+        rawText = await clone.text();
+        if(rawText){
+          data = JSON.parse(rawText);
+        }
+      }catch(_err){
+        rawText = rawText || '';
+      }
+      const statusInfo = `${response.status} ${response.statusText || ''}`.trim();
+      const errorDetails = data?.error || data?.message || rawText || '';
+      if(!response.ok || data?.error){
+        const error = new Error(errorDetails || 'Respuesta inesperada del servicio.');
+        error.responseStatus = statusInfo;
+        error.responseBody = rawText;
+        throw error;
+      }
+      const parts = [];
+      parts.push(`Servicio disponible${statusInfo ? ` (${statusInfo})` : ''}`);
+      parts.push(`Tiempo de respuesta: ${elapsed} ms`);
+      if(data?.message){
+        parts.push(data.message);
+      }else if(rawText){
+        const normalizedText = rawText.replace(/\s+/g, ' ').trim();
+        if(normalizedText){
+          const snippet = normalizedText.length > 160 ? `${normalizedText.slice(0, 160)}…` : normalizedText;
+          parts.push(`Respuesta: ${snippet}`);
+        }
+      }
+      setConnectionStatus(parts.join(' · '), 'success');
+    }catch(err){
+      let message = resolveErrorMessage(err, 'No se pudo contactar el Apps Script.');
+      if(err && typeof err === 'object' && err !== null){
+        const normalized = String(err.message || '').toLowerCase();
+        if(err.responseStatus){
+          message = `${message} (HTTP ${err.responseStatus})`;
+        }else if(normalized.includes('accion no soportada')){
+          message = 'La URL respondió pero no reconoce la acción solicitada. Revisa que el despliegue de Apps Script sea el correcto.';
+        }else if(normalized.includes('acción requerida') || normalized.includes('accion requerida')){
+          message = 'La URL respondió pero requiere una acción específica. Asegúrate de que el Apps Script esté actualizado.';
+        }
+      }
+      setConnectionStatus(message, 'error');
+      const context = { scope: 'connection-check' };
+      if(err && typeof err === 'object' && err !== null){
+        if(err.responseStatus) context.status = err.responseStatus;
+        if(err.responseBody) context.body = err.responseBody;
+      }
+      logNetworkError(err, context);
+    }finally{
+      setButtonBusy(button, false);
+    }
+  }
+
   function showSignInView(options = {}){
     const { preserveError = false } = options;
     const signIn = document.getElementById('loginSignIn');
     const reset = document.getElementById('loginReset');
+    setConnectionStatus('');
     if(signIn){
       signIn.classList.remove('hidden');
       signIn.setAttribute('aria-hidden','false');
@@ -7457,6 +7547,7 @@
       reset.setAttribute('aria-hidden','false');
     }
     setLoginError('');
+    setConnectionStatus('');
     setResetBusy(false);
     updateResetHint(DEFAULT_RESET_HINT);
     setResetStatus('');
@@ -7489,6 +7580,7 @@
     updateLoginHint(DEFAULT_LOGIN_HINT);
     updateResetHint(DEFAULT_RESET_HINT);
     setResetStatus('');
+    setConnectionStatus('');
     setLoginError(message || '');
   }
 
@@ -7500,6 +7592,7 @@
     }
     setLoginError('');
     setResetStatus('');
+    setConnectionStatus('');
     updateLoginHint(DEFAULT_LOGIN_HINT);
     updateResetHint(DEFAULT_RESET_HINT);
   }
@@ -15830,6 +15923,13 @@
     });
   }
 
+  const connectionCheckBtn = document.getElementById('connectionCheckBtn');
+  if(connectionCheckBtn){
+    connectionCheckBtn.addEventListener('click', () => {
+      checkAppsScriptConnection();
+    });
+  }
+
   const loginForm = document.getElementById('loginForm');
   if(loginForm){
     loginForm.addEventListener('submit', async event => {
@@ -15842,6 +15942,7 @@
         setLoginError('Ingresa correo y contraseña.');
         return;
       }
+      setConnectionStatus('');
       setLoginBusy(true);
       setLoginError('');
       try{
