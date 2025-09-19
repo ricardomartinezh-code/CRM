@@ -1847,6 +1847,26 @@
     .permission-rules li{ line-height:1.5; }
     .permission-scope-note{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
     .permission-scope-values{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+    .assignment-grid{ display:flex; flex-direction:column; gap:var(--space); }
+    .assignment-body{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-mode{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-targets{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .assignment-actions{ display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; justify-content:space-between; }
+    .assignment-status{ font-size:13px; color:var(--muted); transition:color .2s ease; }
+    .assignment-status[data-tone="success"]{ color:var(--ok); }
+    .assignment-status[data-tone="warning"]{ color:var(--warn); }
+    .assignment-status[data-tone="error"]{ color:var(--bad); }
+    .assignment-buttons{ display:flex; gap:var(--space-sm); flex-shrink:0; }
+    .assignment-summary{ font-size:13px; color:var(--muted); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:var(--space-sm); min-height:24px; }
+    .assignment-rules{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-rules h4{ margin:0; font-size:15px; display:flex; align-items:center; gap:8px; }
+    .assignment-rules__list{ margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .assignment-filters{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+    html[data-theme="light"] .assignment-summary{ background:rgba(15,23,42,0.05); border-color:rgba(15,23,42,0.08); }
+    @media (max-width:700px){
+      .assignment-buttons{ width:100%; justify-content:flex-end; }
+      .assignment-actions{ align-items:stretch; }
+    }
     .permissions-switch{ display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.02); cursor:pointer; transition:border-color .2s ease, box-shadow .2s ease; }
     .permissions-switch input{ appearance:none; width:44px; height:24px; border-radius:999px; border:1px solid rgba(255,255,255,0.25); background:rgba(15,23,42,0.55); position:relative; cursor:pointer; transition: background .2s ease, border-color .2s ease; }
     .permissions-switch input::before{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(15,23,42,0.25); transform:translateX(0); transition: transform .2s ease; }
@@ -2712,6 +2732,118 @@
             </div>
           </div>
           <div class="panel-section">
+            <h3><span aria-hidden="true">🔄</span> Asignación</h3>
+            <p class="muted small">Reasigna leads manualmente en la base activa seleccionando un caso individual, varios registros o un segmento completo.</p>
+            <div class="assignment-grid">
+              <div class="assignment-header">
+                <div class="segmented" role="radiogroup" aria-label="Modo de reasignación">
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="single" checked>
+                    <span>Individual</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="multiple">
+                    <span>Varios</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="segment">
+                    <span>Segmento</span>
+                  </label>
+                </div>
+              </div>
+              <div class="assignment-body">
+                <div class="assignment-mode" data-mode="single">
+                  <label class="field-with-hint">
+                    <span>Lead a reasignar</span>
+                    <input type="text" id="assignmentSingleInput" list="assignmentLeadOptions" placeholder="ID, matrícula, correo o nombre" autocomplete="off">
+                    <span class="field-hint">Empieza a escribir y selecciona una coincidencia del listado.</span>
+                    <datalist id="assignmentLeadOptions"></datalist>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="multiple">
+                  <label class="field-with-hint">
+                    <span>Leads seleccionados</span>
+                    <textarea id="assignmentBulkInput" rows="4" placeholder="Pega IDs o matrículas separados por comas, saltos de línea o espacios."></textarea>
+                    <span class="field-hint">Los duplicados se omiten automáticamente.</span>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="segment">
+                  <div class="assignment-filters" role="group" aria-label="Filtros del segmento">
+                    <label>
+                      <span>Asesor actual</span>
+                      <select id="assignmentFilterAsesor">
+                        <option value="">Todos</option>
+                        <option value="__unassigned__">Solo sin asesor</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Etapa</span>
+                      <select id="assignmentFilterEtapa">
+                        <option value="">Todas</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Estado</span>
+                      <select id="assignmentFilterEstado" disabled>
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Plantel</span>
+                      <select id="assignmentFilterCampus">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Programa</span>
+                      <select id="assignmentFilterPrograma">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Asignados desde</span>
+                      <input type="date" id="assignmentFilterStart">
+                    </label>
+                    <label>
+                      <span>Asignados hasta</span>
+                      <input type="date" id="assignmentFilterEnd">
+                    </label>
+                    <label>
+                      <span>Límite</span>
+                      <input type="number" id="assignmentFilterLimit" min="1" max="500" placeholder="Ej. 50">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="assignment-targets">
+                <label class="field-with-hint">
+                  <span>Base de trabajo</span>
+                  <select id="assignmentBaseSelect"></select>
+                  <span class="field-hint">Solo se procesarán leads de la base seleccionada.</span>
+                </label>
+                <label class="field-with-hint">
+                  <span>Asesor destino</span>
+                  <input type="text" id="assignmentTargetInput" list="assignmentTargetOptions" placeholder="Nombre o ID" autocomplete="off">
+                  <span class="field-hint">Sugiere asesores activos, pero puedes capturar cualquier nombre válido.</span>
+                  <datalist id="assignmentTargetOptions"></datalist>
+                </label>
+              </div>
+              <div class="assignment-actions">
+                <div class="assignment-status" id="assignmentStatus" role="status" aria-live="polite">Selecciona el modo de reasignación y completa los datos.</div>
+                <div class="assignment-buttons">
+                  <button type="button" class="btn outline" id="assignmentPreviewBtn"><i class="bi bi-search"></i> Calcular selección</button>
+                  <button type="button" class="btn primary" id="assignmentExecuteBtn" disabled><i class="bi bi-arrow-repeat"></i> Reasignar leads</button>
+                </div>
+              </div>
+              <div class="assignment-summary" id="assignmentSummary" aria-live="polite"></div>
+              <div class="assignment-rules">
+                <h4><i class="bi bi-list-check"></i> Reglas de asignación</h4>
+                <ul id="assignmentRulesList" class="assignment-rules__list"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="panel-section">
+            <h3><span aria-hidden="true">📊</span> Referencia de permisos</h3>
             <div class="permissions-reference">
               <div class="permissions-card" id="permissionMatrix"></div>
               <div class="permissions-card" id="permissionRules"></div>
@@ -3076,6 +3208,9 @@
   let teamsLoaded = false;
   let teamsLoading = false;
   let selectedTeamId = '';
+  const assignmentCache = new Map();
+  let assignmentPreview = null;
+  let assignmentMode = 'single';
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
@@ -3447,7 +3582,8 @@
     manageDuplicates: ['admin'],
     repairSheetStructure: ['admin'],
     syncActivos: ['admin','coordinador'],
-    manageTeams: ['admin']
+    manageTeams: ['admin'],
+    reassignLeads: ['admin']
   };
   const ROLE_LABELS = {
     admin: 'Administrador',
@@ -3481,6 +3617,13 @@
       'Exportaciones deben ser auditadas (registro de usuario, filtros y fecha).',
       'Cambios masivos y eliminación de duplicados requieren confirmación adicional.',
       'La selección de “Todas” en Bases o “Todos” en Planteles equivale a acceso global sin restricciones.'
+    ],
+    assignmentRules: [
+      'Solo perfiles con permisos de administración pueden reasignar leads manualmente.',
+      'Se respetan los permisos de base y plantel del usuario que ejecuta la reasignación.',
+      'La base seleccionada define el universo de búsqueda; no se modifican otras hojas.',
+      'Al reasignar se actualiza el asesor destino y la fecha de asignación del lead.',
+      'Los leads que ya pertenecen al asesor destino se omiten para evitar duplicar movimientos.'
     ],
     bases: {
       values: ['Todas','Planteles','Regresos','Reciclados','Rescatados'],
@@ -4484,6 +4627,695 @@
     }
   }
 
+  function renderAssignmentRules(){
+    const list = el('#assignmentRulesList');
+    if(!list) return;
+    list.innerHTML = '';
+    const rules = Array.isArray(PERMISSION_REFERENCE.assignmentRules) ? PERMISSION_REFERENCE.assignmentRules.filter(Boolean) : [];
+    if(!rules.length){
+      const item = document.createElement('li');
+      item.textContent = 'Define las reglas de asignación en la configuración.';
+      list.appendChild(item);
+      return;
+    }
+    rules.forEach(rule => {
+      const item = document.createElement('li');
+      item.textContent = rule;
+      list.appendChild(item);
+    });
+  }
+
+  const normalizeAssignmentKey = value => {
+    const text = String(value || '').trim();
+    if(!text) return '';
+    const lower = text.toLowerCase();
+    if(lower.includes('sistema') || lower === 'sin asignar' || lower === 'sinasesor') return '';
+    return text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  };
+
+  const normalizePlainKey = value => String(value || '').trim().toLowerCase();
+  const normalizeDigits = value => String(value || '').replace(/\D/g, '');
+
+  const assignmentIsUnassigned = value => !normalizeAssignmentKey(value);
+
+  function setAssignmentStatus(message, tone = 'info'){
+    const statusEl = el('#assignmentStatus');
+    if(!statusEl) return;
+    statusEl.textContent = message ? String(message).trim() : '';
+    if(tone){
+      statusEl.dataset.tone = tone;
+    }else{
+      statusEl.removeAttribute('data-tone');
+    }
+  }
+
+  function setAssignmentSummary(message){
+    const summaryEl = el('#assignmentSummary');
+    if(!summaryEl) return;
+    summaryEl.textContent = message ? String(message).trim() : '';
+  }
+
+  function getAssignmentBase(){
+    const select = el('#assignmentBaseSelect');
+    if(select && select.value){
+      return select.value;
+    }
+    return state.sheet || '';
+  }
+
+  function populateAssignmentBaseOptions(){
+    const select = el('#assignmentBaseSelect');
+    if(!select) return;
+    const options = sheets.length ? sheets.slice() : (state.sheet ? [state.sheet] : []);
+    const unique = Array.from(new Set(options.filter(Boolean)));
+    const pieces = ['<option value="">Selecciona una base</option>'];
+    unique.forEach(name => {
+      const label = sheetDisplayName(name) || name;
+      pieces.push(`<option value="${escapeHtml(name)}">${escapeHtml(label)}</option>`);
+    });
+    select.innerHTML = pieces.join('');
+    if(state.sheet && unique.includes(state.sheet)){
+      select.value = state.sheet;
+    }else if(unique.length === 1){
+      select.value = unique[0];
+    }
+  }
+
+  function normalizeAssignmentToken(raw){
+    const value = String(raw || '').trim();
+    if(!value) return '';
+    const split = value.split(/[·|\-–]/);
+    return (split[0] || value).trim();
+  }
+
+  function matchAssignmentField(field, token){
+    const fieldValue = String(field || '').trim();
+    if(!fieldValue) return false;
+    const plainField = normalizePlainKey(fieldValue);
+    const plainToken = normalizePlainKey(token);
+    if(plainField && plainField === plainToken) return true;
+    const digitsField = normalizeDigits(fieldValue);
+    if(digitsField && digitsField === normalizeDigits(token)) return true;
+    const keyField = normalizeAssignmentKey(fieldValue);
+    const keyToken = normalizeAssignmentKey(token);
+    if(keyField && keyField === keyToken) return true;
+    return false;
+  }
+
+  function findAssignmentLeadByToken(leads, token){
+    const cleaned = normalizeAssignmentToken(token);
+    if(!cleaned) return null;
+    const matches = leads.filter(lead => {
+      if(!lead) return false;
+      if(matchAssignmentField(lead.id, cleaned)) return true;
+      if(matchAssignmentField(lead.matricula, cleaned)) return true;
+      if(matchAssignmentField(lead.correo, cleaned)) return true;
+      if(matchAssignmentField(lead.telefono, cleaned)) return true;
+      if(matchAssignmentField(lead.telefonoNormalizado, cleaned)) return true;
+      if(matchAssignmentField(lead.nombre, cleaned)) return true;
+      return false;
+    });
+    if(!matches.length) return null;
+    if(matches.length === 1) return matches[0];
+    const direct = matches.find(lead => matchAssignmentField(lead.id, cleaned));
+    if(direct) return direct;
+    return matches[0];
+  }
+
+  const parseAssignmentDate = value => {
+    if(value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    const text = String(value || '').trim();
+    if(!text) return null;
+    const iso = /^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T00:00:00` : text.replace(' ', 'T');
+    const date = new Date(iso);
+    if(Number.isNaN(date.getTime())) return null;
+    return date;
+  };
+
+  async function ensureAssignmentBaseData(base, options = {}){
+    const { force = false } = options;
+    if(!base) return [];
+    if(!force){
+      if(state.sheet === base && leads.length){
+        assignmentCache.set(base, leads.slice());
+        return assignmentCache.get(base);
+      }
+      if(assignmentCache.has(base)){
+        return assignmentCache.get(base);
+      }
+    }
+    const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(base)}`, { dedupeKey: `assignment:${base}`, label: 'Reasignación' });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const dataset = Array.isArray(data) ? data.map(raw => normalizeLeadRecord(raw, base)) : [];
+    assignmentCache.set(base, dataset);
+    return dataset;
+  }
+
+  function populateAssignmentLeadOptions(base){
+    const datalist = el('#assignmentLeadOptions');
+    if(!datalist) return;
+    const dataset = assignmentCache.get(base) || [];
+    const slice = dataset.slice(0, 200);
+    const options = slice.map(lead => {
+      const primary = lead.id || lead.matricula || lead.correo || '';
+      if(!primary) return '';
+      const labelParts = [];
+      if(lead.nombre) labelParts.push(lead.nombre);
+      if(lead.asesor) labelParts.push(displayAsesorName(lead.asesor));
+      const label = labelParts.length ? `${primary} · ${labelParts.join(' · ')}` : primary;
+      return `<option value="${escapeHtml(primary)}" label="${escapeHtml(label)}"></option>`;
+    }).filter(Boolean);
+    datalist.innerHTML = options.join('');
+  }
+
+  function populateAssignmentTargetOptions(){
+    const targetInput = el('#assignmentTargetInput');
+    const datalist = el('#assignmentTargetOptions');
+    if(!targetInput || !datalist) return;
+    const suggestions = new Set();
+    const addSuggestion = value => {
+      const text = String(value || '').trim();
+      if(!text) return;
+      suggestions.add(text);
+    };
+    permissionUsers.forEach(user => {
+      if(!user || user.active === false) return;
+      addSuggestion(user.name || user.userId || user.email);
+    });
+    leads.forEach(lead => addSuggestion(displayAsesorName(lead.asesor)));
+    const options = Array.from(suggestions).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    datalist.innerHTML = options.map(option => `<option value="${escapeHtml(option)}"></option>`).join('');
+  }
+
+  function populateAssignmentFilters(base){
+    const dataset = assignmentCache.get(base) || [];
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const selected = asesorSelect.value;
+      const asesores = new Set();
+      dataset.forEach(lead => {
+        const name = displayAsesorName(lead.asesor);
+        if(!assignmentIsUnassigned(name)) asesores.add(name);
+      });
+      const sorted = Array.from(asesores).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      asesorSelect.innerHTML = '<option value="">Todos</option><option value="__unassigned__">Solo sin asesor</option>' +
+        sorted.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+      if(selected && Array.from(asesorSelect.options || []).some(opt => opt.value === selected)){
+        asesorSelect.value = selected;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      const previous = etapaSelect.value;
+      etapaSelect.innerHTML = '<option value="">Todas</option>' + etapasUI.map(step => `<option value="${escapeHtml(step)}">${escapeHtml(step)}</option>`).join('');
+      if(previous && etapasUI.includes(previous)){
+        etapaSelect.value = previous;
+      }
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      const previous = campusSelect.value;
+      const campuses = new Set();
+      dataset.forEach(lead => {
+        const campus = String(lead.campus || '').trim();
+        if(campus) campuses.add(campus);
+      });
+      const sorted = Array.from(campuses).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      campusSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(campus => `<option value="${escapeHtml(campus)}">${escapeHtml(campus)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        campusSelect.value = previous;
+      }
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      const previous = programaSelect.value;
+      const programas = new Set();
+      dataset.forEach(lead => {
+        const programa = String(lead.programa || '').trim();
+        if(programa) programas.add(programa);
+      });
+      const sorted = Array.from(programas).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      programaSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(programa => `<option value="${escapeHtml(programa)}">${escapeHtml(programa)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        programaSelect.value = previous;
+      }
+    }
+    updateAssignmentEstadoOptions();
+  }
+
+  function updateAssignmentEstadoOptions(){
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(!estadoSelect) return;
+    const etapaSelect = el('#assignmentFilterEtapa');
+    const etapa = etapaSelect ? etapaSelect.value : '';
+    let states = [];
+    if(etapa){
+      states = estadosByEtapa[etapa] || [];
+    }else{
+      const base = getAssignmentBase();
+      const dataset = assignmentCache.get(base) || [];
+      const set = new Set();
+      dataset.forEach(lead => {
+        const value = String(lead.estado || '').trim();
+        if(value) set.add(value);
+      });
+      states = Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    }
+    const previous = estadoSelect.value;
+    estadoSelect.innerHTML = '<option value="">Todos</option>' + states.map(state => `<option value="${escapeHtml(state)}">${escapeHtml(state)}</option>`).join('');
+    estadoSelect.disabled = states.length === 0;
+    if(previous && states.includes(previous)){
+      estadoSelect.value = previous;
+    }
+  }
+
+  function collectAssignmentFilters(){
+    const filters = {
+      asesor: '',
+      asesorDisplay: '',
+      unassigned: false,
+      etapa: '',
+      estado: '',
+      campus: '',
+      programa: '',
+      start: '',
+      end: '',
+      startDate: null,
+      endDate: null,
+      limit: 0
+    };
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const value = asesorSelect.value;
+      if(value === '__unassigned__'){
+        filters.unassigned = true;
+      }else if(value){
+        filters.asesor = normalizeAssignmentKey(value);
+        filters.asesorDisplay = value;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      filters.etapa = etapaSelect.value || '';
+    }
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(estadoSelect){
+      filters.estado = estadoSelect.value || '';
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      filters.campus = campusSelect.value || '';
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      filters.programa = programaSelect.value || '';
+    }
+    const startInput = el('#assignmentFilterStart');
+    if(startInput && startInput.value){
+      filters.start = startInput.value;
+      const date = parseAssignmentDate(startInput.value);
+      if(date){
+        date.setHours(0, 0, 0, 0);
+        filters.startDate = date;
+      }
+    }
+    const endInput = el('#assignmentFilterEnd');
+    if(endInput && endInput.value){
+      filters.end = endInput.value;
+      const date = parseAssignmentDate(endInput.value);
+      if(date){
+        date.setHours(23, 59, 59, 999);
+        filters.endDate = date;
+      }
+    }
+    const limitInput = el('#assignmentFilterLimit');
+    if(limitInput){
+      const value = Number(limitInput.value);
+      if(Number.isFinite(value) && value > 0){
+        filters.limit = Math.min(500, Math.max(1, Math.floor(value)));
+      }
+    }
+    return filters;
+  }
+
+  function parseBulkTokens(input){
+    return String(input || '')
+      .split(/[\s,;\n]+/)
+      .map(token => token.trim())
+      .filter(Boolean);
+  }
+
+  function collectAssignmentSelection(leads, target){
+    const normalizedTarget = normalizeAssignmentKey(target);
+    const result = {
+      leads: [],
+      unmatched: [],
+      skipped: { alreadyAssigned: 0 },
+      filters: null
+    };
+    if(assignmentMode === 'single'){
+      const input = el('#assignmentSingleInput');
+      const query = input ? input.value : '';
+      if(!query){
+        result.unmatched.push('Sin identificador');
+        return result;
+      }
+      const lead = findAssignmentLeadByToken(leads, query);
+      if(lead){
+        if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+          result.skipped.alreadyAssigned++;
+        }else{
+          result.leads.push(lead);
+        }
+      }else{
+        result.unmatched.push(query.trim());
+      }
+      return result;
+    }
+    if(assignmentMode === 'multiple'){
+      const input = el('#assignmentBulkInput');
+      const raw = input ? input.value : '';
+      const tokens = parseBulkTokens(raw);
+      if(!tokens.length){
+        result.unmatched.push('Sin identificadores');
+        return result;
+      }
+      const seen = new Set();
+      tokens.forEach(token => {
+        const key = normalizePlainKey(token);
+        if(!key || seen.has(key)) return;
+        seen.add(key);
+        const lead = findAssignmentLeadByToken(leads, token);
+        if(lead){
+          if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+            result.skipped.alreadyAssigned++;
+          }else{
+            result.leads.push(lead);
+          }
+        }else{
+          result.unmatched.push(token);
+        }
+      });
+      return result;
+    }
+    const filters = collectAssignmentFilters();
+    result.filters = filters;
+    let filtered = leads.filter(lead => {
+      if(!lead || !lead.id) return false;
+      const asesorKey = normalizeAssignmentKey(lead.asesor);
+      if(filters.unassigned){
+        if(asesorKey) return false;
+      }else if(filters.asesor && asesorKey !== filters.asesor){
+        return false;
+      }
+      if(filters.etapa && etapaLabel(lead.etapa) !== filters.etapa) return false;
+      if(filters.estado && normalizePlainKey(lead.estado) !== normalizePlainKey(filters.estado)) return false;
+      if(filters.campus){
+        const campus = String(lead.campus || '').trim();
+        if(campus !== filters.campus) return false;
+      }
+      if(filters.programa){
+        const programa = String(lead.programa || '').trim();
+        if(programa !== filters.programa) return false;
+      }
+      if(filters.startDate || filters.endDate){
+        const date = parseAssignmentDate(lead.asignacion);
+        if(filters.startDate && (!date || date < filters.startDate)) return false;
+        if(filters.endDate && (!date || date > filters.endDate)) return false;
+      }
+      return true;
+    });
+    if(filters.limit && filters.limit > 0){
+      filtered = filtered.slice(0, filters.limit);
+    }
+    filtered.forEach(lead => {
+      if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+        result.skipped.alreadyAssigned++;
+      }else{
+        result.leads.push(lead);
+      }
+    });
+    return result;
+  }
+
+  function updateAssignmentPreviewSummary(selection, target){
+    if(!selection){
+      setAssignmentSummary('');
+      setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+      return;
+    }
+    const count = selection.leads.length;
+    const unmatchedCount = selection.unmatched?.length || 0;
+    const skippedCount = selection.skipped?.alreadyAssigned || 0;
+    const parts = [];
+    if(count){
+      parts.push(`${count} lead${count === 1 ? '' : 's'} listos para reasignar.`);
+    }
+    if(skippedCount){
+      parts.push(`${skippedCount} ya estaban asignados al asesor destino${target ? ` (${target})` : ''}.`);
+    }
+    if(unmatchedCount){
+      const details = selection.unmatched.slice(0, 5).map(value => value.trim()).filter(Boolean);
+      const hint = details.length ? ` (${details.join(', ')})` : '';
+      parts.push(`${unmatchedCount} sin coincidencia${hint}.`);
+    }
+    if(selection.filters && assignmentMode === 'segment'){
+      const filterParts = [];
+      if(selection.filters.asesorDisplay){ filterParts.push(`Asesor actual: ${selection.filters.asesorDisplay}`); }
+      if(selection.filters.unassigned){ filterParts.push('Solo sin asesor'); }
+      if(selection.filters.etapa){ filterParts.push(`Etapa: ${selection.filters.etapa}`); }
+      if(selection.filters.estado){ filterParts.push(`Estado: ${selection.filters.estado}`); }
+      if(selection.filters.campus){ filterParts.push(`Plantel: ${selection.filters.campus}`); }
+      if(selection.filters.programa){ filterParts.push(`Programa: ${selection.filters.programa}`); }
+      if(selection.filters.start){ filterParts.push(`Desde ${selection.filters.start}`); }
+      if(selection.filters.end){ filterParts.push(`Hasta ${selection.filters.end}`); }
+      if(selection.filters.limit){ filterParts.push(`Límite: ${selection.filters.limit}`); }
+      if(filterParts.length){
+        parts.push(`Filtros aplicados: ${filterParts.join(' · ')}.`);
+      }
+    }
+    setAssignmentSummary(parts.join(' '));
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.disabled = count <= 0;
+    }
+    if(count > 0){
+      setAssignmentStatus(`Selecciona “Reasignar leads” para mover ${count} registro${count === 1 ? '' : 's'}.`, 'success');
+    }else if(skippedCount){
+      setAssignmentStatus('Todos los registros encontrados ya están asignados al asesor destino.', 'warning');
+    }else{
+      setAssignmentStatus('No se encontraron leads listos para reasignar con los criterios proporcionados.', 'warning');
+    }
+  }
+
+  function setAssignmentModeUI(mode){
+    const normalized = ['single', 'multiple', 'segment'].includes(mode) ? mode : 'single';
+    assignmentMode = normalized;
+    const containers = document.querySelectorAll('.assignment-mode');
+    containers.forEach(container => {
+      const containerMode = container?.dataset?.mode || '';
+      if(containerMode === normalized){
+        container.classList.remove('hidden');
+      }else{
+        container.classList.add('hidden');
+      }
+    });
+    if(normalized !== 'segment'){
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentPreview(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    const base = getAssignmentBase();
+    if(!base){
+      setAssignmentStatus('Selecciona una base para continuar.', 'warning');
+      return;
+    }
+    const targetInput = el('#assignmentTargetInput');
+    const target = targetInput ? targetInput.value.trim() : '';
+    if(!target){
+      setAssignmentStatus('Ingresa el asesor destino antes de calcular la selección.', 'warning');
+      if(targetInput) targetInput.focus();
+      return;
+    }
+    setAssignmentStatus(`Calculando selección en ${sheetDisplayName(base) || base}…`, 'info');
+    try{
+      const dataset = await ensureAssignmentBaseData(base);
+      populateAssignmentLeadOptions(base);
+      populateAssignmentFilters(base);
+      const selection = collectAssignmentSelection(dataset, target);
+      assignmentPreview = {
+        base,
+        target,
+        mode: assignmentMode,
+        leadIds: selection.leads.map(lead => lead.id).filter(Boolean),
+        unmatched: selection.unmatched || [],
+        skipped: selection.skipped || {},
+        filters: selection.filters ? {
+          asesorDisplay: selection.filters.asesorDisplay || '',
+          unassigned: selection.filters.unassigned,
+          etapa: selection.filters.etapa || '',
+          estado: selection.filters.estado || '',
+          campus: selection.filters.campus || '',
+          programa: selection.filters.programa || '',
+          start: selection.filters.start || '',
+          end: selection.filters.end || '',
+          limit: selection.filters.limit || 0
+        } : null
+      };
+      updateAssignmentPreviewSummary(selection, target);
+    }catch(err){
+      console.error('Error al calcular la selección', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo calcular la selección.'), 'error');
+      setAssignmentSummary('');
+      assignmentPreview = null;
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentExecute(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    if(!assignmentPreview || !Array.isArray(assignmentPreview.leadIds)){
+      setAssignmentStatus('Calcula una selección antes de ejecutar la reasignación.', 'warning');
+      return;
+    }
+    if(!assignmentPreview.leadIds.length){
+      setAssignmentStatus('No hay leads listos para reasignar.', 'warning');
+      return;
+    }
+    const confirmMessage = `Se reasignarán ${assignmentPreview.leadIds.length} lead${assignmentPreview.leadIds.length === 1 ? '' : 's'} a ${assignmentPreview.target}. ¿Deseas continuar?`;
+    if(!confirm(confirmMessage)) return;
+    const executeBtn = el('#assignmentExecuteBtn');
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn) previewBtn.disabled = true;
+    if(executeBtn) setButtonBusy(executeBtn, true, 'Reasignando…');
+    setAssignmentStatus('Reasignando leads…', 'info');
+    try{
+      const payload = {
+        action: 'reassignLeads',
+        sheet: assignmentPreview.base,
+        target: assignmentPreview.target,
+        mode: assignmentPreview.mode,
+        leadIds: assignmentPreview.leadIds
+      };
+      if(assignmentPreview.mode === 'segment' && assignmentPreview.filters){
+        payload.filters = assignmentPreview.filters;
+      }
+      const res = await apiFetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const response = await res.json().catch(() => ({}));
+      if(response && response.error){
+        throw new Error(response.error);
+      }
+      const reassigned = Number(response?.reassigned) || assignmentPreview.leadIds.length;
+      const skipped = Number(response?.skippedAlreadyAssigned) || 0;
+      const messageParts = [];
+      messageParts.push(`Leads reasignados: ${reassigned}`);
+      if(skipped){
+        messageParts.push(`Sin cambios (ya asignados): ${skipped}`);
+      }
+      if(Array.isArray(response?.unmatched) && response.unmatched.length){
+        messageParts.push(`Sin coincidencia: ${response.unmatched.length}`);
+      }
+      const summaryMessage = messageParts.join(' · ');
+      setAssignmentStatus(response?.message || 'Reasignación completada.', 'success');
+      setAssignmentSummary(summaryMessage);
+      assignmentCache.delete(assignmentPreview.base);
+      if(assignmentPreview.base === state.sheet){
+        await withGlobalLoading('Actualizando leads…', () => loadLeads());
+        populateAsesores();
+        populateCampuses();
+        refresh();
+      }else{
+        await ensureAssignmentBaseData(assignmentPreview.base, { force: true });
+      }
+      populateAssignmentLeadOptions(assignmentPreview.base);
+      populateAssignmentFilters(assignmentPreview.base);
+      assignmentPreview = null;
+      const singleInput = el('#assignmentSingleInput');
+      if(singleInput) singleInput.value = '';
+      const bulkInput = el('#assignmentBulkInput');
+      if(bulkInput) bulkInput.value = '';
+    }catch(err){
+      console.error('Error al reasignar leads', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo completar la reasignación.'), 'error');
+    }finally{
+      if(executeBtn) setButtonBusy(executeBtn, false);
+      if(previewBtn) previewBtn.disabled = false;
+    }
+  }
+
+  function bindAssignmentEvents(){
+    setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+    const modeRadios = document.querySelectorAll('input[name="assignmentMode"]');
+    modeRadios.forEach(radio => {
+      radio.addEventListener('change', event => {
+        if(event?.target?.checked){
+          setAssignmentModeUI(event.target.value);
+          setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+          setAssignmentSummary('');
+          assignmentPreview = null;
+          const executeBtn = el('#assignmentExecuteBtn');
+          if(executeBtn) executeBtn.disabled = true;
+        }
+      });
+    });
+    const baseSelect = el('#assignmentBaseSelect');
+    if(baseSelect){
+      baseSelect.addEventListener('change', async () => {
+        const base = getAssignmentBase();
+        setAssignmentStatus(base ? `Base seleccionada: ${sheetDisplayName(base) || base}.` : 'Selecciona una base para continuar.', 'info');
+        setAssignmentSummary('');
+        assignmentPreview = null;
+        if(base){
+          try{
+            await ensureAssignmentBaseData(base);
+            populateAssignmentLeadOptions(base);
+            populateAssignmentFilters(base);
+          }catch(err){
+            console.error('Error al cargar base para asignación', err);
+            setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+          }
+        }
+      });
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      etapaSelect.addEventListener('change', () => {
+        updateAssignmentEstadoOptions();
+      });
+    }
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn){
+      previewBtn.addEventListener('click', handleAssignmentPreview);
+    }
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.addEventListener('click', handleAssignmentExecute);
+    }
+  }
+
   function updatePermissionRoleHint(role){
     const key = String(role || '').trim().toLowerCase();
     const hint = el('#permRoleHint');
@@ -4827,6 +5659,7 @@
       const users = Array.isArray(data?.users) ? data.users.slice() : [];
       permissionUsers = users.sort(comparePermissionUsers);
       updateTeamMemberOptions();
+      populateAssignmentTargetOptions();
       permissionsLoaded = true;
       const previousSelection = preserveSelection ? selectedPermissionUserId : '';
       if(permissionUsers.length){
@@ -4952,6 +5785,7 @@
         }
         permissionUsers.sort(comparePermissionUsers);
         updateTeamMemberOptions();
+        populateAssignmentTargetOptions();
         populatePermissionForm(savedUser, { focus: false, renderList: false });
         renderPermissionList();
         setPermissionStatus(mode === 'create' ? 'Usuario creado correctamente.' : 'Permisos actualizados.', 'success');
@@ -6245,6 +7079,8 @@
     setDisabled('#diagBtn', canPerform('runDiagnostics'), 'No tienes permisos para ejecutar el diagnóstico.');
     const manageTeamsAllowed = canPerform('manageTeams');
     ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn','#teamCloneBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    const reassignAllowed = canPerform('reassignLeads');
+    ['#assignmentPreviewBtn','#assignmentExecuteBtn'].forEach(sel => setDisabled(sel, reassignAllowed, 'No tienes permisos para reasignar leads.'));
     renderTeamTemplateToolbar();
     renderPreferencePresets();
   }
@@ -6635,6 +7471,10 @@
           });
         }
         leads = mapped;
+        if(state.sheet){
+          assignmentCache.set(state.sheet, mapped.slice());
+        }
+        populateAssignmentTargetOptions();
         state.columnLimits = {};
         state.columnLimitSignature = '';
       }else if(data && data.error){
@@ -9568,6 +10408,21 @@
     }
     initPermissionScopeSelectors();
     renderPermissionReference();
+    renderAssignmentRules();
+    populateAssignmentBaseOptions();
+    populateAssignmentTargetOptions();
+    bindAssignmentEvents();
+    setAssignmentModeUI(assignmentMode);
+    const initialAssignmentBase = getAssignmentBase();
+    if(initialAssignmentBase){
+      ensureAssignmentBaseData(initialAssignmentBase).then(() => {
+        populateAssignmentLeadOptions(initialAssignmentBase);
+        populateAssignmentFilters(initialAssignmentBase);
+      }).catch(err => {
+        console.error('Error al preparar la asignación inicial', err);
+        setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+      });
+    }
     renderTeamTemplateToolbar();
     const permRoleSelect = el('#permRole');
     if(permRoleSelect){
