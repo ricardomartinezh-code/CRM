@@ -13,7 +13,7 @@
       ? source.REQUEST_TIMEOUT_MS
       : 45000,
     VERSION:
-      typeof source.VERSION === 'string' && source.VERSION.trim() ? source.VERSION.trim() : '1.0.0',
+      typeof source.VERSION === 'string' && source.VERSION.trim() ? source.VERSION.trim() : '2.1.0',
   };
   if (typeof module === 'object' && module.exports) {
     module.exports = config;
