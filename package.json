@@ -5,10 +5,7 @@
   "scripts": {
     "build": "echo 'Skipping build step'",
     "start": "serve -s . -l ${PORT:-3000}",
-    "lint": "eslint \"**/*.{js,gs,html}\"",
-    "lint:fix": "eslint \"**/*.{js,gs,html}\" --fix",
-    "format": "prettier --check .",
-    "format:write": "prettier --write ."
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
