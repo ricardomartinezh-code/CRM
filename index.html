@@ -179,6 +179,10 @@
       align-items:stretch;
       justify-content:center;
       padding:calc(var(--space) * 2) clamp(var(--space), 5vw, calc(var(--space) * 4));
+      padding-top:calc(var(--space) * 2 + constant(safe-area-inset-top));
+      padding-top:calc(var(--space) * 2 + env(safe-area-inset-top));
+      padding-bottom:calc(var(--space) * 2 + constant(safe-area-inset-bottom));
+      padding-bottom:calc(var(--space) * 2 + env(safe-area-inset-bottom));
       overflow-y:auto;
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
@@ -1196,10 +1200,13 @@
     .table-wrap { background: var(--card); border:1px solid rgba(255,255,255,.08); border-radius: 16px; overflow:auto }
     table { width:100%; border-collapse: collapse; font-size:14px }
     thead th { position: sticky; top:0; background: linear-gradient(180deg, var(--card), var(--card-2)); text-align:left; padding:12px; border-bottom:1px solid rgba(255,255,255,.12); cursor:pointer }
+    thead th.is-sorted{ color: var(--accent); }
+    thead th.is-sorted::after{ content: attr(data-sort-dir); margin-left:6px; font-size:12px; }
     thead .filter-row th{ padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.12); }
     .col-filter{ width:100%; padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:var(--card-2); color:var(--text); }
     tbody td { padding:12px; border-bottom: 1px dashed rgba(255,255,255,.08) }
     tbody tr:hover { background: rgba(0,58,95,.06) }
+    .table-empty{ text-align:center; padding:24px 12px; color:var(--muted); font-style:italic; }
     .preview-box{ color: var(--text); font-size:14px; }
     .preview-box .table-wrap{ margin-top:8px; }
     .preview-summary{ color: var(--muted); font-size:13px; margin-bottom:6px; }
@@ -1712,7 +1719,20 @@
     .security-timeline__label{ font-weight:600; color:var(--text); }
     .security-timeline__meta{ font-size:11px; color:var(--muted); }
     .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-    .settings-preferences{ display:grid; gap:var(--space); }
+    .settings-preferences{ display:flex; flex-direction:column; gap:var(--space); }
+    .pref-layout{ display:grid; gap:var(--space); }
+    .pref-column{ display:grid; gap:var(--space-sm); }
+    .pref-select-grid{ display:grid; gap:var(--space-sm); }
+    .pref-toggles{ border:1px solid rgba(var(--panel-base-rgb),0.28); border-radius:var(--radius); padding:var(--space-sm); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:var(--space-sm); }
+    html[data-theme="light"] .pref-toggles{ background:rgba(var(--panel-base-rgb),0.12); border-color:rgba(var(--panel-base-rgb),0.22); }
+    .pref-toggles legend{ margin:0; padding:0 var(--space-xs); font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--text); }
+    .pref-toggle-grid{ display:grid; gap:var(--space-sm); }
+    .pref-column--toggles .settings-group.switch{ justify-content:space-between; }
+    @media (min-width: 920px){
+      .pref-layout{ grid-template-columns: minmax(0,1fr) minmax(0,420px); align-items:start; }
+      .pref-select-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .pref-toggle-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
     .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
     .pref-presets[hidden]{ display:none; }
     .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
@@ -1745,7 +1765,6 @@
     .settings-summary[data-state="error"]{ border-color:rgba(239,68,68,0.45); color:#ef4444; background:rgba(239,68,68,0.12); }
     .settings-summary[data-state="warning"]{ border-color:rgba(245,158,11,0.45); color:#f59e0b; background:rgba(245,158,11,0.12); }
     .settings-summary.fade{ opacity:0.45; }
-    .settings-preferences > *:not(.pref-actions){ max-width:420px; }
     .profile-avatar .muted{ max-width:240px; }
     .permissions-grid{ display:grid; grid-template-columns: minmax(220px, 320px) minmax(0,1fr); gap:var(--space); align-items:flex-start; }
     .permissions-panel{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space); background: var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
@@ -2267,11 +2286,58 @@
           </div>
         </div>
         <div class="panel-section">
-          <h3>Leads</h3>
+          <div class="row between align-center" style="gap:var(--space-sm)">
+            <h3>Leads</h3>
+            <div class="seg" role="toolbar" aria-label="Formato de visualización">
+              <button type="button" data-view-mode="board" aria-pressed="true" title="Ver como tablero">
+                <i class="bi bi-kanban"></i> Tablero
+              </button>
+              <button type="button" data-view-mode="table" aria-pressed="false" title="Ver como tabla">
+                <i class="bi bi-table"></i> Tabla
+              </button>
+            </div>
+          </div>
           <section class="content">
             <!-- Kanban -->
             <div id="viewKanban" class="board" role="region" aria-label="Lead Board">
               <!-- Column templates -->
+            </div>
+            <div id="tableWrap" class="table-wrap hidden" role="region" aria-label="Tabla de leads">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-sort="id">ID</th>
+                    <th data-sort="nombre">Nombre</th>
+                    <th data-sort="matricula">Matrícula</th>
+                    <th data-sort="correo">Correo</th>
+                    <th data-sort="telefono">Teléfono</th>
+                    <th data-sort="campus">Plantel</th>
+                    <th data-sort="modalidad">Modalidad</th>
+                    <th data-sort="programa">Programa</th>
+                    <th data-sort="etapa">Etapa</th>
+                    <th data-sort="estado">Estado</th>
+                    <th data-sort="asesor">Asesor</th>
+                    <th data-sort="comentario">Comentario</th>
+                    <th data-sort="asignacion">Asignación</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="id" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="nombre" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="matricula" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="correo" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="telefono" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="campus" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="modalidad" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="programa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="etapa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="estado" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asesor" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="comentario" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asignacion" /></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
             </div>
           </section>
           <div id="paginator" class="pagination"></div>
@@ -2832,6 +2898,10 @@
             </div>
           </div>
           <div class="panel-section">
+            <h3><span aria-hidden="true">📝</span> Estado</h3>
+            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
+          </div>
+          <div class="panel-section">
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
@@ -2867,76 +2937,89 @@
           <div class="panel-section">
             <h3><span aria-hidden="true">🎨</span> Preferencias</h3>
             <div class="settings-preferences">
-              <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
-                <legend id="themeOptionsLabel">Tema</legend>
-                <div class="segmented" role="radiogroup" aria-label="Tema">
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="light" />
-                    <span>Claro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="dark" />
-                    <span>Oscuro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="system" />
-                    <span>Sistema</span>
-                  </label>
+              <div class="pref-layout">
+                <div class="pref-column pref-column--controls">
+                  <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
+                    <legend id="themeOptionsLabel">Tema</legend>
+                    <div class="segmented" role="radiogroup" aria-label="Tema">
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="light" />
+                        <span>Claro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="dark" />
+                        <span>Oscuro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="system" />
+                        <span>Sistema</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                  <div class="pref-select-grid">
+                    <label class="settings-group">
+                      <span>Idioma</span>
+                      <select id="prefLanguage">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Densidad</span>
+                      <select id="prefDensity">
+                        <option value="comfortable">Cómoda</option>
+                        <option value="compact">Compacta</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Diseño del tablero</span>
+                      <select id="prefBoardDensity">
+                        <option value="standard">Estándar</option>
+                        <option value="compact">Compacto</option>
+                        <option value="expanded">Amplio</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Color de acento</span>
+                      <select id="prefAccent">
+                        <option value="blue">Azul institucional</option>
+                        <option value="green">Verde</option>
+                        <option value="purple">Morado</option>
+                        <option value="orange">Ámbar</option>
+                        <option value="teal">Turquesa</option>
+                        <option value="pink">Magenta</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
-              </fieldset>
-              <label class="settings-group">
-                <span>Idioma</span>
-                <select id="prefLanguage">
-                  <option value="es">Español</option>
-                  <option value="en">English</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Densidad</span>
-                <select id="prefDensity">
-                  <option value="comfortable">Cómoda</option>
-                  <option value="compact">Compacta</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Diseño del tablero</span>
-                <select id="prefBoardDensity">
-                  <option value="standard">Estándar</option>
-                  <option value="compact">Compacto</option>
-                  <option value="expanded">Amplio</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Color de acento</span>
-                <select id="prefAccent">
-                  <option value="blue">Azul institucional</option>
-                  <option value="green">Verde</option>
-                  <option value="purple">Morado</option>
-                  <option value="orange">Ámbar</option>
-                  <option value="teal">Turquesa</option>
-                  <option value="pink">Magenta</option>
-                </select>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefEco" />
-                <span>Modo eco</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefMotion" />
-                <span>Reducir animaciones</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefLargeText" />
-                <span>Texto amplio</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefHighContrast" />
-                <span>Contraste alto</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefShowLeadId" />
-                <span>Mostrar ID en tarjetas del tablero</span>
-              </label>
+                <div class="pref-column pref-column--toggles">
+                  <fieldset class="pref-toggles" aria-labelledby="prefToggleLegend">
+                    <legend id="prefToggleLegend">Ajustes rápidos</legend>
+                    <div class="pref-toggle-grid">
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefEco" />
+                        <span>Modo eco</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefMotion" />
+                        <span>Reducir animaciones</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefLargeText" />
+                        <span>Texto amplio</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefHighContrast" />
+                        <span>Contraste alto</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefShowLeadId" />
+                        <span>Mostrar ID en tarjetas del tablero</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
               <div class="pref-presets" id="prefPresetRecommendations" hidden>
                 <p class="pref-presets__title">Recomendaciones institucionales</p>
                 <div class="pref-presets__list" id="prefPresetList"></div>
@@ -2945,10 +3028,6 @@
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
             </div>
-          </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">📝</span> Estado</h3>
-            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
           </div>
         </div>
       </section>
@@ -3930,12 +4009,63 @@
     colFilters:Object.fromEntries(columns.map(k=>[k,''])),
     mobileColumns:{},
     columnLimits:{},
-    columnLimitSignature:''
+    columnLimitSignature:'',
+    viewMode:'board'
   });
   let state = createInitialState();
   const boardMobileQuery = window.matchMedia('(max-width: 700px)');
   const COLUMN_INITIAL_BATCH = 60;
   const COLUMN_BATCH_SIZE = 40;
+  const VIEW_MODES = new Set(['board','table']);
+
+  function normalizeViewMode(mode){
+    return VIEW_MODES.has(mode) ? mode : 'board';
+  }
+
+  function updateViewModeUI(){
+    const board = el('#viewKanban');
+    const table = el('#tableWrap');
+    if(board){
+      board.classList.toggle('hidden', state.viewMode !== 'board');
+    }
+    if(table){
+      table.classList.toggle('hidden', state.viewMode !== 'table');
+    }
+    els('[data-view-mode]').forEach(btn => {
+      if(!(btn instanceof HTMLElement)) return;
+      const btnMode = normalizeViewMode(btn.dataset.viewMode);
+      const isActive = btnMode === state.viewMode;
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      btn.classList.toggle('is-active', isActive);
+    });
+  }
+
+  function setViewMode(mode){
+    const normalized = normalizeViewMode(mode);
+    if(state.viewMode === normalized) return;
+    state.viewMode = normalized;
+    state.page = 0;
+    updateViewModeUI();
+    refresh();
+  }
+
+  function updateSortIndicators(){
+    const sortState = state.sort || {};
+    const { key, dir } = sortState;
+    els('th[data-sort]').forEach(th => {
+      const sortKey = th.dataset.sort;
+      if(key && sortKey === key){
+        th.setAttribute('aria-sort', dir === -1 ? 'descending' : 'ascending');
+        th.classList.add('is-sorted');
+        th.dataset.sortDir = dir === -1 ? '↓' : '↑';
+      }else{
+        th.removeAttribute('aria-sort');
+        th.classList.remove('is-sorted');
+        delete th.dataset.sortDir;
+      }
+    });
+  }
+
   const ensureColumnLimitState = () => {
     if(!state.columnLimits || typeof state.columnLimits !== 'object'){
       state.columnLimits = {};
@@ -6834,6 +6964,7 @@
     const section = document.getElementById(`view-${view}`);
     if(!section) return;
     const sections = els('.view-section');
+    const wasHidden = section.classList.contains('hidden');
     const reduceMotion = document.documentElement.getAttribute('data-motion') === 'reduced'
       || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if(reduceMotion){
@@ -6876,6 +7007,23 @@
           sec.classList.remove('is-visible', 'is-exiting');
         }
       });
+    }
+    if(wasHidden){
+      const scroller = document.scrollingElement || document.documentElement || document.body;
+      const behavior = reduceMotion ? 'auto' : 'smooth';
+      if(scroller){
+        if(typeof scroller.scrollTo === 'function'){
+          scroller.scrollTo({ top: 0, behavior });
+        }else{
+          scroller.scrollTop = 0;
+          if(document.documentElement){
+            document.documentElement.scrollTop = 0;
+          }
+          if(document.body){
+            document.body.scrollTop = 0;
+          }
+        }
+      }
     }
     syncNavigationState(view);
     updateMobileTopbar(section, sourceLink);
@@ -8957,26 +9105,44 @@
   // —— Render Tabla ——
   function renderTabla(rows){
     const tbody = el('#tbody');
-
+    if(!tbody) return;
     tbody.innerHTML = '';
+    if(!Array.isArray(rows) || !rows.length){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = columns.length;
+      td.className = 'table-empty';
+      td.textContent = 'No hay leads que cumplan los filtros seleccionados.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+    const formatValue = value => {
+      if(value === undefined || value === null || value === '') return '—';
+      return escapeHtml(String(value));
+    };
     rows.forEach(r => {
+      const etapaLabel = r.etapa || '—';
+      const etapaClass = etapaLabel === 'Inscrito' ? 'ok' : etapaLabel === 'Descartado' ? 'bad' : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.id}</td>
-        <td>${r.nombre}</td>
-        <td>${r.matricula}</td>
-        <td>${r.correo}</td>
-        <td>${fmtPhone(r.telefono || r.telefonoNormalizado)}</td>
-        <td>${r.campus}</td>
-        <td>${r.modalidad}</td>
-        <td>${r.programa}</td>
-        <td><span class="tag ${r.etapa==='Inscrito'?'ok':''} ${r.etapa==='Descartado'?'bad':''}">${r.etapa}</span></td>
-        <td>${r.estado}</td>
-        <td>${displayAsesorName(r.asesor)}</td>
-        <td>${r.comentario}</td>
-        <td>${r.asignacion}</td>
+        <td>${formatValue(r.id)}</td>
+        <td>${formatValue(r.nombre)}</td>
+        <td>${formatValue(r.matricula)}</td>
+        <td>${formatValue(r.correo)}</td>
+        <td>${formatValue(fmtPhone(r.telefono || r.telefonoNormalizado))}</td>
+        <td>${formatValue(r.campus)}</td>
+        <td>${formatValue(r.modalidad)}</td>
+        <td>${formatValue(r.programa)}</td>
+        <td><span class="tag ${etapaClass}">${escapeHtml(etapaLabel)}</span></td>
+        <td>${formatValue(r.estado)}</td>
+        <td>${formatValue(displayAsesorName(r.asesor))}</td>
+        <td>${formatValue(r.comentario)}</td>
+        <td>${formatValue(r.asignacion)}</td>
       `;
       tr.addEventListener('click', ()=>openDetails(r));
+      tr.addEventListener('keypress', e=>{ if(e.key === 'Enter'){ openDetails(r); } });
+      tr.tabIndex = 0;
       tbody.appendChild(tr);
     });
   }
@@ -10513,10 +10679,43 @@
 
     // Filtros por columna
     els('input[data-col]').forEach(inp=>{
+      const colKey = inp.dataset.col;
+      if(colKey && state.colFilters && typeof state.colFilters[colKey] === 'string'){
+        inp.value = state.colFilters[colKey];
+      }
       inp.addEventListener('input', ()=>{
-        state.colFilters[inp.dataset.col] = inp.value.trim().toLowerCase();
+        const key = inp.dataset.col;
+        if(!key) return;
+        state.colFilters[key] = inp.value.trim().toLowerCase();
         state.page=0;
         refresh();
+      });
+    });
+
+    els('[data-view-mode]').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        setViewMode(btn.dataset.viewMode);
+      });
+    });
+
+    els('th[data-sort]').forEach(th => {
+      th.tabIndex = 0;
+      th.addEventListener('click', ()=>{
+        const key = th.dataset.sort;
+        if(!key) return;
+        if(state.sort && state.sort.key === key){
+          state.sort = { key, dir: state.sort.dir === 1 ? -1 : 1 };
+        }else{
+          state.sort = { key, dir: 1 };
+        }
+        state.page = 0;
+        refresh();
+      });
+      th.addEventListener('keypress', e => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          th.click();
+        }
       });
     });
 
@@ -10598,8 +10797,14 @@
     const start = hasPagination ? state.page * state.pageSize : 0;
     const end = hasPagination ? start + state.pageSize : rows.length;
     const pageRows = rows.slice(start, end);
-    pruneColumnLimits(pageRows);
-    renderKanban(pageRows, totals);
+    if(state.viewMode === 'table'){
+      renderTabla(pageRows);
+    }else{
+      pruneColumnLimits(pageRows);
+      renderKanban(pageRows, totals);
+    }
+    updateViewModeUI();
+    updateSortIndicators();
   }
 
   async function initializeApp(){
