@@ -4,24 +4,24 @@ Esta guía documenta los endpoints disponibles en Apps Script para registrar toq
 
 ## Endpoint base
 
-| Método | URL | Autenticación |
-| --- | --- | --- |
+| Método | URL                                                       | Autenticación                    |
+| ------ | --------------------------------------------------------- | -------------------------------- |
 | `POST` | `https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec` | Token compartido por integración |
 
-* El endpoint espera **JSON** en el cuerpo del POST. Para integraciones que no permiten editar el cuerpo (como Aircall) agrega `?action=<nombre>` en la URL.
-* Se aceptan dos acciones:
-  * `logAircallEvent` registra eventos de llamadas.
-  * `logGmailThread` registra interacciones de hilos de correo.
-* La respuesta devuelve `ok`, `sheet`, `rowNumber`, el `toque` aplicado y la lista actualizada de `toques`. En caso de evento duplicado (`duplicate: true`) no se escribe un nuevo toque.
+- El endpoint espera **JSON** en el cuerpo del POST. Para integraciones que no permiten editar el cuerpo (como Aircall) agrega `?action=<nombre>` en la URL.
+- Se aceptan dos acciones:
+  - `logAircallEvent` registra eventos de llamadas.
+  - `logGmailThread` registra interacciones de hilos de correo.
+- La respuesta devuelve `ok`, `sheet`, `rowNumber`, el `toque` aplicado y la lista actualizada de `toques`. En caso de evento duplicado (`duplicate: true`) no se escribe un nuevo toque.
 
 ### Seguridad con tokens compartidos
 
 El script valida un token almacenado en propiedades del proyecto:
 
-| Integración | Propiedad de Script | Cómo se envía |
-| --- | --- | --- |
-| Aircall | `AIRCALL_WEBHOOK_TOKEN` | Encabezado `X-Integration-Token` o parámetro/campo `token` |
-| Gmail (Apps Script auxiliar) | `GMAIL_WEBHOOK_TOKEN` | Encabezado `X-Integration-Token` o parámetro/campo `token` |
+| Integración                  | Propiedad de Script     | Cómo se envía                                              |
+| ---------------------------- | ----------------------- | ---------------------------------------------------------- |
+| Aircall                      | `AIRCALL_WEBHOOK_TOKEN` | Encabezado `X-Integration-Token` o parámetro/campo `token` |
+| Gmail (Apps Script auxiliar) | `GMAIL_WEBHOOK_TOKEN`   | Encabezado `X-Integration-Token` o parámetro/campo `token` |
 
 Pasos para configurarlo:
 
@@ -63,11 +63,11 @@ Si Aircall enviará firmas HMAC (`X-Aircall-Signature`), puedes conservarlas y e
 
 Los campos se normalizan automáticamente:
 
-* **Identificación del lead:** teléfonos (`raw_digits`, `number.digits`, `contact.phone_numbers`, `from.number`, etc.), correos (`contact.emails`) y `contact.external_id`.
-* **Fecha:** `ended_at`, `updated_at`, `started_at` o `timestamp`; se convierte a la zona horaria del proyecto.
-* **Estado del toque:** combina `direction`, `status` y `result` (`"Entrante · Answered"`, por ejemplo).
-* **Comentario:** agrega agente (`data.user.name`) y duración si están presentes.
-* **Metadatos:** guarda en la columna `Metadatos` un registro resumido del evento (`integrationLogs`). Eventos con el mismo `id` y `source` se ignoran como duplicados.
+- **Identificación del lead:** teléfonos (`raw_digits`, `number.digits`, `contact.phone_numbers`, `from.number`, etc.), correos (`contact.emails`) y `contact.external_id`.
+- **Fecha:** `ended_at`, `updated_at`, `started_at` o `timestamp`; se convierte a la zona horaria del proyecto.
+- **Estado del toque:** combina `direction`, `status` y `result` (`"Entrante · Answered"`, por ejemplo).
+- **Comentario:** agrega agente (`data.user.name`) y duración si están presentes.
+- **Metadatos:** guarda en la columna `Metadatos` un registro resumido del evento (`integrationLogs`). Eventos con el mismo `id` y `source` se ignoran como duplicados.
 
 Ejemplo de payload que entrega Aircall (se incluye token mediante encabezado):
 
@@ -96,11 +96,11 @@ Ejemplo de payload que entrega Aircall (se incluye token mediante encabezado):
 
 Pensado para ejecutarse desde un Apps Script auxiliar que monitorea Gmail y reenvía los datos. Se normalizan:
 
-* **Identificación del lead:** correos presentes en `thread.participants`, `messages[].from`, `messages[].to/cc/bcc`, etc.
-* **Fecha:** `body.timestamp`, `thread.updated` o la fecha del último mensaje.
-* **Estado del toque:** `Correo enviado`, `Correo recibido` o `Correo registrado` según `direction` (`outgoing`, `incoming`).
-* **Comentario:** agrega el asunto (`subject`).
-* **Metadatos:** registra `threadId`, `messageId`, participantes y etiquetas en `integrationLogs`.
+- **Identificación del lead:** correos presentes en `thread.participants`, `messages[].from`, `messages[].to/cc/bcc`, etc.
+- **Fecha:** `body.timestamp`, `thread.updated` o la fecha del último mensaje.
+- **Estado del toque:** `Correo enviado`, `Correo recibido` o `Correo registrado` según `direction` (`outgoing`, `incoming`).
+- **Comentario:** agrega el asunto (`subject`).
+- **Metadatos:** registra `threadId`, `messageId`, participantes y etiquetas en `integrationLogs`.
 
 Ejemplo de payload desde Apps Script:
 
@@ -133,20 +133,20 @@ Ejemplo de payload desde Apps Script:
 
 ## Comportamiento en la hoja
 
-* Se busca el lead en la base indicada (`sheet`) o, si se omite, en todas las hojas válidas.
-* Se completan las columnas `Toque 1` a `Toque 4`. Si todas están ocupadas, se hace *shift* y el nuevo valor queda en la última columna.
-* Se rellena la asignación (`Asignación`/`Asignacion`) y `ActualizadoEl` si estaban vacíos.
-* Se añade el comentario del evento solo una vez por registro.
+- Se busca el lead en la base indicada (`sheet`) o, si se omite, en todas las hojas válidas.
+- Se completan las columnas `Toque 1` a `Toque 4`. Si todas están ocupadas, se hace _shift_ y el nuevo valor queda en la última columna.
+- Se rellena la asignación (`Asignación`/`Asignacion`) y `ActualizadoEl` si estaban vacíos.
+- Se añade el comentario del evento solo una vez por registro.
 
 ## Configuración en Aircall
 
 1. Inicia sesión en el **Dashboard de Aircall** con permisos de administrador.
 2. Ve a **Integrations & API → Webhooks → Add a webhook**.
 3. Define:
-   * **URL:** `https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec?action=logAircallEvent`
-   * **Method:** `POST`
-   * **Secret token:** el valor de `AIRCALL_WEBHOOK_TOKEN`
-   * Selecciona los eventos `call.ended`, `call.answered`, `call.missed` (según necesidad).
+   - **URL:** `https://script.google.com/macros/s/<DEPLOYMENT_ID>/exec?action=logAircallEvent`
+   - **Method:** `POST`
+   - **Secret token:** el valor de `AIRCALL_WEBHOOK_TOKEN`
+   - Selecciona los eventos `call.ended`, `call.answered`, `call.missed` (según necesidad).
 4. Guarda los cambios y realiza una llamada de prueba para verificar que se crea el toque en la hoja.
 
 ## Configuración del Apps Script auxiliar para Gmail
@@ -163,14 +163,14 @@ function notifyThread(thread) {
     action: 'logGmailThread',
     token: WEBHOOK_TOKEN,
     sheet: 'Lead Recuperados',
-    thread: mapThread(thread)
+    thread: mapThread(thread),
   };
   UrlFetchApp.fetch(WEBHOOK_URL, {
     method: 'post',
     contentType: 'application/json',
     headers: { 'X-Integration-Token': WEBHOOK_TOKEN },
     payload: JSON.stringify(payload),
-    muteHttpExceptions: true
+    muteHttpExceptions: true,
   });
 }
 ```
@@ -180,8 +180,8 @@ function notifyThread(thread) {
 
 ## Validaciones recomendadas
 
-* Automatiza pruebas con `curl` o un `UrlFetchApp.fetch` desde el editor de Apps Script para verificar que recibes `ok: true` y que las columnas de toques se actualizan.
-* Conserva registros de respuesta (`response.getContentText()`) en tus integraciones para facilitar el diagnóstico.
-* Si deseas migrar a **verificación de firmas** (p. ej. `X-Aircall-Signature` HMAC SHA256), extiende `verifyIntegrationRequest_` utilizando el mismo secreto almacenado en la propiedad.
+- Automatiza pruebas con `curl` o un `UrlFetchApp.fetch` desde el editor de Apps Script para verificar que recibes `ok: true` y que las columnas de toques se actualizan.
+- Conserva registros de respuesta (`response.getContentText()`) en tus integraciones para facilitar el diagnóstico.
+- Si deseas migrar a **verificación de firmas** (p. ej. `X-Aircall-Signature` HMAC SHA256), extiende `verifyIntegrationRequest_` utilizando el mismo secreto almacenado en la propiedad.
 
 Con estas configuraciones, todas las llamadas y correos quedarán reflejados en los toques de seguimiento de la hoja correspondiente.
