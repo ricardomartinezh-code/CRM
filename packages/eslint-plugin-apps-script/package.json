@@ -1,0 +1,7 @@
+{
+  "name": "@google/eslint-plugin-apps-script",
+  "version": "0.0.1",
+  "description": "Lightweight Google Apps Script environment plugin for ESLint",
+  "main": "index.js",
+  "license": "MIT"
+}
