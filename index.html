@@ -179,6 +179,10 @@
       align-items:stretch;
       justify-content:center;
       padding:calc(var(--space) * 2) clamp(var(--space), 5vw, calc(var(--space) * 4));
+      padding-top:calc(var(--space) * 2 + constant(safe-area-inset-top));
+      padding-top:calc(var(--space) * 2 + env(safe-area-inset-top));
+      padding-bottom:calc(var(--space) * 2 + constant(safe-area-inset-bottom));
+      padding-bottom:calc(var(--space) * 2 + env(safe-area-inset-bottom));
       overflow-y:auto;
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
@@ -1196,10 +1200,13 @@
     .table-wrap { background: var(--card); border:1px solid rgba(255,255,255,.08); border-radius: 16px; overflow:auto }
     table { width:100%; border-collapse: collapse; font-size:14px }
     thead th { position: sticky; top:0; background: linear-gradient(180deg, var(--card), var(--card-2)); text-align:left; padding:12px; border-bottom:1px solid rgba(255,255,255,.12); cursor:pointer }
+    thead th.is-sorted{ color: var(--accent); }
+    thead th.is-sorted::after{ content: attr(data-sort-dir); margin-left:6px; font-size:12px; }
     thead .filter-row th{ padding:8px 12px; border-bottom:1px solid rgba(255,255,255,.12); }
     .col-filter{ width:100%; padding:6px; border-radius:8px; border:1px solid rgba(255,255,255,.12); background:var(--card-2); color:var(--text); }
     tbody td { padding:12px; border-bottom: 1px dashed rgba(255,255,255,.08) }
     tbody tr:hover { background: rgba(0,58,95,.06) }
+    .table-empty{ text-align:center; padding:24px 12px; color:var(--muted); font-style:italic; }
     .preview-box{ color: var(--text); font-size:14px; }
     .preview-box .table-wrap{ margin-top:8px; }
     .preview-summary{ color: var(--muted); font-size:13px; margin-bottom:6px; }
@@ -1766,6 +1773,24 @@
     .hidden{ display:none !important }
     .small{ font-size:12px; line-height:1.5 }
     .settings-card{ display:flex; flex-direction:column; gap:var(--space); }
+    .integration-layout{ display:flex; flex-direction:column; gap:var(--space); }
+    .integration-grid{ display:grid; gap:var(--space); grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
+    .integration-card{ background:var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:calc(var(--space)*0.9); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); display:flex; flex-direction:column; gap:var(--space-sm); position:relative; overflow:hidden; }
+    html[data-theme="light"] .integration-card{ border-color:rgba(15,23,42,0.08); box-shadow:inset 0 1px 0 rgba(255,255,255,0.8); }
+    .integration-card__header{ display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-sm); }
+    .integration-card__title{ font-weight:700; font-size:1.05rem; display:flex; align-items:center; gap:var(--space-xs); }
+    .integration-tag{ display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:999px; background:rgba(var(--panel-base-rgb),0.16); color:var(--panel-stage-text); font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; }
+    html[data-theme="light"] .integration-tag{ background:rgba(var(--panel-base-rgb),0.12); color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 82%, #0f172a 18%); }
+    .integration-card__status{ font-weight:600; display:flex; align-items:center; gap:6px; }
+    .integration-status--connected{ color:var(--ok); }
+    .integration-status--beta{ color:var(--warn); }
+    .integration-card__body{ color:var(--muted); font-size:0.95rem; display:flex; flex-direction:column; gap:var(--space-sm); }
+    .integration-card__actions{ display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; }
+    .integration-card__meta{ font-size:0.8rem; color:var(--muted); }
+    .integration-help{ background:rgba(var(--panel-base-rgb),0.14); border-radius:var(--radius); padding:calc(var(--space)*0.9); border:1px solid rgba(var(--panel-base-rgb),0.28); box-shadow:0 12px 30px rgba(var(--panel-base-rgb),0.18); }
+    html[data-theme="light"] .integration-help{ background:color-mix(in srgb, var(--card) 84%, var(--panel-base-soft) 16%); border-color:rgba(var(--panel-base-rgb),0.24); box-shadow:0 16px 34px rgba(var(--panel-base-rgb),0.12); }
+    .integration-help h4{ margin:0 0 var(--space-sm); font-size:1.05rem; }
+    .integration-help ul{ margin:0; padding-left:20px; display:grid; gap:6px; }
     .settings-profile{ display:flex; flex-wrap:wrap; gap:var(--space); align-items:flex-start; }
     .profile-avatar{ display:flex; flex-direction:column; gap:var(--space-sm); align-items:flex-start; }
     .avatar-frame{ width:var(--avatar-size); height:var(--avatar-size); border-radius:50%; border:2px dashed rgba(255,255,255,0.2); background:var(--card-2); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; text-transform:uppercase; position:relative; overflow:hidden; box-shadow: inset 0 2px 6px rgba(2,12,29,0.35); }
@@ -1809,7 +1834,20 @@
     .security-timeline__label{ font-weight:600; color:var(--text); }
     .security-timeline__meta{ font-size:11px; color:var(--muted); }
     .security-status__actions{ display:flex; flex-wrap:wrap; gap:6px; margin-top:4px; }
-    .settings-preferences{ display:grid; gap:var(--space); }
+    .settings-preferences{ display:flex; flex-direction:column; gap:var(--space); }
+    .pref-layout{ display:grid; gap:var(--space); }
+    .pref-column{ display:grid; gap:var(--space-sm); }
+    .pref-select-grid{ display:grid; gap:var(--space-sm); }
+    .pref-toggles{ border:1px solid rgba(var(--panel-base-rgb),0.28); border-radius:var(--radius); padding:var(--space-sm); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:var(--space-sm); }
+    html[data-theme="light"] .pref-toggles{ background:rgba(var(--panel-base-rgb),0.12); border-color:rgba(var(--panel-base-rgb),0.22); }
+    .pref-toggles legend{ margin:0; padding:0 var(--space-xs); font-size:12px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; color:var(--text); }
+    .pref-toggle-grid{ display:grid; gap:var(--space-sm); }
+    .pref-column--toggles .settings-group.switch{ justify-content:space-between; }
+    @media (min-width: 920px){
+      .pref-layout{ grid-template-columns: minmax(0,1fr) minmax(0,420px); align-items:start; }
+      .pref-select-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .pref-toggle-grid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
     .pref-presets{ padding:12px 14px; border-radius:12px; border:1px dashed rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.08); display:flex; flex-direction:column; gap:8px; }
     .pref-presets[hidden]{ display:none; }
     .pref-presets__title{ margin:0; font-size:13px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
@@ -1842,7 +1880,6 @@
     .settings-summary[data-state="error"]{ border-color:rgba(239,68,68,0.45); color:#ef4444; background:rgba(239,68,68,0.12); }
     .settings-summary[data-state="warning"]{ border-color:rgba(245,158,11,0.45); color:#f59e0b; background:rgba(245,158,11,0.12); }
     .settings-summary.fade{ opacity:0.45; }
-    .settings-preferences > *:not(.pref-actions){ max-width:420px; }
     .profile-avatar .muted{ max-width:240px; }
     .permissions-grid{ display:grid; grid-template-columns: minmax(220px, 320px) minmax(0,1fr); gap:var(--space); align-items:flex-start; }
     .permissions-panel{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space); background: var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
@@ -1925,6 +1962,26 @@
     .permission-rules li{ line-height:1.5; }
     .permission-scope-note{ font-size:12px; color:var(--muted); display:flex; flex-direction:column; gap:4px; }
     .permission-scope-values{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
+    .assignment-grid{ display:flex; flex-direction:column; gap:var(--space); }
+    .assignment-body{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-mode{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-targets{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); }
+    .assignment-actions{ display:flex; flex-wrap:wrap; gap:var(--space-sm); align-items:center; justify-content:space-between; }
+    .assignment-status{ font-size:13px; color:var(--muted); transition:color .2s ease; }
+    .assignment-status[data-tone="success"]{ color:var(--ok); }
+    .assignment-status[data-tone="warning"]{ color:var(--warn); }
+    .assignment-status[data-tone="error"]{ color:var(--bad); }
+    .assignment-buttons{ display:flex; gap:var(--space-sm); flex-shrink:0; }
+    .assignment-summary{ font-size:13px; color:var(--muted); background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); padding:var(--space-sm); min-height:24px; }
+    .assignment-rules{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .assignment-rules h4{ margin:0; font-size:15px; display:flex; align-items:center; gap:8px; }
+    .assignment-rules__list{ margin:0; padding-left:20px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .assignment-filters{ display:grid; gap:var(--space-sm); grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); }
+    html[data-theme="light"] .assignment-summary{ background:rgba(15,23,42,0.05); border-color:rgba(15,23,42,0.08); }
+    @media (max-width:700px){
+      .assignment-buttons{ width:100%; justify-content:flex-end; }
+      .assignment-actions{ align-items:stretch; }
+    }
     .permissions-switch{ display:flex; align-items:center; gap:10px; padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.02); cursor:pointer; transition:border-color .2s ease, box-shadow .2s ease; }
     .permissions-switch input{ appearance:none; width:44px; height:24px; border-radius:999px; border:1px solid rgba(255,255,255,0.25); background:rgba(15,23,42,0.55); position:relative; cursor:pointer; transition: background .2s ease, border-color .2s ease; }
     .permissions-switch input::before{ content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 2px 4px rgba(15,23,42,0.25); transform:translateX(0); transition: transform .2s ease; }
@@ -2332,6 +2389,7 @@
           <a href="#" class="nav-link" data-nav="exportar"><i class="bi bi-box-arrow-up"></i><span>Exportar</span></a>
           <a href="#" class="nav-link" data-nav="sistema"><i class="bi bi-cpu"></i><span>Sistema</span></a>
           <a href="#" class="nav-link" data-nav="permisos"><i class="bi bi-shield-lock"></i><span>Permisos</span></a>
+          <a href="#" class="nav-link" data-nav="integraciones"><i class="bi bi-plug"></i><span>Integraciones</span></a>
           <a href="#" class="nav-link" data-nav="configuracion"><i class="bi bi-gear"></i><span>Configuración</span></a>
         </div>
         <div class="nav-footer">
@@ -2415,9 +2473,6 @@
             <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="q" type="search" placeholder="ID, nombre o teléfono… (Ctrl /)" aria-label="ID" />
           </div>
-          <div class="actions">
-            <div class="btn primary" title="Buscar" id="searchBtn"><i class="bi bi-search"></i> Buscar</div>
-          </div>
         </div>
       </header>
 
@@ -2451,11 +2506,58 @@
           </div>
         </div>
         <div class="panel-section">
-          <h3>Leads</h3>
+          <div class="row between align-center" style="gap:var(--space-sm)">
+            <h3>Leads</h3>
+            <div class="seg" role="toolbar" aria-label="Formato de visualización">
+              <button type="button" data-view-mode="board" aria-pressed="true" title="Ver como tablero">
+                <i class="bi bi-kanban"></i> Tablero
+              </button>
+              <button type="button" data-view-mode="table" aria-pressed="false" title="Ver como tabla">
+                <i class="bi bi-table"></i> Tabla
+              </button>
+            </div>
+          </div>
           <section class="content">
             <!-- Kanban -->
             <div id="viewKanban" class="board" role="region" aria-label="Lead Board">
               <!-- Column templates -->
+            </div>
+            <div id="tableWrap" class="table-wrap hidden" role="region" aria-label="Tabla de leads">
+              <table>
+                <thead>
+                  <tr>
+                    <th data-sort="id">ID</th>
+                    <th data-sort="nombre">Nombre</th>
+                    <th data-sort="matricula">Matrícula</th>
+                    <th data-sort="correo">Correo</th>
+                    <th data-sort="telefono">Teléfono</th>
+                    <th data-sort="campus">Plantel</th>
+                    <th data-sort="modalidad">Modalidad</th>
+                    <th data-sort="programa">Programa</th>
+                    <th data-sort="etapa">Etapa</th>
+                    <th data-sort="estado">Estado</th>
+                    <th data-sort="asesor">Asesor</th>
+                    <th data-sort="comentario">Comentario</th>
+                    <th data-sort="asignacion">Asignación</th>
+                  </tr>
+                  <tr class="filter-row">
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="id" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="nombre" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="matricula" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="correo" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="telefono" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="campus" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="modalidad" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="programa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="etapa" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="estado" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asesor" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="comentario" /></th>
+                    <th><input class="col-filter" type="search" placeholder="Filtrar" data-col="asignacion" /></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody"></tbody>
+              </table>
             </div>
           </section>
           <div id="paginator" class="pagination"></div>
@@ -2786,10 +2888,6 @@
                 </div>
               </form>
             </div>
-            <div class="permissions-reference">
-              <div class="permissions-card" id="permissionMatrix"></div>
-              <div class="permissions-card" id="permissionRules"></div>
-            </div>
           </div>
           <div class="panel-section">
             <h3><span aria-hidden="true">👥</span> Equipos</h3>
@@ -2872,6 +2970,230 @@
               </form>
             </div>
           </div>
+          <div class="panel-section">
+            <h3><span aria-hidden="true">🔄</span> Asignación</h3>
+            <p class="muted small">Reasigna leads manualmente en la base activa seleccionando un caso individual, varios registros o un segmento completo.</p>
+            <div class="assignment-grid">
+              <div class="assignment-header">
+                <div class="segmented" role="radiogroup" aria-label="Modo de reasignación">
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="single" checked>
+                    <span>Individual</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="multiple">
+                    <span>Varios</span>
+                  </label>
+                  <label class="segmented-option">
+                    <input type="radio" name="assignmentMode" value="segment">
+                    <span>Segmento</span>
+                  </label>
+                </div>
+              </div>
+              <div class="assignment-body">
+                <div class="assignment-mode" data-mode="single">
+                  <label class="field-with-hint">
+                    <span>Lead a reasignar</span>
+                    <input type="text" id="assignmentSingleInput" list="assignmentLeadOptions" placeholder="ID, matrícula, correo o nombre" autocomplete="off">
+                    <span class="field-hint">Empieza a escribir y selecciona una coincidencia del listado.</span>
+                    <datalist id="assignmentLeadOptions"></datalist>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="multiple">
+                  <label class="field-with-hint">
+                    <span>Leads seleccionados</span>
+                    <textarea id="assignmentBulkInput" rows="4" placeholder="Pega IDs o matrículas separados por comas, saltos de línea o espacios."></textarea>
+                    <span class="field-hint">Los duplicados se omiten automáticamente.</span>
+                  </label>
+                </div>
+                <div class="assignment-mode hidden" data-mode="segment">
+                  <div class="assignment-filters" role="group" aria-label="Filtros del segmento">
+                    <label>
+                      <span>Asesor actual</span>
+                      <select id="assignmentFilterAsesor">
+                        <option value="">Todos</option>
+                        <option value="__unassigned__">Solo sin asesor</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Etapa</span>
+                      <select id="assignmentFilterEtapa">
+                        <option value="">Todas</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Estado</span>
+                      <select id="assignmentFilterEstado" disabled>
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Plantel</span>
+                      <select id="assignmentFilterCampus">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Programa</span>
+                      <select id="assignmentFilterPrograma">
+                        <option value="">Todos</option>
+                      </select>
+                    </label>
+                    <label>
+                      <span>Asignados desde</span>
+                      <input type="date" id="assignmentFilterStart">
+                    </label>
+                    <label>
+                      <span>Asignados hasta</span>
+                      <input type="date" id="assignmentFilterEnd">
+                    </label>
+                    <label>
+                      <span>Límite</span>
+                      <input type="number" id="assignmentFilterLimit" min="1" max="500" placeholder="Ej. 50">
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div class="assignment-targets">
+                <label class="field-with-hint">
+                  <span>Base de trabajo</span>
+                  <select id="assignmentBaseSelect"></select>
+                  <span class="field-hint">Solo se procesarán leads de la base seleccionada.</span>
+                </label>
+                <label class="field-with-hint">
+                  <span>Asesor destino</span>
+                  <input type="text" id="assignmentTargetInput" list="assignmentTargetOptions" placeholder="Nombre o ID" autocomplete="off">
+                  <span class="field-hint">Sugiere asesores activos, pero puedes capturar cualquier nombre válido.</span>
+                  <datalist id="assignmentTargetOptions"></datalist>
+                </label>
+              </div>
+              <div class="assignment-actions">
+                <div class="assignment-status" id="assignmentStatus" role="status" aria-live="polite">Selecciona el modo de reasignación y completa los datos.</div>
+                <div class="assignment-buttons">
+                  <button type="button" class="btn outline" id="assignmentPreviewBtn"><i class="bi bi-search"></i> Calcular selección</button>
+                  <button type="button" class="btn primary" id="assignmentExecuteBtn" disabled><i class="bi bi-arrow-repeat"></i> Reasignar leads</button>
+                </div>
+              </div>
+              <div class="assignment-summary" id="assignmentSummary" aria-live="polite"></div>
+              <div class="assignment-rules">
+                <h4><i class="bi bi-list-check"></i> Reglas de asignación</h4>
+                <ul id="assignmentRulesList" class="assignment-rules__list"></ul>
+              </div>
+            </div>
+          </div>
+          <div class="panel-section">
+            <h3><span aria-hidden="true">📊</span> Referencia de permisos</h3>
+            <div class="permissions-reference">
+              <div class="permissions-card" id="permissionMatrix"></div>
+              <div class="permissions-card" id="permissionRules"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="view-integraciones" class="view-section hidden" data-mobile-title="Integraciones">
+        <div class="card" style="margin:18px">
+          <div class="panel-section">
+            <h3><span aria-hidden="true">🔗</span> Integraciones disponibles</h3>
+            <p class="muted">Conecta los servicios que usas a diario para centralizar conversaciones, llamadas y flujos operativos sin salir de ReLead EDU. Cada vínculo se realiza con tus credenciales personales y puede revocarse en cualquier momento.</p>
+          </div>
+          <div class="panel-section integration-layout">
+            <div class="integration-grid" role="list">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-whatsapp-title"><i class="bi bi-whatsapp" aria-hidden="true"></i> <span>WhatsApp Web personal</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
+                  </div>
+                  <span class="integration-tag">Sesión manual</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Escanea el código QR desde tu teléfono para responder mensajes desde el panel de leads sin perder el historial institucional.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
+                    <button type="button" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
+                  </div>
+                  <p class="integration-card__meta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-aircall-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-aircall-title"><i class="bi bi-telephone" aria-hidden="true"></i> <span>Aircall Workspace</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-plug" aria-hidden="true"></i> <span>Pendiente de vincular</span></div>
+                  </div>
+                  <span class="integration-tag">VoIP</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Sincroniza tus llamadas y listas de contactos para marcar con un clic y registrar notas desde el tablero.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-cloud-upload"></i> Conectar workspace</button>
+                    <a href="https://dashboard.aircall.io/" target="_blank" rel="noreferrer" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir Aircall</a>
+                  </div>
+                  <p class="integration-card__meta">Requiere permisos de administrador en tu organización de Aircall para autorizar la aplicación.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-gmail-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-gmail-title"><i class="bi bi-envelope-at" aria-hidden="true"></i> <span>Gmail institucional</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-shield-lock" aria-hidden="true"></i> <span>Autorización requerida</span></div>
+                  </div>
+                  <span class="integration-tag">OAuth</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Autoriza tu buzón institucional para enviar correos de seguimiento y registrar plantillas sin salir del panel.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-unlock"></i> Vincular cuenta</button>
+                    <button type="button" class="btn"><i class="bi bi-arrow-clockwise"></i> Revisar autorizaciones</button>
+                  </div>
+                  <p class="integration-card__meta">Tu token se almacena cifrado y puedes revocarlo desde la consola de seguridad de Google Workspace.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-neotel-title"><i class="bi bi-broadcast" aria-hidden="true"></i> <span>Neotel</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-bezier" aria-hidden="true"></i> <span>Programa beta</span></div>
+                  </div>
+                  <span class="integration-tag">Beta cerrada</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Activa la marcación automática y el registro de llamadas proveniente de la plataforma Neotel para agilizar la gestión.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-rocket"></i> Solicitar acceso</button>
+                    <button type="button" class="btn outline"><i class="bi bi-card-checklist"></i> Ver requisitos</button>
+                  </div>
+                  <p class="integration-card__meta">La integración está disponible sólo para equipos piloto. Recibirás instrucciones personalizadas al aprobarse tu solicitud.</p>
+                </div>
+              </article>
+              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title">
+                <div class="integration-card__header">
+                  <div>
+                    <div class="integration-card__title" id="integration-siie-title"><i class="bi bi-mortarboard" aria-hidden="true"></i> <span>SIIE UNIDEP</span></div>
+                    <div class="integration-card__status integration-status--beta"><i class="bi bi-exclamation-circle" aria-hidden="true"></i> <span>En pruebas internas</span></div>
+                  </div>
+                  <span class="integration-tag">Beta</span>
+                </div>
+                <div class="integration-card__body">
+                  <p>Sincroniza expedientes académicos desde <a href="https://siie-unidep.csweb.mx/" target="_blank" rel="noreferrer">siie-unidep.csweb.mx</a> para validar inscripciones y estatus de seguimiento.</p>
+                  <div class="integration-card__actions">
+                    <button type="button" class="btn primary"><i class="bi bi-gear-wide-connected"></i> Configurar sandbox</button>
+                    <button type="button" class="btn"><i class="bi bi-clipboard-check"></i> Registrar credenciales</button>
+                  </div>
+                  <p class="integration-card__meta">Asegúrate de contar con un usuario de pruebas. Los datos reales permanecerán protegidos hasta el despliegue general.</p>
+                </div>
+              </article>
+            </div>
+            <aside class="integration-help" aria-label="Recomendaciones de seguridad">
+              <h4><span aria-hidden="true">🛡️</span> Buenas prácticas al vincular servicios</h4>
+              <ul>
+                <li>Verifica que estés utilizando una red confiable antes de autorizar cualquier cuenta institucional.</li>
+                <li>Cierra las sesiones abiertas en dispositivos compartidos y revoca accesos desde los portales oficiales tras cada guardia.</li>
+                <li>Coordina con el área de TI la activación de factores de autenticación adicionales para servicios críticos.</li>
+              </ul>
+            </aside>
+          </div>
         </div>
       </section>
 
@@ -2921,6 +3243,10 @@
             </div>
           </div>
           <div class="panel-section">
+            <h3><span aria-hidden="true">📝</span> Estado</h3>
+            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
+          </div>
+          <div class="panel-section">
             <h3><span aria-hidden="true">🔒</span> Seguridad</h3>
             <form id="passwordForm" class="form-grid security-form" autocomplete="off">
               <div class="security-status" id="passwordStatusCard" aria-live="polite">
@@ -2956,76 +3282,89 @@
           <div class="panel-section">
             <h3><span aria-hidden="true">🎨</span> Preferencias</h3>
             <div class="settings-preferences">
-              <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
-                <legend id="themeOptionsLabel">Tema</legend>
-                <div class="segmented" role="radiogroup" aria-label="Tema">
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="light" />
-                    <span>Claro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="dark" />
-                    <span>Oscuro</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="pref-theme" value="system" />
-                    <span>Sistema</span>
-                  </label>
+              <div class="pref-layout">
+                <div class="pref-column pref-column--controls">
+                  <fieldset class="settings-group" aria-labelledby="themeOptionsLabel">
+                    <legend id="themeOptionsLabel">Tema</legend>
+                    <div class="segmented" role="radiogroup" aria-label="Tema">
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="light" />
+                        <span>Claro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="dark" />
+                        <span>Oscuro</span>
+                      </label>
+                      <label class="segmented-option">
+                        <input type="radio" name="pref-theme" value="system" />
+                        <span>Sistema</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                  <div class="pref-select-grid">
+                    <label class="settings-group">
+                      <span>Idioma</span>
+                      <select id="prefLanguage">
+                        <option value="es">Español</option>
+                        <option value="en">English</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Densidad</span>
+                      <select id="prefDensity">
+                        <option value="comfortable">Cómoda</option>
+                        <option value="compact">Compacta</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Diseño del tablero</span>
+                      <select id="prefBoardDensity">
+                        <option value="standard">Estándar</option>
+                        <option value="compact">Compacto</option>
+                        <option value="expanded">Amplio</option>
+                      </select>
+                    </label>
+                    <label class="settings-group">
+                      <span>Color de acento</span>
+                      <select id="prefAccent">
+                        <option value="blue">Azul institucional</option>
+                        <option value="green">Verde</option>
+                        <option value="purple">Morado</option>
+                        <option value="orange">Ámbar</option>
+                        <option value="teal">Turquesa</option>
+                        <option value="pink">Magenta</option>
+                      </select>
+                    </label>
+                  </div>
                 </div>
-              </fieldset>
-              <label class="settings-group">
-                <span>Idioma</span>
-                <select id="prefLanguage">
-                  <option value="es">Español</option>
-                  <option value="en">English</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Densidad</span>
-                <select id="prefDensity">
-                  <option value="comfortable">Cómoda</option>
-                  <option value="compact">Compacta</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Diseño del tablero</span>
-                <select id="prefBoardDensity">
-                  <option value="standard">Estándar</option>
-                  <option value="compact">Compacto</option>
-                  <option value="expanded">Amplio</option>
-                </select>
-              </label>
-              <label class="settings-group">
-                <span>Color de acento</span>
-                <select id="prefAccent">
-                  <option value="blue">Azul institucional</option>
-                  <option value="green">Verde</option>
-                  <option value="purple">Morado</option>
-                  <option value="orange">Ámbar</option>
-                  <option value="teal">Turquesa</option>
-                  <option value="pink">Magenta</option>
-                </select>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefEco" />
-                <span>Modo eco</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefMotion" />
-                <span>Reducir animaciones</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefLargeText" />
-                <span>Texto amplio</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefHighContrast" />
-                <span>Contraste alto</span>
-              </label>
-              <label class="settings-group switch">
-                <input type="checkbox" id="prefShowLeadId" />
-                <span>Mostrar ID en tarjetas del tablero</span>
-              </label>
+                <div class="pref-column pref-column--toggles">
+                  <fieldset class="pref-toggles" aria-labelledby="prefToggleLegend">
+                    <legend id="prefToggleLegend">Ajustes rápidos</legend>
+                    <div class="pref-toggle-grid">
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefEco" />
+                        <span>Modo eco</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefMotion" />
+                        <span>Reducir animaciones</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefLargeText" />
+                        <span>Texto amplio</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefHighContrast" />
+                        <span>Contraste alto</span>
+                      </label>
+                      <label class="settings-group switch">
+                        <input type="checkbox" id="prefShowLeadId" />
+                        <span>Mostrar ID en tarjetas del tablero</span>
+                      </label>
+                    </div>
+                  </fieldset>
+                </div>
+              </div>
               <div class="pref-presets" id="prefPresetRecommendations" hidden>
                 <p class="pref-presets__title">Recomendaciones institucionales</p>
                 <div class="pref-presets__list" id="prefPresetList"></div>
@@ -3034,10 +3373,6 @@
                 <button type="button" class="btn" id="prefReset"><i class="bi bi-arrow-counterclockwise"></i> Restablecer</button>
               </div>
             </div>
-          </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">📝</span> Estado</h3>
-            <div class="settings-summary visible" id="settingsStatus" role="status" aria-live="polite">Tus ajustes se guardan en este dispositivo.</div>
           </div>
         </div>
       </section>
@@ -3218,6 +3553,9 @@
   let teamsLoaded = false;
   let teamsLoading = false;
   let selectedTeamId = '';
+  const assignmentCache = new Map();
+  let assignmentPreview = null;
+  let assignmentMode = 'single';
   const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
@@ -3585,6 +3923,7 @@
     exportar: ['admin','coordinador','viewer'],
     sistema: ['admin','coordinador','viewer'],
     permisos: ['admin'],
+    integraciones: ['admin','coordinador','asesor','viewer'],
     configuracion: ['admin','coordinador','asesor','viewer'],
     ayuda: ['admin','coordinador','asesor','viewer']
   };
@@ -3596,7 +3935,8 @@
     manageDuplicates: ['admin'],
     repairSheetStructure: ['admin'],
     syncActivos: ['admin','coordinador'],
-    manageTeams: ['admin']
+    manageTeams: ['admin'],
+    reassignLeads: ['admin']
   };
   const ROLE_LABELS = {
     admin: 'Administrador',
@@ -3630,6 +3970,13 @@
       'Exportaciones deben ser auditadas (registro de usuario, filtros y fecha).',
       'Cambios masivos y eliminación de duplicados requieren confirmación adicional.',
       'La selección de “Todas” en Bases o “Todos” en Planteles equivale a acceso global sin restricciones.'
+    ],
+    assignmentRules: [
+      'Solo perfiles con permisos de administración pueden reasignar leads manualmente.',
+      'Se respetan los permisos de base y plantel del usuario que ejecuta la reasignación.',
+      'La base seleccionada define el universo de búsqueda; no se modifican otras hojas.',
+      'Al reasignar se actualiza el asesor destino y la fecha de asignación del lead.',
+      'Los leads que ya pertenecen al asesor destino se omiten para evitar duplicar movimientos.'
     ],
     bases: {
       values: ['Todas','Planteles','Regresos','Reciclados','Rescatados'],
@@ -4004,6 +4351,8 @@
     return '';
   }
   // —— Estado UI ——
+  const ALL_SHEETS_VALUE = '__ALL__';
+
   const createInitialState = () => ({
     query:"",
     sheet:"",
@@ -4015,12 +4364,63 @@
     colFilters:Object.fromEntries(columns.map(k=>[k,''])),
     mobileColumns:{},
     columnLimits:{},
-    columnLimitSignature:''
+    columnLimitSignature:'',
+    viewMode:'board'
   });
   let state = createInitialState();
   const boardMobileQuery = window.matchMedia('(max-width: 700px)');
   const COLUMN_INITIAL_BATCH = 60;
   const COLUMN_BATCH_SIZE = 40;
+  const VIEW_MODES = new Set(['board','table']);
+
+  function normalizeViewMode(mode){
+    return VIEW_MODES.has(mode) ? mode : 'board';
+  }
+
+  function updateViewModeUI(){
+    const board = el('#viewKanban');
+    const table = el('#tableWrap');
+    if(board){
+      board.classList.toggle('hidden', state.viewMode !== 'board');
+    }
+    if(table){
+      table.classList.toggle('hidden', state.viewMode !== 'table');
+    }
+    els('[data-view-mode]').forEach(btn => {
+      if(!(btn instanceof HTMLElement)) return;
+      const btnMode = normalizeViewMode(btn.dataset.viewMode);
+      const isActive = btnMode === state.viewMode;
+      btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+      btn.classList.toggle('is-active', isActive);
+    });
+  }
+
+  function setViewMode(mode){
+    const normalized = normalizeViewMode(mode);
+    if(state.viewMode === normalized) return;
+    state.viewMode = normalized;
+    state.page = 0;
+    updateViewModeUI();
+    refresh();
+  }
+
+  function updateSortIndicators(){
+    const sortState = state.sort || {};
+    const { key, dir } = sortState;
+    els('th[data-sort]').forEach(th => {
+      const sortKey = th.dataset.sort;
+      if(key && sortKey === key){
+        th.setAttribute('aria-sort', dir === -1 ? 'descending' : 'ascending');
+        th.classList.add('is-sorted');
+        th.dataset.sortDir = dir === -1 ? '↓' : '↑';
+      }else{
+        th.removeAttribute('aria-sort');
+        th.classList.remove('is-sorted');
+        delete th.dataset.sortDir;
+      }
+    });
+  }
+
   const ensureColumnLimitState = () => {
     if(!state.columnLimits || typeof state.columnLimits !== 'object'){
       state.columnLimits = {};
@@ -4582,6 +4982,695 @@
     }
   }
 
+  function renderAssignmentRules(){
+    const list = el('#assignmentRulesList');
+    if(!list) return;
+    list.innerHTML = '';
+    const rules = Array.isArray(PERMISSION_REFERENCE.assignmentRules) ? PERMISSION_REFERENCE.assignmentRules.filter(Boolean) : [];
+    if(!rules.length){
+      const item = document.createElement('li');
+      item.textContent = 'Define las reglas de asignación en la configuración.';
+      list.appendChild(item);
+      return;
+    }
+    rules.forEach(rule => {
+      const item = document.createElement('li');
+      item.textContent = rule;
+      list.appendChild(item);
+    });
+  }
+
+  const normalizeAssignmentKey = value => {
+    const text = String(value || '').trim();
+    if(!text) return '';
+    const lower = text.toLowerCase();
+    if(lower.includes('sistema') || lower === 'sin asignar' || lower === 'sinasesor') return '';
+    return text
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, ' ')
+      .trim();
+  };
+
+  const normalizePlainKey = value => String(value || '').trim().toLowerCase();
+  const normalizeDigits = value => String(value || '').replace(/\D/g, '');
+
+  const assignmentIsUnassigned = value => !normalizeAssignmentKey(value);
+
+  function setAssignmentStatus(message, tone = 'info'){
+    const statusEl = el('#assignmentStatus');
+    if(!statusEl) return;
+    statusEl.textContent = message ? String(message).trim() : '';
+    if(tone){
+      statusEl.dataset.tone = tone;
+    }else{
+      statusEl.removeAttribute('data-tone');
+    }
+  }
+
+  function setAssignmentSummary(message){
+    const summaryEl = el('#assignmentSummary');
+    if(!summaryEl) return;
+    summaryEl.textContent = message ? String(message).trim() : '';
+  }
+
+  function getAssignmentBase(){
+    const select = el('#assignmentBaseSelect');
+    if(select && select.value){
+      return select.value;
+    }
+    return state.sheet || '';
+  }
+
+  function populateAssignmentBaseOptions(){
+    const select = el('#assignmentBaseSelect');
+    if(!select) return;
+    const options = sheets.length ? sheets.slice() : (state.sheet ? [state.sheet] : []);
+    const unique = Array.from(new Set(options.filter(Boolean)));
+    const pieces = ['<option value="">Selecciona una base</option>'];
+    unique.forEach(name => {
+      const label = sheetDisplayName(name) || name;
+      pieces.push(`<option value="${escapeHtml(name)}">${escapeHtml(label)}</option>`);
+    });
+    select.innerHTML = pieces.join('');
+    if(state.sheet && unique.includes(state.sheet)){
+      select.value = state.sheet;
+    }else if(unique.length === 1){
+      select.value = unique[0];
+    }
+  }
+
+  function normalizeAssignmentToken(raw){
+    const value = String(raw || '').trim();
+    if(!value) return '';
+    const split = value.split(/[·|\-–]/);
+    return (split[0] || value).trim();
+  }
+
+  function matchAssignmentField(field, token){
+    const fieldValue = String(field || '').trim();
+    if(!fieldValue) return false;
+    const plainField = normalizePlainKey(fieldValue);
+    const plainToken = normalizePlainKey(token);
+    if(plainField && plainField === plainToken) return true;
+    const digitsField = normalizeDigits(fieldValue);
+    if(digitsField && digitsField === normalizeDigits(token)) return true;
+    const keyField = normalizeAssignmentKey(fieldValue);
+    const keyToken = normalizeAssignmentKey(token);
+    if(keyField && keyField === keyToken) return true;
+    return false;
+  }
+
+  function findAssignmentLeadByToken(leads, token){
+    const cleaned = normalizeAssignmentToken(token);
+    if(!cleaned) return null;
+    const matches = leads.filter(lead => {
+      if(!lead) return false;
+      if(matchAssignmentField(lead.id, cleaned)) return true;
+      if(matchAssignmentField(lead.matricula, cleaned)) return true;
+      if(matchAssignmentField(lead.correo, cleaned)) return true;
+      if(matchAssignmentField(lead.telefono, cleaned)) return true;
+      if(matchAssignmentField(lead.telefonoNormalizado, cleaned)) return true;
+      if(matchAssignmentField(lead.nombre, cleaned)) return true;
+      return false;
+    });
+    if(!matches.length) return null;
+    if(matches.length === 1) return matches[0];
+    const direct = matches.find(lead => matchAssignmentField(lead.id, cleaned));
+    if(direct) return direct;
+    return matches[0];
+  }
+
+  const parseAssignmentDate = value => {
+    if(value instanceof Date && !Number.isNaN(value.getTime())) return value;
+    const text = String(value || '').trim();
+    if(!text) return null;
+    const iso = /^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T00:00:00` : text.replace(' ', 'T');
+    const date = new Date(iso);
+    if(Number.isNaN(date.getTime())) return null;
+    return date;
+  };
+
+  async function ensureAssignmentBaseData(base, options = {}){
+    const { force = false } = options;
+    if(!base) return [];
+    if(!force){
+      if(state.sheet === base && leads.length){
+        assignmentCache.set(base, leads.slice());
+        return assignmentCache.get(base);
+      }
+      if(assignmentCache.has(base)){
+        return assignmentCache.get(base);
+      }
+    }
+    const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(base)}`, { dedupeKey: `assignment:${base}`, label: 'Reasignación' });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    const dataset = Array.isArray(data) ? data.map(raw => normalizeLeadRecord(raw, base)) : [];
+    assignmentCache.set(base, dataset);
+    return dataset;
+  }
+
+  function populateAssignmentLeadOptions(base){
+    const datalist = el('#assignmentLeadOptions');
+    if(!datalist) return;
+    const dataset = assignmentCache.get(base) || [];
+    const slice = dataset.slice(0, 200);
+    const options = slice.map(lead => {
+      const primary = lead.id || lead.matricula || lead.correo || '';
+      if(!primary) return '';
+      const labelParts = [];
+      if(lead.nombre) labelParts.push(lead.nombre);
+      if(lead.asesor) labelParts.push(displayAsesorName(lead.asesor));
+      const label = labelParts.length ? `${primary} · ${labelParts.join(' · ')}` : primary;
+      return `<option value="${escapeHtml(primary)}" label="${escapeHtml(label)}"></option>`;
+    }).filter(Boolean);
+    datalist.innerHTML = options.join('');
+  }
+
+  function populateAssignmentTargetOptions(){
+    const targetInput = el('#assignmentTargetInput');
+    const datalist = el('#assignmentTargetOptions');
+    if(!targetInput || !datalist) return;
+    const suggestions = new Set();
+    const addSuggestion = value => {
+      const text = String(value || '').trim();
+      if(!text) return;
+      suggestions.add(text);
+    };
+    permissionUsers.forEach(user => {
+      if(!user || user.active === false) return;
+      addSuggestion(user.name || user.userId || user.email);
+    });
+    leads.forEach(lead => addSuggestion(displayAsesorName(lead.asesor)));
+    const options = Array.from(suggestions).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    datalist.innerHTML = options.map(option => `<option value="${escapeHtml(option)}"></option>`).join('');
+  }
+
+  function populateAssignmentFilters(base){
+    const dataset = assignmentCache.get(base) || [];
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const selected = asesorSelect.value;
+      const asesores = new Set();
+      dataset.forEach(lead => {
+        const name = displayAsesorName(lead.asesor);
+        if(!assignmentIsUnassigned(name)) asesores.add(name);
+      });
+      const sorted = Array.from(asesores).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      asesorSelect.innerHTML = '<option value="">Todos</option><option value="__unassigned__">Solo sin asesor</option>' +
+        sorted.map(name => `<option value="${escapeHtml(name)}">${escapeHtml(name)}</option>`).join('');
+      if(selected && Array.from(asesorSelect.options || []).some(opt => opt.value === selected)){
+        asesorSelect.value = selected;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      const previous = etapaSelect.value;
+      etapaSelect.innerHTML = '<option value="">Todas</option>' + etapasUI.map(step => `<option value="${escapeHtml(step)}">${escapeHtml(step)}</option>`).join('');
+      if(previous && etapasUI.includes(previous)){
+        etapaSelect.value = previous;
+      }
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      const previous = campusSelect.value;
+      const campuses = new Set();
+      dataset.forEach(lead => {
+        const campus = String(lead.campus || '').trim();
+        if(campus) campuses.add(campus);
+      });
+      const sorted = Array.from(campuses).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      campusSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(campus => `<option value="${escapeHtml(campus)}">${escapeHtml(campus)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        campusSelect.value = previous;
+      }
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      const previous = programaSelect.value;
+      const programas = new Set();
+      dataset.forEach(lead => {
+        const programa = String(lead.programa || '').trim();
+        if(programa) programas.add(programa);
+      });
+      const sorted = Array.from(programas).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+      programaSelect.innerHTML = '<option value="">Todos</option>' + sorted.map(programa => `<option value="${escapeHtml(programa)}">${escapeHtml(programa)}</option>`).join('');
+      if(previous && sorted.includes(previous)){
+        programaSelect.value = previous;
+      }
+    }
+    updateAssignmentEstadoOptions();
+  }
+
+  function updateAssignmentEstadoOptions(){
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(!estadoSelect) return;
+    const etapaSelect = el('#assignmentFilterEtapa');
+    const etapa = etapaSelect ? etapaSelect.value : '';
+    let states = [];
+    if(etapa){
+      states = estadosByEtapa[etapa] || [];
+    }else{
+      const base = getAssignmentBase();
+      const dataset = assignmentCache.get(base) || [];
+      const set = new Set();
+      dataset.forEach(lead => {
+        const value = String(lead.estado || '').trim();
+        if(value) set.add(value);
+      });
+      states = Array.from(set).sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+    }
+    const previous = estadoSelect.value;
+    estadoSelect.innerHTML = '<option value="">Todos</option>' + states.map(state => `<option value="${escapeHtml(state)}">${escapeHtml(state)}</option>`).join('');
+    estadoSelect.disabled = states.length === 0;
+    if(previous && states.includes(previous)){
+      estadoSelect.value = previous;
+    }
+  }
+
+  function collectAssignmentFilters(){
+    const filters = {
+      asesor: '',
+      asesorDisplay: '',
+      unassigned: false,
+      etapa: '',
+      estado: '',
+      campus: '',
+      programa: '',
+      start: '',
+      end: '',
+      startDate: null,
+      endDate: null,
+      limit: 0
+    };
+    const asesorSelect = el('#assignmentFilterAsesor');
+    if(asesorSelect){
+      const value = asesorSelect.value;
+      if(value === '__unassigned__'){
+        filters.unassigned = true;
+      }else if(value){
+        filters.asesor = normalizeAssignmentKey(value);
+        filters.asesorDisplay = value;
+      }
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      filters.etapa = etapaSelect.value || '';
+    }
+    const estadoSelect = el('#assignmentFilterEstado');
+    if(estadoSelect){
+      filters.estado = estadoSelect.value || '';
+    }
+    const campusSelect = el('#assignmentFilterCampus');
+    if(campusSelect){
+      filters.campus = campusSelect.value || '';
+    }
+    const programaSelect = el('#assignmentFilterPrograma');
+    if(programaSelect){
+      filters.programa = programaSelect.value || '';
+    }
+    const startInput = el('#assignmentFilterStart');
+    if(startInput && startInput.value){
+      filters.start = startInput.value;
+      const date = parseAssignmentDate(startInput.value);
+      if(date){
+        date.setHours(0, 0, 0, 0);
+        filters.startDate = date;
+      }
+    }
+    const endInput = el('#assignmentFilterEnd');
+    if(endInput && endInput.value){
+      filters.end = endInput.value;
+      const date = parseAssignmentDate(endInput.value);
+      if(date){
+        date.setHours(23, 59, 59, 999);
+        filters.endDate = date;
+      }
+    }
+    const limitInput = el('#assignmentFilterLimit');
+    if(limitInput){
+      const value = Number(limitInput.value);
+      if(Number.isFinite(value) && value > 0){
+        filters.limit = Math.min(500, Math.max(1, Math.floor(value)));
+      }
+    }
+    return filters;
+  }
+
+  function parseBulkTokens(input){
+    return String(input || '')
+      .split(/[\s,;\n]+/)
+      .map(token => token.trim())
+      .filter(Boolean);
+  }
+
+  function collectAssignmentSelection(leads, target){
+    const normalizedTarget = normalizeAssignmentKey(target);
+    const result = {
+      leads: [],
+      unmatched: [],
+      skipped: { alreadyAssigned: 0 },
+      filters: null
+    };
+    if(assignmentMode === 'single'){
+      const input = el('#assignmentSingleInput');
+      const query = input ? input.value : '';
+      if(!query){
+        result.unmatched.push('Sin identificador');
+        return result;
+      }
+      const lead = findAssignmentLeadByToken(leads, query);
+      if(lead){
+        if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+          result.skipped.alreadyAssigned++;
+        }else{
+          result.leads.push(lead);
+        }
+      }else{
+        result.unmatched.push(query.trim());
+      }
+      return result;
+    }
+    if(assignmentMode === 'multiple'){
+      const input = el('#assignmentBulkInput');
+      const raw = input ? input.value : '';
+      const tokens = parseBulkTokens(raw);
+      if(!tokens.length){
+        result.unmatched.push('Sin identificadores');
+        return result;
+      }
+      const seen = new Set();
+      tokens.forEach(token => {
+        const key = normalizePlainKey(token);
+        if(!key || seen.has(key)) return;
+        seen.add(key);
+        const lead = findAssignmentLeadByToken(leads, token);
+        if(lead){
+          if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+            result.skipped.alreadyAssigned++;
+          }else{
+            result.leads.push(lead);
+          }
+        }else{
+          result.unmatched.push(token);
+        }
+      });
+      return result;
+    }
+    const filters = collectAssignmentFilters();
+    result.filters = filters;
+    let filtered = leads.filter(lead => {
+      if(!lead || !lead.id) return false;
+      const asesorKey = normalizeAssignmentKey(lead.asesor);
+      if(filters.unassigned){
+        if(asesorKey) return false;
+      }else if(filters.asesor && asesorKey !== filters.asesor){
+        return false;
+      }
+      if(filters.etapa && etapaLabel(lead.etapa) !== filters.etapa) return false;
+      if(filters.estado && normalizePlainKey(lead.estado) !== normalizePlainKey(filters.estado)) return false;
+      if(filters.campus){
+        const campus = String(lead.campus || '').trim();
+        if(campus !== filters.campus) return false;
+      }
+      if(filters.programa){
+        const programa = String(lead.programa || '').trim();
+        if(programa !== filters.programa) return false;
+      }
+      if(filters.startDate || filters.endDate){
+        const date = parseAssignmentDate(lead.asignacion);
+        if(filters.startDate && (!date || date < filters.startDate)) return false;
+        if(filters.endDate && (!date || date > filters.endDate)) return false;
+      }
+      return true;
+    });
+    if(filters.limit && filters.limit > 0){
+      filtered = filtered.slice(0, filters.limit);
+    }
+    filtered.forEach(lead => {
+      if(normalizeAssignmentKey(lead.asesor) === normalizedTarget){
+        result.skipped.alreadyAssigned++;
+      }else{
+        result.leads.push(lead);
+      }
+    });
+    return result;
+  }
+
+  function updateAssignmentPreviewSummary(selection, target){
+    if(!selection){
+      setAssignmentSummary('');
+      setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+      return;
+    }
+    const count = selection.leads.length;
+    const unmatchedCount = selection.unmatched?.length || 0;
+    const skippedCount = selection.skipped?.alreadyAssigned || 0;
+    const parts = [];
+    if(count){
+      parts.push(`${count} lead${count === 1 ? '' : 's'} listos para reasignar.`);
+    }
+    if(skippedCount){
+      parts.push(`${skippedCount} ya estaban asignados al asesor destino${target ? ` (${target})` : ''}.`);
+    }
+    if(unmatchedCount){
+      const details = selection.unmatched.slice(0, 5).map(value => value.trim()).filter(Boolean);
+      const hint = details.length ? ` (${details.join(', ')})` : '';
+      parts.push(`${unmatchedCount} sin coincidencia${hint}.`);
+    }
+    if(selection.filters && assignmentMode === 'segment'){
+      const filterParts = [];
+      if(selection.filters.asesorDisplay){ filterParts.push(`Asesor actual: ${selection.filters.asesorDisplay}`); }
+      if(selection.filters.unassigned){ filterParts.push('Solo sin asesor'); }
+      if(selection.filters.etapa){ filterParts.push(`Etapa: ${selection.filters.etapa}`); }
+      if(selection.filters.estado){ filterParts.push(`Estado: ${selection.filters.estado}`); }
+      if(selection.filters.campus){ filterParts.push(`Plantel: ${selection.filters.campus}`); }
+      if(selection.filters.programa){ filterParts.push(`Programa: ${selection.filters.programa}`); }
+      if(selection.filters.start){ filterParts.push(`Desde ${selection.filters.start}`); }
+      if(selection.filters.end){ filterParts.push(`Hasta ${selection.filters.end}`); }
+      if(selection.filters.limit){ filterParts.push(`Límite: ${selection.filters.limit}`); }
+      if(filterParts.length){
+        parts.push(`Filtros aplicados: ${filterParts.join(' · ')}.`);
+      }
+    }
+    setAssignmentSummary(parts.join(' '));
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.disabled = count <= 0;
+    }
+    if(count > 0){
+      setAssignmentStatus(`Selecciona “Reasignar leads” para mover ${count} registro${count === 1 ? '' : 's'}.`, 'success');
+    }else if(skippedCount){
+      setAssignmentStatus('Todos los registros encontrados ya están asignados al asesor destino.', 'warning');
+    }else{
+      setAssignmentStatus('No se encontraron leads listos para reasignar con los criterios proporcionados.', 'warning');
+    }
+  }
+
+  function setAssignmentModeUI(mode){
+    const normalized = ['single', 'multiple', 'segment'].includes(mode) ? mode : 'single';
+    assignmentMode = normalized;
+    const containers = document.querySelectorAll('.assignment-mode');
+    containers.forEach(container => {
+      const containerMode = container?.dataset?.mode || '';
+      if(containerMode === normalized){
+        container.classList.remove('hidden');
+      }else{
+        container.classList.add('hidden');
+      }
+    });
+    if(normalized !== 'segment'){
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentPreview(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    const base = getAssignmentBase();
+    if(!base){
+      setAssignmentStatus('Selecciona una base para continuar.', 'warning');
+      return;
+    }
+    const targetInput = el('#assignmentTargetInput');
+    const target = targetInput ? targetInput.value.trim() : '';
+    if(!target){
+      setAssignmentStatus('Ingresa el asesor destino antes de calcular la selección.', 'warning');
+      if(targetInput) targetInput.focus();
+      return;
+    }
+    setAssignmentStatus(`Calculando selección en ${sheetDisplayName(base) || base}…`, 'info');
+    try{
+      const dataset = await ensureAssignmentBaseData(base);
+      populateAssignmentLeadOptions(base);
+      populateAssignmentFilters(base);
+      const selection = collectAssignmentSelection(dataset, target);
+      assignmentPreview = {
+        base,
+        target,
+        mode: assignmentMode,
+        leadIds: selection.leads.map(lead => lead.id).filter(Boolean),
+        unmatched: selection.unmatched || [],
+        skipped: selection.skipped || {},
+        filters: selection.filters ? {
+          asesorDisplay: selection.filters.asesorDisplay || '',
+          unassigned: selection.filters.unassigned,
+          etapa: selection.filters.etapa || '',
+          estado: selection.filters.estado || '',
+          campus: selection.filters.campus || '',
+          programa: selection.filters.programa || '',
+          start: selection.filters.start || '',
+          end: selection.filters.end || '',
+          limit: selection.filters.limit || 0
+        } : null
+      };
+      updateAssignmentPreviewSummary(selection, target);
+    }catch(err){
+      console.error('Error al calcular la selección', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo calcular la selección.'), 'error');
+      setAssignmentSummary('');
+      assignmentPreview = null;
+      const executeBtn = el('#assignmentExecuteBtn');
+      if(executeBtn) executeBtn.disabled = true;
+    }
+  }
+
+  async function handleAssignmentExecute(){
+    if(!canPerform('reassignLeads')){
+      alert('No tienes permisos para reasignar leads.');
+      return;
+    }
+    if(!assignmentPreview || !Array.isArray(assignmentPreview.leadIds)){
+      setAssignmentStatus('Calcula una selección antes de ejecutar la reasignación.', 'warning');
+      return;
+    }
+    if(!assignmentPreview.leadIds.length){
+      setAssignmentStatus('No hay leads listos para reasignar.', 'warning');
+      return;
+    }
+    const confirmMessage = `Se reasignarán ${assignmentPreview.leadIds.length} lead${assignmentPreview.leadIds.length === 1 ? '' : 's'} a ${assignmentPreview.target}. ¿Deseas continuar?`;
+    if(!confirm(confirmMessage)) return;
+    const executeBtn = el('#assignmentExecuteBtn');
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn) previewBtn.disabled = true;
+    if(executeBtn) setButtonBusy(executeBtn, true, 'Reasignando…');
+    setAssignmentStatus('Reasignando leads…', 'info');
+    try{
+      const payload = {
+        action: 'reassignLeads',
+        sheet: assignmentPreview.base,
+        target: assignmentPreview.target,
+        mode: assignmentPreview.mode,
+        leadIds: assignmentPreview.leadIds
+      };
+      if(assignmentPreview.mode === 'segment' && assignmentPreview.filters){
+        payload.filters = assignmentPreview.filters;
+      }
+      const res = await apiFetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: payload
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const response = await res.json().catch(() => ({}));
+      if(response && response.error){
+        throw new Error(response.error);
+      }
+      const reassigned = Number(response?.reassigned) || assignmentPreview.leadIds.length;
+      const skipped = Number(response?.skippedAlreadyAssigned) || 0;
+      const messageParts = [];
+      messageParts.push(`Leads reasignados: ${reassigned}`);
+      if(skipped){
+        messageParts.push(`Sin cambios (ya asignados): ${skipped}`);
+      }
+      if(Array.isArray(response?.unmatched) && response.unmatched.length){
+        messageParts.push(`Sin coincidencia: ${response.unmatched.length}`);
+      }
+      const summaryMessage = messageParts.join(' · ');
+      setAssignmentStatus(response?.message || 'Reasignación completada.', 'success');
+      setAssignmentSummary(summaryMessage);
+      assignmentCache.delete(assignmentPreview.base);
+      if(assignmentPreview.base === state.sheet){
+        await withGlobalLoading('Actualizando leads…', () => loadLeads());
+        populateAsesores();
+        populateCampuses();
+        refresh();
+      }else{
+        await ensureAssignmentBaseData(assignmentPreview.base, { force: true });
+      }
+      populateAssignmentLeadOptions(assignmentPreview.base);
+      populateAssignmentFilters(assignmentPreview.base);
+      assignmentPreview = null;
+      const singleInput = el('#assignmentSingleInput');
+      if(singleInput) singleInput.value = '';
+      const bulkInput = el('#assignmentBulkInput');
+      if(bulkInput) bulkInput.value = '';
+    }catch(err){
+      console.error('Error al reasignar leads', err);
+      setAssignmentStatus(resolveErrorMessage(err, 'No se pudo completar la reasignación.'), 'error');
+    }finally{
+      if(executeBtn) setButtonBusy(executeBtn, false);
+      if(previewBtn) previewBtn.disabled = false;
+    }
+  }
+
+  function bindAssignmentEvents(){
+    setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+    const modeRadios = document.querySelectorAll('input[name="assignmentMode"]');
+    modeRadios.forEach(radio => {
+      radio.addEventListener('change', event => {
+        if(event?.target?.checked){
+          setAssignmentModeUI(event.target.value);
+          setAssignmentStatus('Selecciona el modo de reasignación y completa los datos.', 'info');
+          setAssignmentSummary('');
+          assignmentPreview = null;
+          const executeBtn = el('#assignmentExecuteBtn');
+          if(executeBtn) executeBtn.disabled = true;
+        }
+      });
+    });
+    const baseSelect = el('#assignmentBaseSelect');
+    if(baseSelect){
+      baseSelect.addEventListener('change', async () => {
+        const base = getAssignmentBase();
+        setAssignmentStatus(base ? `Base seleccionada: ${sheetDisplayName(base) || base}.` : 'Selecciona una base para continuar.', 'info');
+        setAssignmentSummary('');
+        assignmentPreview = null;
+        if(base){
+          try{
+            await ensureAssignmentBaseData(base);
+            populateAssignmentLeadOptions(base);
+            populateAssignmentFilters(base);
+          }catch(err){
+            console.error('Error al cargar base para asignación', err);
+            setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+          }
+        }
+      });
+    }
+    const etapaSelect = el('#assignmentFilterEtapa');
+    if(etapaSelect){
+      etapaSelect.addEventListener('change', () => {
+        updateAssignmentEstadoOptions();
+      });
+    }
+    const previewBtn = el('#assignmentPreviewBtn');
+    if(previewBtn){
+      previewBtn.addEventListener('click', handleAssignmentPreview);
+    }
+    const executeBtn = el('#assignmentExecuteBtn');
+    if(executeBtn){
+      executeBtn.addEventListener('click', handleAssignmentExecute);
+    }
+  }
+
   function updatePermissionRoleHint(role){
     const key = String(role || '').trim().toLowerCase();
     const hint = el('#permRoleHint');
@@ -4925,6 +6014,7 @@
       const users = Array.isArray(data?.users) ? data.users.slice() : [];
       permissionUsers = users.sort(comparePermissionUsers);
       updateTeamMemberOptions();
+      populateAssignmentTargetOptions();
       permissionsLoaded = true;
       const previousSelection = preserveSelection ? selectedPermissionUserId : '';
       if(permissionUsers.length){
@@ -5050,6 +6140,7 @@
         }
         permissionUsers.sort(comparePermissionUsers);
         updateTeamMemberOptions();
+        populateAssignmentTargetOptions();
         populatePermissionForm(savedUser, { focus: false, renderList: false });
         renderPermissionList();
         setPermissionStatus(mode === 'create' ? 'Usuario creado correctamente.' : 'Permisos actualizados.', 'success');
@@ -6228,6 +7319,7 @@
     const section = document.getElementById(`view-${view}`);
     if(!section) return;
     const sections = els('.view-section');
+    const wasHidden = section.classList.contains('hidden');
     const reduceMotion = document.documentElement.getAttribute('data-motion') === 'reduced'
       || (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
     if(reduceMotion){
@@ -6270,6 +7362,23 @@
           sec.classList.remove('is-visible', 'is-exiting');
         }
       });
+    }
+    if(wasHidden){
+      const scroller = document.scrollingElement || document.documentElement || document.body;
+      const behavior = reduceMotion ? 'auto' : 'smooth';
+      if(scroller){
+        if(typeof scroller.scrollTo === 'function'){
+          scroller.scrollTo({ top: 0, behavior });
+        }else{
+          scroller.scrollTop = 0;
+          if(document.documentElement){
+            document.documentElement.scrollTop = 0;
+          }
+          if(document.body){
+            document.body.scrollTop = 0;
+          }
+        }
+      }
     }
     syncNavigationState(view);
     updateMobileTopbar(section, sourceLink);
@@ -6325,6 +7434,8 @@
     setDisabled('#diagBtn', canPerform('runDiagnostics'), 'No tienes permisos para ejecutar el diagnóstico.');
     const manageTeamsAllowed = canPerform('manageTeams');
     ['#teamSaveBtn','#teamDeleteBtn','#teamNewBtn','#teamReloadBtn','#teamCloneBtn'].forEach(sel => setDisabled(sel, manageTeamsAllowed, 'No tienes permisos para administrar equipos.'));
+    const reassignAllowed = canPerform('reassignLeads');
+    ['#assignmentPreviewBtn','#assignmentExecuteBtn'].forEach(sel => setDisabled(sel, reassignAllowed, 'No tienes permisos para reasignar leads.'));
     renderTeamTemplateToolbar();
     renderPreferencePresets();
   }
@@ -6561,22 +7672,33 @@
     selects.forEach(select => {
       if(!select) return;
       const previous = select.value;
-      select.innerHTML = sheets
-        .map(s => {
-          const label = sheetDisplayName(s) || s;
-          return `<option value="${s}">${label}</option>`;
-        })
-        .join('');
-      if(state.sheet && sheets.includes(state.sheet)){
-        select.value = state.sheet;
-      }else if(sheets.length){
-        select.value = sheets[0] || '';
-      }else{
-        select.value = '';
+      const isMainSelector = select.id === 'sheetSelect';
+      const optionParts = sheets.map(s => {
+        const label = sheetDisplayName(s) || s;
+        return `<option value="${s}">${label}</option>`;
+      });
+      if(isMainSelector){
+        optionParts.unshift(`<option value="${ALL_SHEETS_VALUE}">Todos</option>`);
       }
-      if(!select.value && previous && sheets.includes(previous)){
-        select.value = previous;
+      select.innerHTML = optionParts.join('');
+      let targetValue = '';
+      if(isMainSelector){
+        if(state.sheet === ALL_SHEETS_VALUE){
+          targetValue = ALL_SHEETS_VALUE;
+        }else if(state.sheet && sheets.includes(state.sheet)){
+          targetValue = state.sheet;
+        }
+      }else if(state.sheet && sheets.includes(state.sheet)){
+        targetValue = state.sheet;
       }
+      if(!targetValue){
+        if(previous && sheets.includes(previous)){
+          targetValue = previous;
+        }else if(sheets.length){
+          targetValue = sheets[0] || '';
+        }
+      }
+      select.value = targetValue;
     });
   }
 
@@ -6604,10 +7726,8 @@
         .map(name => (typeof name === 'string' ? name.trim() : ''))
         .filter(Boolean);
       sheets = parsedSheets.filter(isLeadSheetName);
-      if(state.sheet && !sheets.includes(state.sheet)){
-        state.sheet = sheets[0] || '';
-      }
-      if(!state.sheet){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
     }catch(err){
@@ -6690,6 +7810,42 @@
     };
   }
 
+  function filterLeadsByPlantel(list){
+    const entries = Array.isArray(list) ? list : [];
+    const planteles = getAllowedPlanteles();
+    if(planteles.hasGlobalAccess || !planteles.length){
+      return entries;
+    }
+    const allowedSet = new Set(planteles.map(normalizePlantelKey));
+    return entries.filter(item => {
+      const campus = item?.campus || '';
+      if(!campus) return true;
+      return allowedSet.has(normalizePlantelKey(campus));
+    });
+  }
+
+  async function fetchLeadsForSheet(sheetName){
+    if(!sheetName) return [];
+    try{
+      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(sheetName)}`, { dedupeKey: `getLeads:${sheetName}` });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if(Array.isArray(data)){
+        const mapped = data.map(raw => normalizeLeadRecord(raw, sheetName));
+        return filterLeadsByPlantel(mapped);
+      }
+      if(data && data.error){
+        throw new Error(data.error);
+      }
+    }catch(err){
+      if(!(err && err.code === 'UNAUTHORIZED')){
+        console.error('Error al cargar leads', sheetName, err);
+      }
+      if(err && err.code === 'UNAUTHORIZED') throw err;
+    }
+    return [];
+  }
+
   async function loadLeads(){
     if(!authToken){
       leads = [];
@@ -6700,19 +7856,16 @@
       return;
     }
     try{
-      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(state.sheet)}`, { dedupeKey: `getLeads:${state.sheet}` });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if(Array.isArray(data)){
-        let mapped = data.map(raw => normalizeLeadRecord(raw, state.sheet));
-        const planteles = getAllowedPlanteles();
-        if(!planteles.hasGlobalAccess && planteles.length){
-          const allowedSet = new Set(planteles.map(normalizePlantelKey));
-          mapped = mapped.filter(item => {
-            const campus = item.campus || '';
-            if(!campus) return true;
-            return allowedSet.has(normalizePlantelKey(campus));
-          });
+      if(state.sheet === ALL_SHEETS_VALUE){
+        const sheetNames = sheets.filter(Boolean);
+        const results = [];
+        for(const sheetName of sheetNames){
+          try{
+            const list = await fetchLeadsForSheet(sheetName);
+            results.push(...list);
+          }catch(err){
+            if(err && err.code === 'UNAUTHORIZED') throw err;
+          }
         }
         leads = mapped;
         syncQuickAccessWithLeads();
@@ -6724,6 +7877,8 @@
         leads = [];
         syncQuickAccessWithLeads();
       }
+      state.columnLimits = {};
+      state.columnLimitSignature = '';
     }catch(err){
       if(err && err.code === 'UNAUTHORIZED') return;
       console.error('Error al cargar leads', err);
@@ -9329,26 +10484,44 @@
   // —— Render Tabla ——
   function renderTabla(rows){
     const tbody = el('#tbody');
-
+    if(!tbody) return;
     tbody.innerHTML = '';
+    if(!Array.isArray(rows) || !rows.length){
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = columns.length;
+      td.className = 'table-empty';
+      td.textContent = 'No hay leads que cumplan los filtros seleccionados.';
+      tr.appendChild(td);
+      tbody.appendChild(tr);
+      return;
+    }
+    const formatValue = value => {
+      if(value === undefined || value === null || value === '') return '—';
+      return escapeHtml(String(value));
+    };
     rows.forEach(r => {
+      const etapaLabel = r.etapa || '—';
+      const etapaClass = etapaLabel === 'Inscrito' ? 'ok' : etapaLabel === 'Descartado' ? 'bad' : '';
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${r.id}</td>
-        <td>${r.nombre}</td>
-        <td>${r.matricula}</td>
-        <td>${r.correo}</td>
-        <td>${fmtPhone(r.telefono || r.telefonoNormalizado)}</td>
-        <td>${r.campus}</td>
-        <td>${r.modalidad}</td>
-        <td>${r.programa}</td>
-        <td><span class="tag ${r.etapa==='Inscrito'?'ok':''} ${r.etapa==='Descartado'?'bad':''}">${r.etapa}</span></td>
-        <td>${r.estado}</td>
-        <td>${displayAsesorName(r.asesor)}</td>
-        <td>${r.comentario}</td>
-        <td>${r.asignacion}</td>
+        <td>${formatValue(r.id)}</td>
+        <td>${formatValue(r.nombre)}</td>
+        <td>${formatValue(r.matricula)}</td>
+        <td>${formatValue(r.correo)}</td>
+        <td>${formatValue(fmtPhone(r.telefono || r.telefonoNormalizado))}</td>
+        <td>${formatValue(r.campus)}</td>
+        <td>${formatValue(r.modalidad)}</td>
+        <td>${formatValue(r.programa)}</td>
+        <td><span class="tag ${etapaClass}">${escapeHtml(etapaLabel)}</span></td>
+        <td>${formatValue(r.estado)}</td>
+        <td>${formatValue(displayAsesorName(r.asesor))}</td>
+        <td>${formatValue(r.comentario)}</td>
+        <td>${formatValue(r.asignacion)}</td>
       `;
       tr.addEventListener('click', ()=>openDetails(r));
+      tr.addEventListener('keypress', e=>{ if(e.key === 'Enter'){ openDetails(r); } });
+      tr.tabIndex = 0;
       tbody.appendChild(tr);
     });
   }
@@ -9520,10 +10693,15 @@
         }
         return;
       }
+      const targetSheet = state.sheet === ALL_SHEETS_VALUE ? (r.base || '') : state.sheet;
+      if(!targetSheet){
+        alert('No se pudo determinar la base del lead.');
+        return;
+      }
       const params = new URLSearchParams({
         action: 'updateLead',
         id: r.id,
-        sheet: state.sheet,
+        sheet: targetSheet,
         etapa: etapaBackend(r.etapa),
         estado: r.estado,
         comentario: comentarioActual,
@@ -10594,7 +11772,6 @@
     // Buscar (Ctrl+/)
     const q = el('#q');
     q.addEventListener('input', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
-    el('#searchBtn').addEventListener('click', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
     window.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey) && e.key === '/'){ e.preventDefault(); q.focus(); } })
 
     const appShell = el('#app');
@@ -10722,6 +11899,21 @@
     }
     initPermissionScopeSelectors();
     renderPermissionReference();
+    renderAssignmentRules();
+    populateAssignmentBaseOptions();
+    populateAssignmentTargetOptions();
+    bindAssignmentEvents();
+    setAssignmentModeUI(assignmentMode);
+    const initialAssignmentBase = getAssignmentBase();
+    if(initialAssignmentBase){
+      ensureAssignmentBaseData(initialAssignmentBase).then(() => {
+        populateAssignmentLeadOptions(initialAssignmentBase);
+        populateAssignmentFilters(initialAssignmentBase);
+      }).catch(err => {
+        console.error('Error al preparar la asignación inicial', err);
+        setAssignmentStatus(resolveErrorMessage(err, 'No se pudo cargar la base seleccionada.'), 'error');
+      });
+    }
     renderTeamTemplateToolbar();
     const permRoleSelect = el('#permRole');
     if(permRoleSelect){
@@ -10872,6 +12064,7 @@
     const importSheetSel = el('#importBaseSelect');
 
     const ensureSheetSelection = () => {
+      if(state.sheet === ALL_SHEETS_VALUE) return;
       if(!sheets.includes(state.sheet)){
         state.sheet = sheets[0] || '';
       }
@@ -10881,7 +12074,8 @@
       const select = event?.currentTarget;
       if(!select) return;
       const selected = select.value;
-      if(!selected || !sheets.includes(selected)){
+      const isAll = selected === ALL_SHEETS_VALUE;
+      if(!isAll && (!selected || !sheets.includes(selected))){
         syncSheetSelectorsUI();
         return;
       }
@@ -10978,10 +12172,43 @@
 
     // Filtros por columna
     els('input[data-col]').forEach(inp=>{
+      const colKey = inp.dataset.col;
+      if(colKey && state.colFilters && typeof state.colFilters[colKey] === 'string'){
+        inp.value = state.colFilters[colKey];
+      }
       inp.addEventListener('input', ()=>{
-        state.colFilters[inp.dataset.col] = inp.value.trim().toLowerCase();
+        const key = inp.dataset.col;
+        if(!key) return;
+        state.colFilters[key] = inp.value.trim().toLowerCase();
         state.page=0;
         refresh();
+      });
+    });
+
+    els('[data-view-mode]').forEach(btn => {
+      btn.addEventListener('click', ()=>{
+        setViewMode(btn.dataset.viewMode);
+      });
+    });
+
+    els('th[data-sort]').forEach(th => {
+      th.tabIndex = 0;
+      th.addEventListener('click', ()=>{
+        const key = th.dataset.sort;
+        if(!key) return;
+        if(state.sort && state.sort.key === key){
+          state.sort = { key, dir: state.sort.dir === 1 ? -1 : 1 };
+        }else{
+          state.sort = { key, dir: 1 };
+        }
+        state.page = 0;
+        refresh();
+      });
+      th.addEventListener('keypress', e => {
+        if(e.key === 'Enter' || e.key === ' '){
+          e.preventDefault();
+          th.click();
+        }
       });
     });
 
@@ -11064,14 +12291,21 @@
     const start = hasPagination ? state.page * state.pageSize : 0;
     const end = hasPagination ? start + state.pageSize : rows.length;
     const pageRows = rows.slice(start, end);
-    pruneColumnLimits(pageRows);
-    renderKanban(pageRows, totals);
+    if(state.viewMode === 'table'){
+      renderTabla(pageRows);
+    }else{
+      pruneColumnLimits(pageRows);
+      renderKanban(pageRows, totals);
+    }
+    updateViewModeUI();
+    updateSortIndicators();
   }
 
   async function initializeApp(){
     try{
       await withGlobalLoading('Sincronizando bases…', () => loadSheets());
-      if(!state.sheet || !sheets.includes(state.sheet)){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
       syncSheetSelectorsUI();
@@ -12646,7 +13880,7 @@
   async function requestImport(confirmFlag, override){
     const payload = {
       action: 'importLeads',
-      sheet: override?.sheet || state.sheet,
+      sheet: override?.sheet || (state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet),
       rows: Array.isArray(override?.rows) ? override.rows : importData,
       confirm: confirmFlag === true
     };
@@ -13150,13 +14384,14 @@
   if(execBtn) execBtn.addEventListener('click', async()=>{
     if(!canPerform('importData')){ alert('No tienes permisos para importar datos.'); return; }
     if(!importData.length){ alert('No hay datos verificados'); return; }
-    if(!state.sheet){ alert('Selecciona una base antes de importar.'); return; }
+    const activeSheet = state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet;
+    if(!activeSheet){ alert('Selecciona una base antes de importar.'); return; }
     setButtonBusy(execBtn, true, 'Verificando...');
     try{
-      const result = await requestImport(false);
+      const result = await requestImport(false, { sheet: activeSheet });
       if(result?.requiresConfirmation){
         pendingImportPayload = {
-          sheet: state.sheet,
+          sheet: activeSheet,
           rows: importData.map(row => ({ ...row }))
         };
         pendingImportSummary = {
