@@ -106,6 +106,11 @@ function doPost(e){
     if(auth.error) return auth.response;
     return handleDeleteTeam_(e, body, auth.user);
   }
+  if(action === 'reassignLeads'){
+    const auth = requireAuth_(e, { body, requireActive: true, role: 'admin' });
+    if(auth.error) return auth.response;
+    return handleReassignLeads_(e, body, auth.user);
+  }
   if(action === 'importLeads'){
     const auth = requireAuth_(e, { body, requireActive: true });
     if(auth.error) return auth.response;
@@ -3015,11 +3020,143 @@ function assignAsesoresRoundRobin_(rows, sheetName){
   try{
     Logger.log(`[RoundRobin] Base ${sheetName} · Inicio:${startPointer} · Fin:${pointer} · Asignados:${rows.length}`);
     rows.forEach((row, idx) => {
-      Logger.log(`[RoundRobin] ${sheetName} · #${idx + 1} Lead:${row.leadId || ''} -> ${row.asesorValue}`);
+    Logger.log(`[RoundRobin] ${sheetName} · #${idx + 1} Lead:${row.leadId || ''} -> ${row.asesorValue}`);
     });
   }catch(err){
     // logging failures are ignored
   }
+}
+
+function normalizeAssignmentKey_(value){
+  const text = String(value || '').trim();
+  if(!text) return '';
+  const lower = text.toLowerCase();
+  if(lower.includes('sistema') || lower === 'sin asignar' || lower === 'sinasesor') return '';
+  return text
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+
+function parseAssignmentDate_(value){
+  if(value instanceof Date && !isNaN(value.getTime())) return value;
+  if(typeof value === 'number' && isFinite(value)){
+    const fromNumber = new Date(value);
+    if(!isNaN(fromNumber.getTime())) return fromNumber;
+  }
+  const text = String(value || '').trim();
+  if(!text) return null;
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(text) ? `${text}T00:00:00` : text.replace(' ', 'T');
+  const date = new Date(iso);
+  if(isNaN(date.getTime())) return null;
+  return date;
+}
+
+function rowMatchesAssignmentFilters_(row, map, filters){
+  if(!filters) return true;
+  const asesorValue = getRowValue_(row, map, 'Asesor');
+  const asesorKey = normalizeAssignmentKey_(asesorValue);
+  if(filters.unassigned){
+    if(asesorKey) return false;
+  }else if(filters.asesorKey && asesorKey !== filters.asesorKey){
+    return false;
+  }
+  if(filters.etapa){
+    const etapaValue = etapaLabel(getRowValue_(row, map, 'Etapa') || '');
+    if(etapaValue !== filters.etapa) return false;
+  }
+  if(filters.estadoLower){
+    const estadoValue = String(getRowValue_(row, map, 'Estado') || '').trim().toLowerCase();
+    if(estadoValue !== filters.estadoLower) return false;
+  }
+  if(filters.campus){
+    const campusValue = String(getRowValue_(row, map, 'Plantel') || '').trim();
+    if(campusValue !== filters.campus) return false;
+  }
+  if(filters.programa){
+    const programaValue = String(getRowValue_(row, map, 'Programa') || '').trim();
+    if(programaValue !== filters.programa) return false;
+  }
+  if(filters.startDate || filters.endDate){
+    const asignacionValue = getRowValue_(row, map, 'Asignación') || getRowValue_(row, map, 'Asignacion') || '';
+    const date = parseAssignmentDate_(asignacionValue);
+    if(filters.startDate && (!date || date < filters.startDate)) return false;
+    if(filters.endDate && (!date || date > filters.endDate)) return false;
+  }
+  return true;
+}
+
+function parseAssignmentFilters_(raw){
+  const filters = {
+    asesorKey: '',
+    asesorLabel: '',
+    unassigned: false,
+    etapa: '',
+    estadoLower: '',
+    campus: '',
+    programa: '',
+    start: '',
+    end: '',
+    startDate: null,
+    endDate: null,
+    limit: 0
+  };
+  if(!raw || typeof raw !== 'object') return filters;
+  if(raw.unassigned === true || normalizeBoolean_(raw.unassigned)){
+    filters.unassigned = true;
+  }
+  const asesor = String(raw.asesor || raw.asesorDisplay || '').trim();
+  if(asesor){
+    filters.asesorKey = normalizeAssignmentKey_(asesor);
+    filters.asesorLabel = asesor;
+  }
+  if(raw.etapa){
+    filters.etapa = etapaLabel(String(raw.etapa || ''));
+  }
+  if(raw.estado){
+    filters.estadoLower = String(raw.estado || '').trim().toLowerCase();
+  }
+  if(raw.campus){
+    filters.campus = String(raw.campus || '').trim();
+  }
+  if(raw.programa){
+    filters.programa = String(raw.programa || '').trim();
+  }
+  if(raw.start){
+    filters.start = String(raw.start || '').trim();
+    const date = parseAssignmentDate_(filters.start);
+    if(date){
+      date.setHours(0, 0, 0, 0);
+      filters.startDate = date;
+    }
+  }
+  if(raw.end){
+    filters.end = String(raw.end || '').trim();
+    const date = parseAssignmentDate_(filters.end);
+    if(date){
+      date.setHours(23, 59, 59, 999);
+      filters.endDate = date;
+    }
+  }
+  const limitValue = Number(raw.limit);
+  if(isFinite(limitValue) && limitValue > 0){
+    filters.limit = Math.min(500, Math.max(1, Math.floor(limitValue)));
+  }
+  return filters;
+}
+
+function selectRowsByFilters_(values, map, filters){
+  if(!Array.isArray(values) || !filters) return [];
+  const matches = [];
+  for(let index = 0; index < values.length; index++){
+    const row = values[index];
+    if(!rowMatchesAssignmentFilters_(row, map, filters)) continue;
+    matches.push({ row, rowNumber: index + 2, index });
+    if(filters.limit && matches.length >= filters.limit) break;
+  }
+  return matches;
 }
 
 function isGlobalBaseValue_(value){
@@ -3789,6 +3926,149 @@ function handleSyncActivos_(e, body, user){
     result.message = 'No se aplicaron cambios.';
   }
   return jsonResponse(result, e);
+}
+
+function handleReassignLeads_(e, body, user){
+  const sheetName = String(body?.sheet || body?.base || '').trim();
+  if(!sheetName){
+    return jsonResponse({ ok: false, error: 'Falta la base objetivo.' }, e);
+  }
+  if(user && !userCanAccessSheet_(user, sheetName)){
+    return jsonResponse({ ok: false, error: 'No tienes permiso para reasignar en esta base.' }, e);
+  }
+  const target = String(body?.target || body?.asesor || '').trim();
+  if(!target){
+    return jsonResponse({ ok: false, error: 'Ingresa el asesor destino.' }, e);
+  }
+  const normalizedTarget = normalizeAssignmentKey_(target);
+  if(!normalizedTarget){
+    return jsonResponse({ ok: false, error: 'El asesor destino no es válido.' }, e);
+  }
+  const ss = getSpreadsheet_();
+  if(!ss) return jsonResponse({ ok: false, error: SPREADSHEET_ERROR_MESSAGE }, e);
+  const sheet = ss.getSheetByName(sheetName);
+  if(!sheet){
+    return jsonResponse({ ok: false, error: 'La hoja "' + sheetName + '" no existe.' }, e);
+  }
+  const { headers, map } = getColumnMap_(sheet);
+  const totalCols = sheet.getLastColumn();
+  const dataRowCount = Math.max(0, sheet.getLastRow() - 1);
+  if(dataRowCount <= 0){
+    return jsonResponse({ ok: false, error: 'No hay leads registrados en la base seleccionada.' }, e);
+  }
+  const values = sheet.getRange(2, 1, dataRowCount, headers.length).getValues();
+  const indexes = buildSheetLeadIndex_(values, map);
+  const leadIds = parseList_(body?.leadIds);
+  const filters = parseAssignmentFilters_(body?.filters || {});
+  const mode = String(body?.mode || '').trim().toLowerCase();
+  const selected = [];
+  const unmatched = [];
+  const seenRows = new Set();
+
+  if(leadIds.length){
+    leadIds.forEach(token => {
+      const idValue = String(token || '').trim();
+      if(!idValue) return;
+      const entry = { id: idValue };
+      const match = findLeadReferenceForSync_(entry, indexes);
+      if(match.error || !match.ref){
+        unmatched.push(idValue);
+        return;
+      }
+      const ref = match.ref;
+      if(seenRows.has(ref.rowNumber)) return;
+      if(filters && (filters.unassigned || filters.asesorKey || filters.etapa || filters.estadoLower || filters.campus || filters.programa || filters.startDate || filters.endDate)){
+        if(!rowMatchesAssignmentFilters_(ref.row, map, filters)) return;
+      }
+      seenRows.add(ref.rowNumber);
+      selected.push(ref);
+    });
+  }else{
+    const filtered = selectRowsByFilters_(values, map, filters);
+    filtered.forEach(ref => {
+      if(seenRows.has(ref.rowNumber)) return;
+      seenRows.add(ref.rowNumber);
+      selected.push(ref);
+    });
+  }
+
+  if(!selected.length){
+    const response = {
+      ok: true,
+      reassigned: 0,
+      skippedAlreadyAssigned: 0,
+      unmatched
+    };
+    response.message = 'No se aplicaron cambios.';
+    if(filters){
+      response.appliedFilters = {
+        asesor: filters.asesorLabel || '',
+        unassigned: filters.unassigned,
+        etapa: filters.etapa || '',
+        estado: filters.estadoLower || '',
+        campus: filters.campus || '',
+        programa: filters.programa || '',
+        start: filters.start || '',
+        end: filters.end || '',
+        limit: filters.limit || 0
+      };
+    }
+    if(!leadIds.length && !filters.limit && !filters.unassigned && !filters.asesorKey && !filters.etapa && !filters.estadoLower && !filters.campus && !filters.programa && !filters.start && !filters.end){
+      response.error = 'No se encontraron leads que coincidan con la selección proporcionada.';
+    }
+    return jsonResponse(response, e);
+  }
+
+  const timestamp = formatDateTime_(new Date());
+  let reassigned = 0;
+  let alreadyAssigned = 0;
+  const pending = new Map();
+
+  selected.forEach(ref => {
+    const currentAsesor = getRowValue_(ref.row, map, 'Asesor');
+    if(normalizeAssignmentKey_(currentAsesor) === normalizedTarget){
+      alreadyAssigned++;
+      return;
+    }
+    const rowCopy = ref.row.slice();
+    setRowValue_(rowCopy, map, 'Asesor', target);
+    setRowValue_(rowCopy, map, 'Asignación', timestamp);
+    setRowValue_(rowCopy, map, 'Asignacion', timestamp);
+    setRowValue_(rowCopy, map, 'ActualizadoEl', timestamp);
+    pending.set(ref.rowNumber, rowCopy);
+    reassigned++;
+  });
+
+  pending.forEach((rowValues, rowNumber) => {
+    sheet.getRange(rowNumber, 1, 1, totalCols).setValues([rowValues]);
+  });
+
+  const response = {
+    ok: true,
+    reassigned,
+    skippedAlreadyAssigned: alreadyAssigned,
+    unmatched,
+    mode,
+    base: sheetName,
+    target
+  };
+  if(filters){
+    response.appliedFilters = {
+      asesor: filters.asesorLabel || '',
+      unassigned: filters.unassigned,
+      etapa: filters.etapa || '',
+      estado: filters.estadoLower || '',
+      campus: filters.campus || '',
+      programa: filters.programa || '',
+      start: filters.start || '',
+      end: filters.end || '',
+      limit: filters.limit || 0
+    };
+  }
+  response.message = reassigned
+    ? `Leads reasignados: ${reassigned}${alreadyAssigned ? ` · Sin cambios: ${alreadyAssigned}` : ''}`
+    : 'No se aplicaron cambios.';
+  return jsonResponse(response, e);
 }
 
 function handleImportLeads_(e, body, user){
