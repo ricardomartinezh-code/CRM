@@ -674,7 +674,11 @@
       background:#fff;
     }
     .panel-filters{ flex-wrap:wrap; align-items:stretch; gap:var(--space-sm); }
+    .panel-filters label{ display:flex; flex-direction:column; gap:6px; font-size:12px; text-transform:uppercase; letter-spacing:.45px; color:var(--muted); font-weight:700; }
     .panel-filters select{ min-width:160px; padding:10px 12px; }
+    .panel-filters label input[type="number"]{ min-width:120px; padding:10px 12px; border-radius:var(--radius); border:1px solid rgba(255,255,255,.12); background:var(--card-2); color:var(--text); font:600 14px/1.25 'Manrope', var(--font); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .panel-filters label input[type="number"]:focus{ outline:none; border-color:var(--accent); box-shadow: var(--ring); }
+    html[data-theme="light"] .panel-filters label input[type="number"]{ border-color: rgba(15,23,42,0.12); background:#f8fafc; color:#0f172a; box-shadow: inset 0 1px 0 rgba(255,255,255,0.75); }
     .panel-section{ display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space) 0; border-top:1px solid rgba(255,255,255,.08); }
     .panel-section:first-of-type{ border-top:none; padding-top:0; }
     .panel-section h3{ margin:0; font-size:15px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); display:flex; align-items:center; gap:var(--space-sm); }
@@ -1265,6 +1269,23 @@
     .modal-header h2{ margin:0; font-size:1.25rem; }
     .modal-message{ margin:6px 0 0; color:var(--muted); }
     .modal-body{ padding: var(--space); overflow:auto; display:flex; flex-direction:column; gap:var(--space); }
+    .calendar-form{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .calendar-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(160px,1fr)); gap:var(--space-sm); }
+    .calendar-field{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .calendar-field input,
+    .calendar-field select{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); padding:10px 12px; background:var(--card-2); color:var(--text); font:600 14px/1.35 'Manrope', var(--font); box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .calendar-field input:focus,
+    .calendar-field select:focus{ outline:none; border-color:rgba(var(--panel-base-rgb),0.45); box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    .calendar-notes{ display:flex; flex-direction:column; gap:6px; font-size:12px; font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); }
+    .calendar-notes textarea{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); padding:12px 14px; background:var(--card-2); color:var(--text); font:600 14px/1.4 'Manrope', var(--font); min-height:96px; resize:vertical; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+    .calendar-notes textarea:focus{ outline:none; border-color:rgba(var(--panel-base-rgb),0.45); box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    html[data-theme="light"] .calendar-field input,
+    html[data-theme="light"] .calendar-field select,
+    html[data-theme="light"] .calendar-notes textarea{ background:#f8fafc; border-color:rgba(148,163,184,0.35); color:#0f172a; box-shadow: inset 0 1px 0 rgba(255,255,255,0.75); }
+    .schedule-summary{ border-radius:12px; border:1px solid rgba(148,163,184,0.35); background:rgba(148,163,184,0.12); padding:12px 14px; display:flex; flex-direction:column; gap:6px; font-size:13px; color:var(--muted); }
+    .schedule-summary__item strong{ color:var(--text); font-weight:700; }
+    html[data-theme="light"] .schedule-summary{ background:rgba(148,163,184,0.2); border-color:rgba(148,163,184,0.45); color:#475569; }
+    html[data-theme="light"] .schedule-summary__item strong{ color:#0f172a; }
     .modal-section{ display:flex; flex-direction:column; gap:var(--space-sm); }
     .modal-validations{ display:grid; gap:var(--space); grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
     .modal-summary-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
@@ -1947,7 +1968,8 @@
       background: rgba(254,226,226,0.92);
       color:#b91c1c;
     }
-    .drawer-quick__actions{ display:flex; justify-content:flex-end; }
+    .drawer-quick__actions{ display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap; }
+    .drawer-quick__actions .btn{ flex:1 1 160px; justify-content:center; }
 
     /* Responsive */
     @media (max-width: 1200px){ .panel-overlay{ display:none } }
@@ -2563,33 +2585,66 @@
       </div>
     </div>
   </div>
-  <div class="modal-overlay" id="whatsappTemplateModal" role="dialog" aria-modal="true" aria-hidden="true">
-    <div class="modal-card template-modal" role="document">
-      <button type="button" class="modal-close" id="waModalClose" aria-label="Cerrar selección de plantillas">
+  <div class="modal-overlay" id="calendarModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card" role="document">
+      <button type="button" class="modal-close" id="calendarModalClose" aria-label="Cerrar agendador">
         <i class="bi bi-x-lg" aria-hidden="true"></i>
       </button>
       <div class="modal-header">
-        <h2>Enviar por WhatsApp</h2>
-        <p>Elige una plantilla, personaliza el mensaje y envíalo sin salir de la plataforma.</p>
+        <h2>Agendar seguimiento</h2>
+        <p class="modal-message" id="calendarLeadSummary"></p>
       </div>
       <div class="modal-body">
-        <div class="template-modal__grid">
-          <section class="template-modal__section">
-            <h3>Plantillas guardadas</h3>
-            <ul class="template-list" id="waTemplateList" role="list"></ul>
-            <button type="button" class="btn outline" id="waCreateTemplate"><i class="bi bi-plus-lg"></i> Nueva plantilla</button>
-          </section>
-          <section class="template-modal__section">
-            <label class="template-field">
-              <span>Mensaje a enviar</span>
-              <textarea id="waMessage" rows="6"></textarea>
+        <form id="calendarForm" class="calendar-form">
+          <div class="calendar-grid">
+            <label class="calendar-field">Fecha
+              <input type="date" id="calendarDate" required />
             </label>
-            <p class="template-hint">Usa <code>{{nombre}}</code> en tus plantillas para insertar automáticamente el nombre del lead.</p>
-            <div class="template-modal__actions">
-              <button type="button" class="btn" id="waCancelBtn">Cancelar</button>
-              <button type="button" class="btn primary" id="waSendBtn"><i class="bi bi-whatsapp"></i> Enviar por WhatsApp</button>
-            </div>
-          </section>
+            <label class="calendar-field">Hora
+              <input type="time" id="calendarTime" required />
+            </label>
+            <label class="calendar-field">Duración
+              <select id="calendarDuration">
+                <option value="15">15 minutos</option>
+                <option value="30" selected>30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">60 minutos</option>
+              </select>
+            </label>
+          </div>
+          <label class="calendar-notes">Notas para el evento
+            <textarea id="calendarNotes" rows="3" placeholder="Agrega detalles relevantes del seguimiento"></textarea>
+          </label>
+        </form>
+        <div class="schedule-summary" id="calendarSummary" aria-live="polite"></div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-actions">
+          <button type="button" class="btn" id="calendarCancelBtn">Cancelar</button>
+          <button type="submit" class="btn primary" form="calendarForm">Crear en Google Calendar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="app hidden" id="app">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Navegación principal" aria-hidden="false">
+      <button class="sidebar-close" type="button" id="sidebarClose" aria-label="Cerrar menú lateral" title="Cerrar menú lateral">×</button>
+      <nav class="nav" role="navigation">
+        <div class="brand" data-expand-label="Expandir menú lateral">
+          <img
+            src="./icon-unidep180.png"
+            alt=""
+            class="brand-logo"
+            width="44"
+            height="44"
+            loading="lazy"
+            id="sidebarBrandImg"
+            data-fallback-src="./icon-unidep180.png"
+            data-favicon-src="./icon-unidep180.png"
+            data-logo-alt="ReLead EDU"
+          />
+          <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
         </div>
         <form class="template-form hidden" id="waTemplateForm">
           <input type="hidden" id="waTemplateId" />
@@ -2967,6 +3022,7 @@
             </div>
             <div class="panel-quick__actions">
               <button class="btn primary" id="updateBtn">Guardar actualización</button>
+              <button class="btn outline" type="button" id="scheduleBtn"><i class="bi bi-calendar-event"></i> Agendar seguimiento</button>
               <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
                 <a class="btn contact-btn contact-call" data-contact="call" href="#"><i class="bi bi-telephone"></i> Llamar</a>
                 <a class="btn contact-btn contact-wa" data-contact="whatsapp" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
@@ -3034,6 +3090,10 @@
               <label>
                 Base de destino
                 <select id="importBaseSelect"></select>
+              </label>
+              <label>
+                Lote (01-99)
+                <input type="number" id="importLotInput" min="1" max="99" placeholder="01" inputmode="numeric" pattern="[0-9]*" />
               </label>
               <input type="file" id="importFile" accept=".csv,.xlsx" class="file-input">
             </div>
@@ -3929,6 +3989,7 @@
   let teamsLoaded = false;
   let teamsLoading = false;
   let selectedTeamId = '';
+  let activeScheduleLead = null;
   let customTagStore = {};
   let storedReassignmentDecisions = {};
   let autoReassignmentPlan = { stats: null, suggestions: [] };
@@ -3950,6 +4011,16 @@
   const CONTACT_CHANNEL_LABELS = { call: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo' };
   const DAILY_SHORTCUT_LIMIT = 3;
   const LEAD_PRIORITY_THRESHOLDS = { high: 6, medium: 3 };
+  const calendarModal = el('#calendarModal');
+  const calendarModalClose = el('#calendarModalClose');
+  const calendarForm = el('#calendarForm');
+  const calendarDateInput = el('#calendarDate');
+  const calendarTimeInput = el('#calendarTime');
+  const calendarDurationInput = el('#calendarDuration');
+  const calendarNotesInput = el('#calendarNotes');
+  const calendarSummary = el('#calendarSummary');
+  const calendarLeadSummary = el('#calendarLeadSummary');
+  const calendarCancelBtn = el('#calendarCancelBtn');
   const CONTACT_TIMESTAMP_FORMAT = (() => {
     try{
       return new Intl.DateTimeFormat('es-MX', { dateStyle: 'short', timeStyle: 'short' });
@@ -11391,6 +11462,11 @@
       feedbackMessageEl: el('#panelFeedbackMessage')
     });
 
+    const scheduleBtn = el('#scheduleBtn');
+    if(scheduleBtn){
+      scheduleBtn.onclick = () => { openScheduleModal(r); };
+    }
+
     const phone = parsePhone(basePhone);
     const phoneDigits = phone.intl || phone.digits;
     const waDigits = phone.wa || phoneDigits;
@@ -11574,6 +11650,7 @@
             <p id="drawerFeedbackMessage"></p>
           </div>
           <div class="drawer-quick__actions">
+            <button class="btn outline" type="button" id="drawerScheduleBtn"><i class="bi bi-calendar-event"></i> Agendar seguimiento</button>
             <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
           </div>
           <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
@@ -11591,6 +11668,22 @@
         feedbackTitleEl: el('#drawerFeedbackTitle'),
         feedbackMessageEl: el('#drawerFeedbackMessage')
       });
+      const drawerScheduleBtn = document.getElementById('drawerScheduleBtn');
+      if(drawerScheduleBtn){
+        drawerScheduleBtn.onclick = () => { openScheduleModal(r); };
+      }
+      const drawerCall = document.getElementById('drawerActCall');
+      if(drawerCall){
+        drawerCall.onclick = () => { maybeRegisterContactNote('call'); };
+      }
+      const drawerWa = document.getElementById('drawerActWa');
+      if(drawerWa){
+        drawerWa.onclick = () => { maybeRegisterContactNote('whatsapp'); };
+      }
+      const drawerMail = document.getElementById('drawerActMail');
+      if(drawerMail){
+        drawerMail.onclick = () => { maybeRegisterContactNote('email'); };
+      }
     }
     applyContactScripts();
     syncSaveAvailability();
@@ -11648,606 +11741,164 @@
     return phone.raw || '';
   };
 
-  function updateLeadDetailAssignmentDisplay(lead){
-    const labelEl = el('#lab-asesor');
-    const valueEl = el('#d-asesor');
-    const value = displayAsesorName(lead && lead.asesor);
-    const hasValue = Boolean(value);
-    if(labelEl){
-      labelEl.classList.toggle('hidden', !hasValue);
-    }
-    if(valueEl){
-      valueEl.classList.toggle('hidden', !hasValue);
-      valueEl.textContent = hasValue ? value : '—';
-    }
-  }
-
-  function renderLeadTagBadges(lead){
-    const tags = getLeadTagsForLead(lead ? lead.id : '');
-    if(!tags.length) return '';
-    return tags
-      .map(tag => `<span class="tag tag-custom" style="--tag-color:${sanitizeTagColor(tag.color)}">${escapeHtml(tag.label)}</span>`)
-      .join('');
-  }
-
-  function updateLeadTagsSection(lead){
-    leadTagContext.leadId = lead && lead.id ? String(lead.id) : '';
-    leadTagContext.editingIndex = -1;
-    const addBtn = el('#leadTagAdd');
-    if(addBtn){
-      addBtn.disabled = !leadTagContext.leadId;
-    }
-    hideLeadTagForm();
-    setLeadTagFeedback('');
-    renderLeadTagList(lead);
-  }
-
-  function renderLeadTagList(lead){
-    const listEl = el('#leadTagList');
-    if(!listEl) return;
-    const tags = getLeadTagsForLead(lead ? lead.id : leadTagContext.leadId);
-    if(!tags.length){
-      listEl.classList.add('is-empty');
-      listEl.innerHTML = '<span>Sin etiquetas personalizadas.</span>';
-      return;
-    }
-    listEl.classList.remove('is-empty');
-    listEl.innerHTML = tags
-      .map((tag, index) => {
-        const color = sanitizeTagColor(tag.color);
-        const label = escapeHtml(tag.label);
-        return `<span class="panel-tags__chip" data-tag-index="${index}" style="--tag-color:${color}"><span class="panel-tags__dot" aria-hidden="true"></span><span class="panel-tags__label">${label}</span><button type="button" class="panel-tags__remove" data-remove-index="${index}" aria-label="Eliminar etiqueta ${label}"><i class="bi bi-x"></i></button></span>`;
-      })
-      .join('');
-  }
-
-  function setLeadTagFeedback(message){
-    const feedback = el('#leadTagFeedback');
-    if(!feedback) return;
-    if(message){
-      feedback.textContent = message;
-      feedback.classList.remove('hidden');
-    }else{
-      feedback.textContent = '';
-      feedback.classList.add('hidden');
-    }
-  }
-
-  function startLeadTagCreation(){
-    if(!leadTagContext.leadId) return;
-    leadTagContext.editingIndex = -1;
-    const form = el('#leadTagForm');
-    const nameInput = el('#leadTagName');
-    const colorInput = el('#leadTagColor');
-    if(form) form.classList.remove('hidden');
-    if(colorInput) colorInput.value = DEFAULT_TAG_COLOR;
-    if(nameInput){
-      nameInput.value = '';
-      nameInput.focus();
-    }
-    setLeadTagFeedback('');
-  }
-
-  function startLeadTagEdit(index){
-    if(!leadTagContext.leadId) return;
-    const tags = getLeadTagsForLead(leadTagContext.leadId);
-    if(index < 0 || index >= tags.length) return;
-    leadTagContext.editingIndex = index;
-    const tag = tags[index];
-    const form = el('#leadTagForm');
-    const nameInput = el('#leadTagName');
-    const colorInput = el('#leadTagColor');
-    if(form) form.classList.remove('hidden');
-    if(nameInput){
-      nameInput.value = tag.label;
-      nameInput.focus();
-      nameInput.select();
-    }
-    if(colorInput) colorInput.value = sanitizeTagColor(tag.color);
-    setLeadTagFeedback('');
-  }
-
-  function hideLeadTagForm(){
-    const form = el('#leadTagForm');
-    if(form) form.classList.add('hidden');
-    leadTagContext.editingIndex = -1;
-  }
-
-  function handleLeadTagSubmit(event){
-    event.preventDefault();
-    if(!leadTagContext.leadId) return;
-    const nameInput = el('#leadTagName');
-    const colorInput = el('#leadTagColor');
-    const label = nameInput ? nameInput.value.trim() : '';
-    if(!label){
-      setLeadTagFeedback('Escribe un nombre para la etiqueta.');
-      if(nameInput) nameInput.focus();
-      return;
-    }
-    const color = colorInput ? sanitizeTagColor(colorInput.value) : DEFAULT_TAG_COLOR;
-    const tags = getLeadTagsForLead(leadTagContext.leadId);
-    if(leadTagContext.editingIndex >= 0 && leadTagContext.editingIndex < tags.length){
-      tags[leadTagContext.editingIndex] = { ...tags[leadTagContext.editingIndex], label, color };
-    }else{
-      tags.push({ id: generateTagId(), label, color });
-    }
-    saveLeadTagsForLead(leadTagContext.leadId, tags);
-    hideLeadTagForm();
-    setLeadTagFeedback('Etiqueta guardada.');
-    renderLeadTagList(detailLeadContext);
-    refresh();
-  }
-
-  function handleLeadTagListClick(event){
-    const removeBtn = event.target.closest('[data-remove-index]');
-    if(removeBtn){
-      const index = Number(removeBtn.getAttribute('data-remove-index'));
-      if(Number.isFinite(index) && leadTagContext.leadId){
-        const tags = getLeadTagsForLead(leadTagContext.leadId);
-        if(index >= 0 && index < tags.length){
-          tags.splice(index, 1);
-          saveLeadTagsForLead(leadTagContext.leadId, tags);
-          renderLeadTagList(detailLeadContext);
-          setLeadTagFeedback('Etiqueta eliminada.');
-          refresh();
-        }
-      }
-      return;
-    }
-    const chip = event.target.closest('[data-tag-index]');
-    if(chip){
-      const index = Number(chip.getAttribute('data-tag-index'));
-      if(Number.isFinite(index)){
-        startLeadTagEdit(index);
-      }
-    }
-  }
-
-  function leadReassignmentScore(lead){
-    const stage = etapaGroup(lead && lead.etapa);
-    switch(stage){
-      case 'Nuevo': return 3;
-      case 'No Contactado': return 2;
-      case 'Contactado': return 1;
-      case 'Inscrito': return -1;
-      case 'Descartado': return -2;
-      default: return 0;
-    }
-  }
-
-  function isLeadEligibleForReassignment(lead){
-    if(!lead || !lead.id) return false;
-    const stage = etapaGroup(lead.etapa);
-    if(stage === 'Inscrito' || stage === 'Descartado') return false;
-    return true;
-  }
-
-  function buildAutoReassignmentPlan(rows){
-    const plan = {
-      stats: {
-        totalLeads: 0,
-        advisorCount: 0,
-        average: 0,
-        overloaded: [],
-        underloaded: [],
-        unassigned: 0
-      },
-      suggestions: []
-    };
-    const advisorMap = new Map();
-    const dataset = Array.isArray(rows) ? rows : [];
-    dataset.forEach(lead => {
-      if(!lead || !lead.id) return;
-      const key = normalizeAsesorName(lead.asesor);
-      if(!key){
-        plan.stats.unassigned++;
-        return;
-      }
-      if(!advisorMap.has(key)){
-        advisorMap.set(key, { key, name: displayAsesorName(lead.asesor), total: 0, leads: [] });
-      }
-      const entry = advisorMap.get(key);
-      entry.total++;
-      entry.leads.push(lead);
-    });
-    const entries = Array.from(advisorMap.values());
-    plan.stats.totalLeads = entries.reduce((sum, entry) => sum + entry.total, 0);
-    plan.stats.advisorCount = entries.length;
-    if(!entries.length || !plan.stats.totalLeads){
-      return plan;
-    }
-    const average = plan.stats.totalLeads / entries.length;
-    plan.stats.average = average;
-    const overloaded = entries.filter(entry => entry.total - average >= AUTO_REASSIGN_DIFFERENCE_THRESHOLD);
-    const underloaded = entries.filter(entry => average - entry.total >= AUTO_REASSIGN_DIFFERENCE_THRESHOLD);
-    plan.stats.overloaded = overloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total })).sort((a,b) => b.total - a.total);
-    plan.stats.underloaded = underloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total })).sort((a,b) => a.total - b.total);
-    if(!overloaded.length || !underloaded.length){
-      return plan;
-    }
-    const overQueue = overloaded
-      .map(entry => ({
-        key: entry.key,
-        name: entry.name,
-        total: entry.total,
-        leads: entries.find(e => e.key === entry.key)?.leads
-          .filter(isLeadEligibleForReassignment)
-          .sort((a, b) => leadReassignmentScore(b) - leadReassignmentScore(a)) || []
-      }))
-      .filter(entry => entry.leads.length);
-    const underQueue = underloaded.map(entry => ({ key: entry.key, name: entry.name, total: entry.total }));
-    const suggestions = [];
-    while(overQueue.length && underQueue.length){
-      overQueue.sort((a, b) => (b.total - average) - (a.total - average));
-      underQueue.sort((a, b) => (a.total - average) - (b.total - average));
-      const source = overQueue[0];
-      const target = underQueue[0];
-      if(!source || !target){
-        break;
-      }
-      let lead = null;
-      while(source.leads.length){
-        const candidate = source.leads.shift();
-        const decision = getStoredReassignmentDecision(candidate.id);
-        if(decision && decision.status === 'dismissed'){
-          continue;
-        }
-        if(decision && decision.status === 'applied'){
-          continue;
-        }
-        lead = candidate;
-        break;
-      }
-      if(!lead){
-        overQueue.shift();
-        continue;
-      }
-      if(source.key === target.key){
-        continue;
-      }
-      suggestions.push({
-        leadId: lead.id,
-        lead,
-        fromKey: source.key,
-        fromName: source.name,
-        toKey: target.key,
-        toName: target.name
-      });
-      source.total -= 1;
-      target.total += 1;
-      if(source.total - average < AUTO_REASSIGN_DIFFERENCE_THRESHOLD || !source.leads.length){
-        overQueue.shift();
-      }
-      if(average - target.total < AUTO_REASSIGN_DIFFERENCE_THRESHOLD){
-        underQueue.shift();
-      }
-    }
-    plan.suggestions = suggestions;
-    return plan;
-  }
-
-  function applyAutoReassignmentAnnotations(){
-    const suggestionMap = new Map();
-    (autoReassignmentPlan?.suggestions || []).forEach(item => {
-      if(item && item.leadId){
-        suggestionMap.set(String(item.leadId), item);
-      }
-    });
-    leads.forEach(lead => {
-      const id = String(lead.id || '');
-      if(!id) return;
-      const decision = getStoredReassignmentDecision(id);
-      if(decision && decision.status === 'applied' && decision.toName){
-        if(!lead._originalAsesor) lead._originalAsesor = lead._originalAsesor || lead.asesor;
-        lead.asesor = decision.toName;
-        lead.autoReassign = {
-          status: 'applied',
-          toName: decision.toName,
-          toKey: decision.toKey || normalizeAsesorName(decision.toName),
-          fromName: decision.fromName || lead._originalAsesor || '',
-          fromKey: decision.fromKey || normalizeAsesorName(decision.fromName || lead._originalAsesor || ''),
-          appliedAt: decision.updatedAt || Date.now()
-        };
-        return;
-      }
-      if(decision && decision.status === 'dismissed'){
-        delete lead.autoReassign;
-        return;
-      }
-      const suggestion = suggestionMap.get(id);
-      if(suggestion){
-        lead.autoReassign = {
-          status: 'pending',
-          toName: suggestion.toName,
-          toKey: suggestion.toKey,
-          fromName: suggestion.fromName,
-          fromKey: suggestion.fromKey
-        };
-      }else{
-        delete lead.autoReassign;
-      }
-    });
-  }
-
-  function formatAutoReassignSummary(stats, suggestionCount){
-    if(!stats) return 'Las cargas por asesor están equilibradas.';
-    const advisors = stats.advisorCount || 0;
-    if(!advisors) return 'Aún no hay asesores con leads asignados.';
-    const avg = stats.average || 0;
-    const averageLabel = `${avg.toFixed(1)} leads por asesor (${advisors} asesores analizados)`;
-    const suggestionLabel = suggestionCount
-      ? `${suggestionCount} reasignación${suggestionCount === 1 ? '' : 'es'} sugerida${suggestionCount === 1 ? '' : 's'}`
-      : 'Sin reasignaciones pendientes';
-    const unassigned = stats.unassigned || 0;
-    const unassignedLabel = unassigned ? ` · ${unassigned} lead${unassigned === 1 ? '' : 's'} sin asignar` : '';
-    return `${averageLabel} · ${suggestionLabel}${unassignedLabel}`;
-  }
-
-  function renderAutoReassignmentPanel(_filteredRows){
-    const section = el('#autoReassignSection');
-    if(!section) return;
-    const summaryEl = el('#autoReassignSummary');
-    const listEl = el('#autoReassignList');
-    const suggestions = autoReassignmentPlan?.suggestions || [];
-    const pending = suggestions.slice();
-    if(!pending.length){
-      const hasOverload = (autoReassignmentPlan?.stats?.overloaded || []).length > 0;
-      if(summaryEl){
-        summaryEl.textContent = hasOverload
-          ? formatAutoReassignSummary(autoReassignmentPlan.stats, 0)
-          : 'Las cargas actuales por asesor están equilibradas.';
-      }
-      if(listEl){
-        listEl.innerHTML = hasOverload
-          ? '<li class="auto-reassign-item"><div><strong>Seguimiento equilibrado</strong><div class="auto-reassign-meta">Las sugerencias anteriores se han aplicado o descartado.</div></div></li>'
-          : '';
-      }
-      section.classList.toggle('hidden', !hasOverload);
-      section.setAttribute('aria-hidden', hasOverload ? 'false' : 'true');
-      return;
-    }
-    section.classList.remove('hidden');
-    section.setAttribute('aria-hidden', 'false');
-    if(summaryEl){
-      summaryEl.textContent = formatAutoReassignSummary(autoReassignmentPlan?.stats, pending.length);
-    }
-    if(listEl){
-      listEl.innerHTML = pending
-        .map(item => {
-          const lead = item.lead;
-          const stage = etapaGroup(lead && lead.etapa);
-          const name = escapeHtml(lead && lead.nombre ? lead.nombre : (lead && lead.id ? String(lead.id) : 'Lead sin nombre'));
-          const from = escapeHtml(item.fromName || 'Sin asesor');
-          const to = escapeHtml(item.toName || 'Sin asignar');
-          const stageLabel = escapeHtml(stage || '—');
-          const leadId = escapeHtml(String(item.leadId || ''));
-          return `<li class="auto-reassign-item" data-lead-id="${leadId}"><div><strong>${name}</strong><div class="auto-reassign-meta"><span><i class="bi bi-arrow-left-right"></i> ${from} → ${to}</span><span><i class="bi bi-kanban"></i> Etapa: ${stageLabel}</span></div></div><div class="auto-reassign-actions"><button class="btn outline" type="button" data-lead-open="${leadId}"><i class="bi bi-search"></i> Revisar lead</button></div></li>`;
-        })
-        .join('');
-    }
-  }
-
-  function renderAutoReassignBadge(lead){
-    if(!lead || !lead.autoReassign) return '';
-    const info = lead.autoReassign;
-    if(info.status === 'pending'){
-      return `<div class="auto-reassign-badge" data-status="pending"><i class="bi bi-arrow-left-right"></i> Reasignar a ${escapeHtml(info.toName || 'otro asesor')}</div>`;
-    }
-    if(info.status === 'applied'){
-      return `<div class="auto-reassign-badge" data-status="applied"><i class="bi bi-check2-circle"></i> Reasignado a ${escapeHtml(info.toName || 'nuevo asesor')}</div>`;
-    }
-    return '';
-  }
-
-  function updateAutoReassignDetail(lead){
-    const container = el('#autoReassignDetail');
-    if(!container){
-      return;
-    }
-    const titleEl = el('#autoReassignDetailTitle');
-    const messageEl = el('#autoReassignDetailMessage');
-    const applyBtn = el('#autoReassignApply');
-    const keepBtn = el('#autoReassignKeep');
-    if(!lead || !lead.autoReassign){
-      container.classList.add('hidden');
-      container.removeAttribute('data-tone');
-      if(applyBtn) applyBtn.disabled = true;
-      return;
-    }
-    const info = lead.autoReassign;
-    container.classList.remove('hidden');
-    container.removeAttribute('data-tone');
-    if(info.status === 'pending'){
-      if(titleEl) titleEl.textContent = 'Reasignación sugerida';
-      if(messageEl) messageEl.textContent = `Se recomienda mover este lead de ${info.fromName || 'tu equipo'} a ${info.toName || 'otro asesor'} para equilibrar la carga.`;
-      if(applyBtn) applyBtn.disabled = false;
-      if(keepBtn) keepBtn.textContent = 'Mantener asignación actual';
-    }else if(info.status === 'applied'){
-      container.setAttribute('data-tone', 'success');
-      if(titleEl) titleEl.textContent = 'Reasignación aplicada';
-      if(messageEl) messageEl.textContent = `Marcaste localmente este lead con ${info.toName || 'otro asesor'}. Puedes revertir el cambio cuando lo necesites.`;
-      if(applyBtn) applyBtn.disabled = true;
-      if(keepBtn) keepBtn.textContent = 'Deshacer reasignación';
-    }else{
-      container.classList.add('hidden');
-      if(applyBtn) applyBtn.disabled = true;
-    }
-  }
-
-  function handleAutoReassignApply(){
-    const lead = detailLeadContext;
-    if(!lead || !lead.autoReassign || lead.autoReassign.status !== 'pending') return;
-    const info = lead.autoReassign;
-    lead._originalAsesor = lead._originalAsesor || lead.asesor;
-    lead.asesor = info.toName || lead.asesor;
-    saveReassignmentDecision(lead.id, {
-      status: 'applied',
-      toName: lead.asesor,
-      toKey: info.toKey || normalizeAsesorName(lead.asesor),
-      fromName: info.fromName || lead._originalAsesor || '',
-      fromKey: info.fromKey || normalizeAsesorName(info.fromName || lead._originalAsesor || '')
-    });
-    autoReassignmentPlan = buildAutoReassignmentPlan(leads);
-    applyAutoReassignmentAnnotations();
-    updateLeadDetailAssignmentDisplay(lead);
-    updateAutoReassignDetail(lead);
-    refresh();
-  }
-
-  function handleAutoReassignKeep(){
-    const lead = detailLeadContext;
-    if(!lead || !lead.autoReassign) return;
-    if(lead.autoReassign.status === 'pending'){
-      saveReassignmentDecision(lead.id, {
-        status: 'dismissed',
-        toName: lead.autoReassign.toName,
-        toKey: lead.autoReassign.toKey,
-        fromName: lead.autoReassign.fromName,
-        fromKey: lead.autoReassign.fromKey
-      });
-    }else if(lead.autoReassign.status === 'applied'){
-      lead.asesor = lead._originalAsesor || lead.autoReassign.fromName || lead.asesor;
-      clearReassignmentDecision(lead.id);
-    }
-    autoReassignmentPlan = buildAutoReassignmentPlan(leads);
-    applyAutoReassignmentAnnotations();
-    updateLeadDetailAssignmentDisplay(lead);
-    updateAutoReassignDetail(lead);
-    refresh();
-  }
-
-  function getDefaultCalendarStart(){
+  function computeDefaultScheduleStart(){
     const now = new Date();
-    now.setMinutes(now.getMinutes() + 60);
     now.setSeconds(0, 0);
+    now.setMinutes(now.getMinutes() + 30);
+    const remainder = now.getMinutes() % 15;
+    if(remainder){
+      now.setMinutes(now.getMinutes() + (15 - remainder));
+    }
     return now;
   }
-
-  function formatDateInput(date){
+  function formatCalendarDateTime(date){
     if(!(date instanceof Date)) return '';
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  }
-
-  function formatTimeInput(date){
-    if(!(date instanceof Date)) return '';
     const hours = String(date.getHours()).padStart(2, '0');
     const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${hours}:${minutes}`;
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+    return `${year}${month}${day}T${hours}${minutes}${seconds}`;
   }
-
-  function parseCalendarDateTime(dateValue, timeValue){
-    if(!dateValue || !timeValue) return null;
-    const [year, month, day] = dateValue.split('-').map(Number);
-    const [hour, minute] = timeValue.split(':').map(Number);
-    if(!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day) || !Number.isFinite(hour) || !Number.isFinite(minute)){
-      return null;
+  function buildCalendarEventUrl(lead, options = {}){
+    const url = new URL('https://calendar.google.com/calendar/render');
+    url.searchParams.set('action','TEMPLATE');
+    const leadName = cleanValue(lead?.nombre || '') || 'Seguimiento';
+    url.searchParams.set('text', `Seguimiento – ${leadName}`);
+    if(options.start instanceof Date && options.end instanceof Date){
+      url.searchParams.set('dates', `${formatCalendarDateTime(options.start)}/${formatCalendarDateTime(options.end)}`);
     }
-    const date = new Date(year, month - 1, day, hour, minute, 0, 0);
-    return Number.isNaN(date.getTime()) ? null : date;
+    const details = [];
+    if(lead?.id) details.push(`ID: ${lead.id}`);
+    const baseLabel = lead?.base ? sheetDisplayName(lead.base) : (state.sheet ? sheetDisplayName(state.sheet) : '');
+    if(baseLabel) details.push(`Base: ${baseLabel}`);
+    if(lead?.campus) details.push(`Plantel: ${lead.campus}`);
+    if(lead?.programa) details.push(`Programa: ${lead.programa}`);
+    if(lead?.modalidad) details.push(`Modalidad: ${lead.modalidad}`);
+    const telefono = fmtPhone(lead?.telefono || lead?.telefonoNormalizado);
+    if(telefono) details.push(`Teléfono: ${telefono}`);
+    if(lead?.correo) details.push(`Correo: ${lead.correo}`);
+    const asesorName = lead?.asesor ? displayAsesorName(lead.asesor) : '';
+    if(asesorName) details.push(`Asesor asignado: ${asesorName}`);
+    const notes = typeof options.notes === 'string' ? options.notes.trim() : '';
+    if(notes) details.push(`Notas: ${notes}`);
+    if(details.length){
+      url.searchParams.set('details', details.join('\n'));
+    }
+    if(lead?.campus){
+      url.searchParams.set('location', lead.campus);
+    }
+    return url.toString();
   }
-
-  function buildCalendarEventLink(lead, start, end){
-    const formatCalDate = date => {
-      const year = date.getFullYear();
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const day = String(date.getDate()).padStart(2, '0');
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      const seconds = String(date.getSeconds()).padStart(2, '0');
-      return `${year}${month}${day}T${hours}${minutes}${seconds}`;
-    };
-    const startStr = formatCalDate(start);
-    const endStr = formatCalDate(end);
-    const titleParts = ['Seguimiento'];
-    if(lead && lead.nombre) titleParts.push(lead.nombre);
-    const title = titleParts.join(' · ');
-    const detailLines = [];
-    if(lead && lead.nombre) detailLines.push(`Lead: ${lead.nombre}`);
-    if(lead && lead.programa) detailLines.push(`Programa: ${lead.programa}`);
-    if(lead && lead.modalidad) detailLines.push(`Modalidad: ${lead.modalidad}`);
-    if(lead && (lead.telefono || lead.telefonoNormalizado)) detailLines.push(`Teléfono: ${fmtPhone(lead.telefono || lead.telefonoNormalizado)}`);
-    if(lead && lead.correo) detailLines.push(`Correo: ${lead.correo}`);
-    if(lead && lead.comentario) detailLines.push(`Último comentario: ${lead.comentario}`);
-    const params = new URLSearchParams({ action: 'TEMPLATE', text: title });
-    if(detailLines.length){
-      params.set('details', detailLines.join('\n'));
-    }
-    params.set('dates', `${startStr}/${endStr}`);
-    if(lead && lead.correo){
-      params.append('add', lead.correo);
-    }
-    if(lead && lead.campus){
-      params.set('location', lead.campus);
-    }
-    return `https://calendar.google.com/calendar/render?${params.toString()}`;
-  }
-
-  function updateCalendarStatusMessage(lead){
-    const dateInput = el('#calendarDate');
-    const timeInput = el('#calendarTime');
-    const durationSelect = el('#calendarDuration');
-    const statusEl = el('#calendarStatus');
-    const button = el('#calendarCreateBtn');
-    if(!dateInput || !timeInput || !durationSelect || !button) return;
-    const duration = Number(durationSelect.value) || CALENDAR_DEFAULT_DURATION;
-    const start = parseCalendarDateTime(dateInput.value, timeInput.value);
-    if(!start){
-      button.disabled = true;
-      button.dataset.href = '';
-      if(statusEl){
-        statusEl.textContent = 'Selecciona fecha y hora válidas para agendar el seguimiento.';
-      }
+  function updateCalendarSummary(lead, notes){
+    if(!calendarSummary) return;
+    if(!lead){
+      calendarSummary.innerHTML = '';
       return;
     }
-    const end = new Date(start.getTime() + duration * 60000);
-    const url = buildCalendarEventLink(lead, start, end);
-    button.disabled = false;
-    button.dataset.href = url;
-    if(statusEl){
-      let formatted;
-      try{
-        formatted = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(start);
-      }catch(err){
-        formatted = `${dateInput.value} ${timeInput.value}`;
+    const items = [];
+    if(lead.id) items.push({ label:'ID', value: lead.id });
+    if(lead.campus) items.push({ label:'Plantel', value: lead.campus });
+    if(lead.programa) items.push({ label:'Programa', value: lead.programa });
+    if(lead.modalidad) items.push({ label:'Modalidad', value: lead.modalidad });
+    const telefono = fmtPhone(lead.telefono || lead.telefonoNormalizado);
+    if(telefono) items.push({ label:'Teléfono', value: telefono });
+    if(lead.correo) items.push({ label:'Correo', value: lead.correo });
+    const asesorName = lead.asesor ? displayAsesorName(lead.asesor) : '';
+    if(asesorName) items.push({ label:'Asesor', value: asesorName });
+    const trimmedNotes = typeof notes === 'string' ? notes.trim() : '';
+    if(trimmedNotes) items.push({ label:'Notas', value: trimmedNotes });
+    if(items.length){
+      calendarSummary.innerHTML = items
+        .map(item => `<div class="schedule-summary__item"><strong>${escapeHtml(item.label)}:</strong> ${escapeHtml(item.value)}</div>`)
+        .join('');
+    }else{
+      calendarSummary.innerHTML = '<span class="muted">Sin información adicional.</span>';
+    }
+  }
+  function openScheduleModal(lead){
+    if(!calendarModal || !lead) return;
+    activeScheduleLead = lead;
+    const defaultStart = computeDefaultScheduleStart();
+    if(calendarDateInput){
+      calendarDateInput.value = defaultStart.toISOString().slice(0, 10);
+    }
+    if(calendarTimeInput){
+      calendarTimeInput.value = defaultStart.toISOString().slice(11, 16);
+    }
+    if(calendarDurationInput){
+      calendarDurationInput.value = '30';
+    }
+    if(calendarNotesInput){
+      calendarNotesInput.value = lead.comentario || '';
+    }
+    if(calendarLeadSummary){
+      const summaryParts = [lead.nombre, lead.campus, lead.programa].filter(Boolean);
+      calendarLeadSummary.textContent = summaryParts.join(' · ');
+    }
+    updateCalendarSummary(lead, calendarNotesInput ? calendarNotesInput.value : '');
+    calendarModal.classList.add('active');
+    calendarModal.setAttribute('aria-hidden','false');
+    document.body.classList.add('modal-open');
+    if(calendarDateInput){
+      calendarDateInput.focus();
+    }
+  }
+  function closeScheduleModal(){
+    if(!calendarModal) return;
+    calendarModal.classList.remove('active');
+    calendarModal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('modal-open');
+    activeScheduleLead = null;
+  }
+  if(calendarModalClose){
+    calendarModalClose.addEventListener('click', closeScheduleModal);
+  }
+  if(calendarCancelBtn){
+    calendarCancelBtn.addEventListener('click', closeScheduleModal);
+  }
+  if(calendarModal){
+    calendarModal.addEventListener('click', event => {
+      if(event.target === calendarModal){
+        closeScheduleModal();
       }
-      statusEl.textContent = `El recordatorio se programará el ${formatted} (${duration} minutos).`;
-    }
+    });
   }
-
-  function prepareCalendarForm(lead){
-    const dateInput = el('#calendarDate');
-    const timeInput = el('#calendarTime');
-    const durationSelect = el('#calendarDuration');
-    const statusEl = el('#calendarStatus');
-    const button = el('#calendarCreateBtn');
-    if(!dateInput || !timeInput || !durationSelect || !button) return;
-    const defaultStart = getDefaultCalendarStart();
-    dateInput.value = formatDateInput(defaultStart);
-    timeInput.value = formatTimeInput(defaultStart);
-    durationSelect.value = String(CALENDAR_DEFAULT_DURATION);
-    if(durationSelect.value !== String(CALENDAR_DEFAULT_DURATION) && durationSelect.options.length){
-      durationSelect.value = durationSelect.options[0].value;
-    }
-    if(statusEl){
-      statusEl.textContent = '';
-    }
-    button.disabled = false;
-    button.dataset.href = '';
-    updateCalendarStatusMessage(lead);
+  if(calendarNotesInput){
+    calendarNotesInput.addEventListener('input', ()=>{
+      if(activeScheduleLead){
+        updateCalendarSummary(activeScheduleLead, calendarNotesInput.value);
+      }
+    });
   }
-
-  function handleCalendarCreate(){
-    const button = el('#calendarCreateBtn');
-    if(!button || button.disabled) return;
-    const href = button.dataset.href;
-    if(!href){
-      updateCalendarStatusMessage(detailLeadContext);
-      return;
-    }
-    window.open(href, '_blank', 'noopener');
+  if(calendarForm){
+    calendarForm.addEventListener('submit', event => {
+      event.preventDefault();
+      if(!activeScheduleLead){
+        closeScheduleModal();
+        return;
+      }
+      const dateValue = calendarDateInput?.value || '';
+      const timeValue = calendarTimeInput?.value || '';
+      if(!dateValue || !timeValue){
+        alert('Selecciona fecha y hora para el seguimiento.');
+        return;
+      }
+      const start = new Date(`${dateValue}T${timeValue}`);
+      if(Number.isNaN(start.getTime())){
+        alert('La fecha u hora seleccionada no es válida.');
+        return;
+      }
+      start.setSeconds(0, 0);
+      const durationMinutes = Number.parseInt(calendarDurationInput?.value || '30', 10);
+      const minutes = Number.isFinite(durationMinutes) && durationMinutes > 0 ? durationMinutes : 30;
+      const end = new Date(start.getTime() + minutes * 60000);
+      const notesValue = calendarNotesInput?.value || '';
+      const calendarUrl = buildCalendarEventUrl(activeScheduleLead, { start, end, notes: notesValue });
+      window.open(calendarUrl, '_blank', 'noopener');
+      closeScheduleModal();
+    });
   }
 
   function isLeadSheetName(name){
@@ -13872,6 +13523,71 @@
     telefono: value => fmtPhone(value),
     telefonoNormalizado: value => fmtPhone(value)
   };
+  const BASE_CODE_MAP = (() => {
+    const map = new Map();
+    const register = (name, code, extras = []) => {
+      [name, ...extras].forEach(value => {
+        const key = normalizeBaseKey(value);
+        if(!key) return;
+        if(!map.has(key)) map.set(key, code);
+        const collapsed = key.replace(/[^a-z0-9]+/g, '');
+        if(collapsed && !map.has(collapsed)) map.set(collapsed, code);
+      });
+    };
+    register('Planteles', '01');
+    register('Regresos', '02');
+    register('Reciclados', '03');
+    register('Rescate', '04', ['Rescatados']);
+    return map;
+  })();
+  const PLANTEL_CODE_MAP = (() => {
+    const map = new Map();
+    const register = (name, code, extras = []) => {
+      [name, ...extras].forEach(value => {
+        const key = normalizePlantelKey(value);
+        if(!key) return;
+        if(!map.has(key)) map.set(key, code);
+        const collapsed = key.replace(/[^a-z0-9]+/g, '');
+        if(collapsed && !map.has(collapsed)) map.set(collapsed, code);
+      });
+    };
+    register('HERMOSILLO', '20');
+    register('AGUA PRIETA', '21');
+    register('NOGALES', '22');
+    register('OBREGÓN', '25');
+    register('CULIACÁN', '28');
+    register('MAZATLÁN', '29');
+    register('CHIHUAHUA', '31');
+    register('ZACATECAS', '32');
+    register('TORREÓN', '33', ['TORREON']);
+    register('LA PAZ', '35');
+    register('SALTILLO', '36');
+    register('TIJUANA', '37');
+    register('ENSENADA', '38');
+    register('MEXICALI', '39');
+    register('AGUASCALIENTES', '41');
+    register('QUERÉTARO', '42', ['QUERETARO']);
+    register('LOS CABOS', '43');
+    register('PUERTO PEÑASCO', '44', ['PUERTO PENASCO']);
+    register('ALTAMIRA', '45');
+    register('CD. MANTE', '48', ['CD MANTE', 'CIUDAD MANTE']);
+    register('ZIHUATANEJO', '49');
+    register('LÁZARO CÁRDENAS', '50', ['LAZARO CARDENAS']);
+    register('TUXPAN', '51');
+    register('CD. DEL CARMEN', '52', ['CD DEL CARMEN', 'CIUDAD DEL CARMEN']);
+    register('VERACRUZ', '53');
+    register('ACAPULCO', '54');
+    register('SAN MIGUEL DE ALLENDE', '55');
+    register('TULA', '56');
+    register('QUERÉTARO (2)', '57', ['QUERETARO (2)', 'QUERÉTARO 2', 'QUERETARO 2']);
+    register('HUICHAPAN', '58');
+    register('CANANEA', '59');
+    register('TEOCALTICHE', '60');
+    register('ONLINE', '64', ['EN LINEA', 'EN LÍNEA']);
+    register('SENADO DE LA REPÚBLICA', '65', ['SENADO DE LA REPUBLICA']);
+    register('PACHUCA', '66');
+    return map;
+  })();
 
   function normalizeAliasKey(value){
     return String(value || '')
@@ -13887,6 +13603,9 @@
       .toLowerCase()
       .replace(/\s+/g,' ')
       .trim();
+  }
+  function normalizeBaseKey(value){
+    return normalizeTextValue(value);
   }
   function registerHeaderAlias(key, aliases){
     const list = Array.isArray(aliases) ? aliases : [aliases];
@@ -14550,6 +14269,69 @@
     if(!hasFieldData(row, BULK_OUTPUT_FIELDS)) return null;
     return row;
   }
+  function resolveBaseCode(baseName){
+    const key = normalizeBaseKey(baseName);
+    if(!key) return '';
+    const collapsed = key.replace(/[^a-z0-9]+/g, '');
+    return BASE_CODE_MAP.get(key) || (collapsed ? BASE_CODE_MAP.get(collapsed) : '') || '';
+  }
+  function resolvePlantelCode(campus){
+    const key = normalizePlantelKey(campus);
+    if(!key) return '';
+    const collapsed = key.replace(/[^a-z0-9]+/g, '');
+    return PLANTEL_CODE_MAP.get(key) || (collapsed ? PLANTEL_CODE_MAP.get(collapsed) : '') || '';
+  }
+  function formatLotCode(value){
+    if(value === undefined || value === null) return '';
+    const str = typeof value === 'string' ? value.trim() : String(value);
+    if(!str) return '';
+    const numeric = Number.parseInt(str, 10);
+    if(!Number.isFinite(numeric)) return '';
+    if(numeric < 1 || numeric > 99) return '';
+    return String(Math.trunc(numeric)).padStart(2, '0');
+  }
+  function applyAutoId(rows, options = {}){
+    const list = Array.isArray(rows) ? rows : [];
+    const baseName = options.baseName || '';
+    const baseCode = resolveBaseCode(baseName);
+    if(!baseCode){
+      const error = new Error(`No se reconoce la base "${baseName}" para generar IDs automáticos.`);
+      error.code = 'INVALID_BASE';
+      throw error;
+    }
+    const lotCode = formatLotCode(options.lotNumber);
+    if(!lotCode){
+      const error = new Error('Ingresa un número de lote válido (01-99) para generar IDs.');
+      error.code = 'INVALID_LOT';
+      throw error;
+    }
+    const counters = new Map();
+    const processed = [];
+    const issues = [];
+    list.forEach(row => {
+      if(!row || typeof row !== 'object') return;
+      const existingId = cleanValue(row.id || '');
+      if(existingId){
+        row._idKey = normalizeIdentifierKey(existingId);
+        processed.push(row);
+        return;
+      }
+      const plantelCode = resolvePlantelCode(row.campus || '');
+      if(!plantelCode){
+        const hasCampus = cleanValue(row.campus || '');
+        issues.push({ row, reason: hasCampus ? 'Plantel sin código para generar ID' : 'Sin plantel para generar ID' });
+        return;
+      }
+      const count = (counters.get(plantelCode) || 0) + 1;
+      counters.set(plantelCode, count);
+      const recordCode = String(count).padStart(3, '0');
+      const newId = `${baseCode}-${plantelCode}-${lotCode}-${recordCode}`;
+      row.id = newId;
+      row._idKey = normalizeIdentifierKey(newId);
+      processed.push(row);
+    });
+    return { rows: processed, errors: issues };
+  }
   function createLeadKeyStores(){
     const stores = { phone:new Set(), email:new Set(), id:new Set(), matricula:new Set() };
     leads.forEach(lead => {
@@ -14864,6 +14646,7 @@
   }
 
   let importData = [];
+  const importLotInput = el('#importLotInput');
   const importFile = el('#importFile');
   const importPreview = el('#importPreview');
   const dupWrap = el('#dupWrap');
@@ -14884,6 +14667,21 @@
   let pendingImportSkipped = [];
   let importModalConfirmable = false;
   const SKIPPED_MODAL_FIELDS = ['row','id','nombre','matricula','telefono','correo','motivo'];
+
+  if(importLotInput){
+    importLotInput.addEventListener('input', ()=>{
+      importData = [];
+      clearContainer(importPreview);
+      clearContainer(dupWrap);
+      if(execBtn) execBtn.disabled = true;
+    });
+    importLotInput.addEventListener('blur', ()=>{
+      const formatted = formatLotCode(importLotInput.value);
+      if(formatted){
+        importLotInput.value = formatted;
+      }
+    });
+  }
 
   const summarizeValidationTotals = summary => ({
     errors: Array.isArray(summary?.errors)
@@ -15125,6 +14923,10 @@
       alert('No tienes permisos para importar datos.');
       return;
     }
+    if(!state.sheet){
+      alert('Selecciona una base antes de verificar la importación.');
+      return;
+    }
     const file = importFile?.files?.[0];
     if(!file){ alert('Selecciona un archivo'); return; }
     setButtonBusy(verifyBtn, true, 'Verificando...');
@@ -15150,9 +14952,45 @@
         if(execBtn) execBtn.disabled = true;
         return;
       }
-      const { valid, duplicates } = splitImportRows(normalized);
+      const lotValue = importLotInput?.value || '';
+      if(!lotValue){
+        alert('Ingresa el número de lote (01-99) antes de verificar.');
+        importData = [];
+        clearContainer(importPreview);
+        clearContainer(dupWrap);
+        if(execBtn) execBtn.disabled = true;
+        return;
+      }
+      let autoIdResult;
+      try{
+        autoIdResult = applyAutoId(normalized, {
+          baseName: sheetDisplayName(state.sheet),
+          lotNumber: lotValue
+        });
+      }catch(autoErr){
+        console.error('Error al generar IDs automáticos', autoErr);
+        alert(autoErr.message || 'No se pudieron generar los IDs automáticamente.');
+        importData = [];
+        clearContainer(importPreview);
+        clearContainer(dupWrap);
+        if(execBtn) execBtn.disabled = true;
+        return;
+      }
+      const normalizedWithIds = Array.isArray(autoIdResult?.rows) ? autoIdResult.rows : [];
+      const idGenerationIssues = Array.isArray(autoIdResult?.errors) ? autoIdResult.errors : [];
+      if(importLotInput){
+        const formattedLot = formatLotCode(importLotInput.value);
+        if(formattedLot) importLotInput.value = formattedLot;
+      }
+      const { valid, duplicates } = splitImportRows(normalizedWithIds);
+      const issues = duplicates.slice();
+      idGenerationIssues.forEach(entry => {
+        if(entry && entry.row){
+          issues.push({ data: entry.row, reason: entry.reason || 'No se pudo generar el ID' });
+        }
+      });
       const validRows = valid.map(projectImportRow);
-      const duplicateRows = duplicates.map(item => {
+      const duplicateRows = issues.map(item => {
         const projected = projectImportRow(item.data);
         projected.motivo = item.reason;
         return projected;
@@ -15160,7 +14998,7 @@
       importData = validRows;
       if(validRows.length){
         renderTable(importPreview, validRows, {
-          fields: ['nombre','matricula','telefono','programa','etapa','estado'],
+          fields: ['id','nombre','matricula','telefono','programa','etapa','estado'],
           summary: `Registros listos: ${validRows.length}${duplicateRows.length ? ` · Descartados: ${duplicateRows.length}` : ''}`
         });
         if(execBtn) execBtn.disabled = false;
@@ -15170,7 +15008,7 @@
       }
       if(duplicateRows.length){
         renderTable(dupWrap, duplicateRows, {
-          fields: ['nombre','matricula','telefono','motivo'],
+          fields: ['id','nombre','matricula','telefono','motivo'],
           limit: 10,
           summary: `Registros descartados: ${duplicateRows.length}`
         });
