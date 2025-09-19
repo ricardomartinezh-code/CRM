@@ -2211,9 +2211,6 @@
             <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="q" type="search" placeholder="ID, nombre o teléfono… (Ctrl /)" aria-label="ID" />
           </div>
-          <div class="actions">
-            <div class="btn primary" title="Buscar" id="searchBtn"><i class="bi bi-search"></i> Buscar</div>
-          </div>
         </div>
       </header>
 
@@ -3774,6 +3771,8 @@
     return '';
   }
   // —— Estado UI ——
+  const ALL_SHEETS_VALUE = '__ALL__';
+
   const createInitialState = () => ({
     query:"",
     sheet:"",
@@ -6331,22 +6330,33 @@
     selects.forEach(select => {
       if(!select) return;
       const previous = select.value;
-      select.innerHTML = sheets
-        .map(s => {
-          const label = sheetDisplayName(s) || s;
-          return `<option value="${s}">${label}</option>`;
-        })
-        .join('');
-      if(state.sheet && sheets.includes(state.sheet)){
-        select.value = state.sheet;
-      }else if(sheets.length){
-        select.value = sheets[0] || '';
-      }else{
-        select.value = '';
+      const isMainSelector = select.id === 'sheetSelect';
+      const optionParts = sheets.map(s => {
+        const label = sheetDisplayName(s) || s;
+        return `<option value="${s}">${label}</option>`;
+      });
+      if(isMainSelector){
+        optionParts.unshift(`<option value="${ALL_SHEETS_VALUE}">Todos</option>`);
       }
-      if(!select.value && previous && sheets.includes(previous)){
-        select.value = previous;
+      select.innerHTML = optionParts.join('');
+      let targetValue = '';
+      if(isMainSelector){
+        if(state.sheet === ALL_SHEETS_VALUE){
+          targetValue = ALL_SHEETS_VALUE;
+        }else if(state.sheet && sheets.includes(state.sheet)){
+          targetValue = state.sheet;
+        }
+      }else if(state.sheet && sheets.includes(state.sheet)){
+        targetValue = state.sheet;
       }
+      if(!targetValue){
+        if(previous && sheets.includes(previous)){
+          targetValue = previous;
+        }else if(sheets.length){
+          targetValue = sheets[0] || '';
+        }
+      }
+      select.value = targetValue;
     });
   }
 
@@ -6374,10 +6384,8 @@
         .map(name => (typeof name === 'string' ? name.trim() : ''))
         .filter(Boolean);
       sheets = parsedSheets.filter(isLeadSheetName);
-      if(state.sheet && !sheets.includes(state.sheet)){
-        state.sheet = sheets[0] || '';
-      }
-      if(!state.sheet){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
     }catch(err){
@@ -6460,6 +6468,42 @@
     };
   }
 
+  function filterLeadsByPlantel(list){
+    const entries = Array.isArray(list) ? list : [];
+    const planteles = getAllowedPlanteles();
+    if(planteles.hasGlobalAccess || !planteles.length){
+      return entries;
+    }
+    const allowedSet = new Set(planteles.map(normalizePlantelKey));
+    return entries.filter(item => {
+      const campus = item?.campus || '';
+      if(!campus) return true;
+      return allowedSet.has(normalizePlantelKey(campus));
+    });
+  }
+
+  async function fetchLeadsForSheet(sheetName){
+    if(!sheetName) return [];
+    try{
+      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(sheetName)}`, { dedupeKey: `getLeads:${sheetName}` });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if(Array.isArray(data)){
+        const mapped = data.map(raw => normalizeLeadRecord(raw, sheetName));
+        return filterLeadsByPlantel(mapped);
+      }
+      if(data && data.error){
+        throw new Error(data.error);
+      }
+    }catch(err){
+      if(!(err && err.code === 'UNAUTHORIZED')){
+        console.error('Error al cargar leads', sheetName, err);
+      }
+      if(err && err.code === 'UNAUTHORIZED') throw err;
+    }
+    return [];
+  }
+
   async function loadLeads(){
     if(!authToken){
       leads = [];
@@ -6470,28 +6514,23 @@
       return;
     }
     try{
-      const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(state.sheet)}`, { dedupeKey: `getLeads:${state.sheet}` });
-      if(!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if(Array.isArray(data)){
-        let mapped = data.map(raw => normalizeLeadRecord(raw, state.sheet));
-        const planteles = getAllowedPlanteles();
-        if(!planteles.hasGlobalAccess && planteles.length){
-          const allowedSet = new Set(planteles.map(normalizePlantelKey));
-          mapped = mapped.filter(item => {
-            const campus = item.campus || '';
-            if(!campus) return true;
-            return allowedSet.has(normalizePlantelKey(campus));
-          });
+      if(state.sheet === ALL_SHEETS_VALUE){
+        const sheetNames = sheets.filter(Boolean);
+        const results = [];
+        for(const sheetName of sheetNames){
+          try{
+            const list = await fetchLeadsForSheet(sheetName);
+            results.push(...list);
+          }catch(err){
+            if(err && err.code === 'UNAUTHORIZED') throw err;
+          }
         }
-        leads = mapped;
-        state.columnLimits = {};
-        state.columnLimitSignature = '';
-      }else if(data && data.error){
-        throw new Error(data.error);
+        leads = results;
       }else{
-        leads = [];
+        leads = await fetchLeadsForSheet(state.sheet);
       }
+      state.columnLimits = {};
+      state.columnLimitSignature = '';
     }catch(err){
       if(err && err.code === 'UNAUTHORIZED') return;
       console.error('Error al cargar leads', err);
@@ -8285,10 +8324,15 @@
         }
         return;
       }
+      const targetSheet = state.sheet === ALL_SHEETS_VALUE ? (r.base || '') : state.sheet;
+      if(!targetSheet){
+        alert('No se pudo determinar la base del lead.');
+        return;
+      }
       const params = new URLSearchParams({
         action: 'updateLead',
         id: r.id,
-        sheet: state.sheet,
+        sheet: targetSheet,
         etapa: etapaBackend(r.etapa),
         estado: r.estado,
         comentario: comentarioActual,
@@ -9272,7 +9316,6 @@
     // Buscar (Ctrl+/)
     const q = el('#q');
     q.addEventListener('input', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
-    el('#searchBtn').addEventListener('click', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
     window.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey) && e.key === '/'){ e.preventDefault(); q.focus(); } })
 
     const appShell = el('#app');
@@ -9550,6 +9593,7 @@
     const importSheetSel = el('#importBaseSelect');
 
     const ensureSheetSelection = () => {
+      if(state.sheet === ALL_SHEETS_VALUE) return;
       if(!sheets.includes(state.sheet)){
         state.sheet = sheets[0] || '';
       }
@@ -9559,7 +9603,8 @@
       const select = event?.currentTarget;
       if(!select) return;
       const selected = select.value;
-      if(!selected || !sheets.includes(selected)){
+      const isAll = selected === ALL_SHEETS_VALUE;
+      if(!isAll && (!selected || !sheets.includes(selected))){
         syncSheetSelectorsUI();
         return;
       }
@@ -9748,7 +9793,8 @@
   async function initializeApp(){
     try{
       await withGlobalLoading('Sincronizando bases…', () => loadSheets());
-      if(!state.sheet || !sheets.includes(state.sheet)){
+      const hasValidSelection = state.sheet === ALL_SHEETS_VALUE || sheets.includes(state.sheet);
+      if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
       syncSheetSelectorsUI();
@@ -11323,7 +11369,7 @@
   async function requestImport(confirmFlag, override){
     const payload = {
       action: 'importLeads',
-      sheet: override?.sheet || state.sheet,
+      sheet: override?.sheet || (state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet),
       rows: Array.isArray(override?.rows) ? override.rows : importData,
       confirm: confirmFlag === true
     };
@@ -11827,13 +11873,14 @@
   if(execBtn) execBtn.addEventListener('click', async()=>{
     if(!canPerform('importData')){ alert('No tienes permisos para importar datos.'); return; }
     if(!importData.length){ alert('No hay datos verificados'); return; }
-    if(!state.sheet){ alert('Selecciona una base antes de importar.'); return; }
+    const activeSheet = state.sheet === ALL_SHEETS_VALUE ? '' : state.sheet;
+    if(!activeSheet){ alert('Selecciona una base antes de importar.'); return; }
     setButtonBusy(execBtn, true, 'Verificando...');
     try{
-      const result = await requestImport(false);
+      const result = await requestImport(false, { sheet: activeSheet });
       if(result?.requiresConfirmation){
         pendingImportPayload = {
-          sheet: state.sheet,
+          sheet: activeSheet,
           rows: importData.map(row => ({ ...row }))
         };
         pendingImportSummary = {
