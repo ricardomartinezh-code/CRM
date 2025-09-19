@@ -198,12 +198,19 @@
     .login-logo{ display:flex; justify-content:center; }
     .login-logo img{ max-width:132px; width:100%; height:auto; filter: drop-shadow(0 12px 24px rgba(15,23,42,0.24)); }
     .login-title{
-      margin:0;
+      margin:0 0 var(--space-xs);
       text-align:center;
       font-size:1.45rem;
       letter-spacing:.5px;
       font-weight:800;
       color:var(--text);
+    }
+    .login-intro{
+      margin:0 0 var(--space);
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.55;
+      text-align:center;
     }
     .login-form{ display:flex; flex-direction:column; gap:var(--space-sm); }
     .login-form label{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:var(--muted); }
@@ -351,7 +358,7 @@
     .menu-btn:focus-visible { outline:none; box-shadow: var(--ring), var(--shadow); }
     .mobile-topbar{ display:none; align-items:center; gap:var(--space-sm); padding:var(--space-sm) var(--space); position:sticky; top:0; z-index:70; backdrop-filter: blur(10px); background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0)); border-bottom:1px solid rgba(255,255,255,.06); }
     html[data-theme="light"] .mobile-topbar{ background: linear-gradient(180deg, rgba(248,252,255,0.88), rgba(248,252,255,0.6)); border-bottom:1px solid rgba(15,23,42,0.08); }
-    .mobile-topbar__label{ font-weight:700; letter-spacing:.35px; text-transform:uppercase; color:var(--muted); font-size:13px; }
+    .mobile-topbar__label{ font-weight:700; letter-spacing:.35px; text-transform:none; color:var(--muted); font-size:13px; }
     .search { position:relative; flex:1 1 220px; min-width:0 }
     .search input { width:100%; padding:10px 36px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: var(--card); color: var(--text); box-shadow: var(--shadow); outline:none }
     .search input:focus { box-shadow: var(--ring), var(--shadow) }
@@ -485,6 +492,58 @@
       gap:var(--space-sm);
       width:100%;
     }
+    .preferences-callout{
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-xs);
+      padding:var(--space);
+      border-radius:14px;
+      border:1px dashed rgba(255,255,255,0.2);
+      background: rgba(15,23,42,0.28);
+      color:var(--muted);
+      flex:1 1 280px;
+      min-width:260px;
+    }
+    html[data-theme="light"] .preferences-callout{
+      border-color: rgba(15,23,42,0.18);
+      background: rgba(226,232,240,0.55);
+      color:#1e293b;
+    }
+    .preferences-callout__heading{
+      font-size:12px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.5px;
+      color:var(--accent);
+    }
+    .preferences-callout p{
+      margin:0 0 var(--space-sm);
+      font-size:13px;
+      line-height:1.5;
+      color:inherit;
+    }
+    .preferences-callout__action{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:0;
+      border:none;
+      background:none;
+      color:var(--accent);
+      font-weight:700;
+      font-size:13px;
+      cursor:pointer;
+      text-decoration:underline;
+      text-underline-offset:4px;
+    }
+    .preferences-callout__action:focus-visible{
+      outline:none;
+      text-decoration:none;
+      box-shadow:0 0 0 3px rgba(0,58,95,0.35);
+      border-radius:8px;
+      padding:4px 8px;
+      margin:-4px -8px;
+    }
     .view-controls .filters {
       display:flex;
       align-items:center;
@@ -613,6 +672,24 @@
     html[data-board-density="compact"] .card-lead{ padding:6px; }
     html[data-board-density="expanded"] .card-lead{ padding:12px; }
     .card-lead:hover { transform: translateY(-2px) scale(1.01); border-color: rgba(0,58,95,.35); box-shadow: 0 4px 14px rgba(0,0,0,.12) }
+    .card-lead__header{ display:flex; align-items:flex-start; justify-content:space-between; gap:var(--space-sm); }
+    .card-lead__header strong{ font-size:1rem; line-height:1.35; }
+    .card-lead__contact{ margin-top:10px; display:flex; flex-direction:column; gap:6px; }
+    .contact-label{ font-size:11px; text-transform:uppercase; letter-spacing:.4px; color:color-mix(in srgb, var(--accent) 70%, var(--muted) 30%); }
+    .card-lead__contact-row{ display:flex; flex-wrap:wrap; gap:8px; }
+    .contact-chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 14px; border-radius:999px; font-weight:600; font-size:13px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.12); }
+    .contact-chip i{ font-size:14px; }
+    .contact-chip--primary{ background: rgba(var(--panel-base-rgb),0.25); color:var(--text); border:1px solid rgba(var(--panel-base-rgb),0.5); }
+    .contact-chip--secondary{ background: rgba(148,163,184,0.18); color:var(--muted); border:1px solid rgba(148,163,184,0.28); }
+    .contact-chip--phone.contact-chip--primary i{ color:#22c55e; }
+    .contact-chip--mail.contact-chip--primary i{ color:#2563eb; }
+    .contact-chip--phone.contact-chip--secondary i{ color:#22c55e; }
+    .contact-chip--mail.contact-chip--secondary i{ color:#2563eb; }
+    html[data-theme="light"] .contact-chip--primary{ background: rgba(var(--panel-base-rgb),0.14); color:#0f172a; border-color: rgba(var(--panel-base-rgb),0.32); }
+    html[data-theme="light"] .contact-chip--secondary{ background:#e2e8f0; color:#1e293b; border-color: rgba(148,163,184,0.45); }
+    html[data-theme="light"] .contact-label{ color:var(--accent); }
+    .card-lead__meta{ margin-top:10px; display:flex; flex-direction:column; gap:4px; }
+    .card-lead__footer{ margin-top:10px; display:flex; flex-wrap:wrap; gap:6px; }
     .tag { padding:2px 8px; border-radius:999px; font-size:12px; border:1px solid rgba(255,255,255,.15); color: var(--muted) }
     .tag.ok{ color: #065f46; background: rgba(16,185,129,.15); border-color: rgba(16,185,129,.25) }
     .tag.bad{ color: #7f1d1d; background: rgba(239,68,68,.15); border-color: rgba(239,68,68,.25) }
@@ -759,38 +836,94 @@
     }
     .stage-pill i{ font-size:16px; }
     .stage-pill.is-empty{ background: color-mix(in srgb, var(--panel-tone-bright) 25%, #1e293b 75%); border-color: color-mix(in srgb, var(--panel-tone-bright) 20%, #1f2937 80%); color: var(--muted); }
-    .panel .stage-group{ width:100%; margin-top:20px; align-items:stretch; flex-wrap:wrap; gap:16px; }
-    .panel .stage-group label{
-      flex:1 1 0;
+    .panel-quick{
+      margin-top:24px;
+      padding:24px;
+      border-radius:18px;
+      background: color-mix(in srgb, var(--panel-tone-soft) 65%, rgba(5,12,28,0.45) 35%);
+      border:1px solid color-mix(in srgb, var(--panel-tone-strong) 55%, #050b1b 45%);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    html[data-theme="light"] .panel-quick{
+      background: color-mix(in srgb, #ffffff 80%, var(--panel-tone-soft) 20%);
+      border-color: color-mix(in srgb, var(--panel-tone-strong) 25%, #e2e8f0 75%);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .panel-quick__header h4{
+      margin:0;
+      font-size:16px;
+      font-weight:800;
+      letter-spacing:.35px;
+      color:var(--panel-tone-text);
+    }
+    .panel-quick__header p{
+      margin:4px 0 0;
+      color:color-mix(in srgb, var(--panel-tone-text) 70%, rgba(226,232,240,0.9) 30%);
+      font-size:13px;
+      line-height:1.4;
+    }
+    html[data-theme="light"] .panel-quick__header p{
+      color:color-mix(in srgb, var(--panel-tone-strong) 40%, #1e293b 60%);
+    }
+    .panel-quick__grid{
+      display:flex;
+      flex-wrap:wrap;
+      gap:16px;
+    }
+    .panel-quick__field{
+      flex:1 1 200px;
       display:flex;
       flex-direction:column;
       gap:10px;
-      padding:18px 20px;
-      border-radius:16px;
-      background: linear-gradient(140deg, var(--panel-tone-strong), var(--panel-tone-soft));
-      border:1px solid var(--panel-tone-strong);
-      color:var(--panel-tone-text);
-      text-transform:uppercase;
-      font-size:12.5px;
+      font-size:12px;
       font-weight:700;
+      text-transform:uppercase;
       letter-spacing:.4px;
-      box-shadow: 0 18px 44px rgba(5,12,28,0.4);
+      color:var(--panel-tone-text);
     }
-    .panel .stage-group label span{ opacity:0.9; }
-    .panel .stage-group label select{
-      margin-top:4px;
+    .panel-quick__field select{
       border-radius:12px;
-      border:1px solid color-mix(in srgb, var(--panel-tone-bright) 40%, var(--panel-tone-strong) 60%);
+      border:1px solid color-mix(in srgb, var(--panel-tone-bright) 45%, var(--panel-tone-strong) 55%);
       padding:12px 14px;
       width:100%;
       min-width:0;
       background: var(--panel-tone-soft);
       color:var(--panel-tone-text);
       font:600 15px/1.25 'Manrope', var(--font);
-      letter-spacing:.22px;
+      letter-spacing:.2px;
       text-transform:none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
-    .panel .stage-group label select:focus{ outline:none; box-shadow:0 0 0 3px var(--panel-tone-bright); }
+    .panel-quick__field select:focus{ outline:none; box-shadow:0 0 0 3px var(--panel-tone-bright); }
+    .panel-quick__comment textarea{
+      border-radius:12px;
+      border:1px solid color-mix(in srgb, var(--panel-tone-bright) 45%, var(--panel-tone-strong) 55%);
+      padding:12px 14px;
+      background: var(--panel-tone-soft);
+      color:var(--panel-tone-text);
+      font:600 14px/1.4 'Manrope', var(--font);
+      min-height:96px;
+      resize:vertical;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
+    }
+    .panel-quick__comment textarea:focus{ outline:none; box-shadow:0 0 0 3px var(--panel-tone-bright); }
+    .panel-quick__actions{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .panel-quick__shortcuts{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+    }
+    .panel-quick__shortcuts .btn{
+      flex:1 1 140px;
+      justify-content:center;
+    }
     html[data-theme="light"] .stage-pill.is-empty{ background: color-mix(in srgb, #ffffff 60%, var(--panel-tone-bright) 40%); border-color: color-mix(in srgb, #e2e8f0 70%, var(--panel-tone-strong) 30%); }
     .kv { display:grid; grid-template-columns: 140px 1fr; gap:12px 18px; font-size:15px }
     .panel .kv-label {
@@ -837,7 +970,6 @@
         padding:34px 36px;
         width:min(680px, calc(100vw - 140px));
       }
-      .panel .stage-group{ gap:20px; }
       .kv{ grid-template-columns: 160px 1fr; }
     }
 
@@ -846,6 +978,18 @@
     .drawer.open { display:flex }
     .drawer .sheet { background: var(--card); width: 100%; max-height: 85vh; border-radius: 16px 16px 0 0; padding: 12px; overflow:auto }
     .drawer-summary{ margin:6px 0 0; color:var(--muted); font-size:13px; }
+    .drawer-quick{ margin-top:18px; padding:18px; border-radius:16px; background:var(--card-2); border:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; gap:14px; }
+    html[data-theme="light"] .drawer-quick{ background:#f1f5f9; border-color:rgba(15,23,42,0.12); }
+    .drawer-quick__hint{ margin:0; font-size:13px; color:var(--muted); }
+    .drawer-quick__shortcuts{ display:flex; flex-wrap:wrap; gap:10px; }
+    .drawer-quick__shortcuts .btn{ flex:1 1 140px; justify-content:center; }
+    .drawer-quick__field{ display:flex; flex-direction:column; gap:8px; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.35px; color:var(--muted); }
+    .drawer-quick__field select,
+    .drawer-quick__field textarea{ border-radius:10px; border:1px solid rgba(148,163,184,0.35); padding:10px 12px; background:var(--card); color:var(--text); font:600 14px/1.35 'Manrope', var(--font); box-shadow: inset 0 1px 0 rgba(255,255,255,0.08); }
+    .drawer-quick__field textarea{ min-height:96px; resize:vertical; }
+    .drawer-quick__field select:focus,
+    .drawer-quick__field textarea:focus{ outline:none; box-shadow:0 0 0 3px rgba(var(--panel-base-rgb),0.25); }
+    .drawer-quick__actions{ display:flex; justify-content:flex-end; }
 
     /* Responsive */
     @media (max-width: 1200px){ .panel-overlay{ display:none } }
@@ -888,6 +1032,9 @@
       .topbar-inner{ padding:var(--space) var(--space-sm); }
       .brand-name{ display:block; }
       .nav a span{ display:inline; }
+      .preferences-callout{ flex:1 1 100%; min-width:100%; }
+      .panel-quick{ padding:18px; }
+      .panel-quick__shortcuts .btn{ flex:1 1 100%; }
     }
     @media (min-width: 901px){ .sidebar-overlay{ display:none; } }
     @media (max-width: 700px){
@@ -1190,6 +1337,7 @@
         <img src="./icon-unidep180.png" alt="" width="132" height="132" />
       </div>
       <h1 id="loginTitle" class="login-title">ReLead EDU</h1>
+      <p class="login-intro">Bienvenido. Si es tu primer acceso, utiliza el correo e ID que te compartió la coordinación para generar tu contraseña y empezar a atender leads de inmediato.</p>
       <div id="loginSignIn" aria-hidden="false">
         <form class="login-form" id="loginForm" autocomplete="off">
           <label>
@@ -1201,15 +1349,15 @@
             <input type="password" id="loginPassword" autocomplete="current-password" required />
           </label>
           <div class="login-actions">
-            <button type="submit" class="btn primary w100" id="loginSubmit">Ingresar</button>
+            <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
           </div>
         </form>
         <p class="login-message login-error hidden" id="loginError" role="alert"></p>
-        <p class="login-hint" id="loginHint">¿Olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Recupérala aquí</button>.</p>
+        <p class="login-hint" id="loginHint">¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.</p>
       </div>
       <div id="loginReset" class="hidden" aria-hidden="true">
         <form class="login-form" id="resetForm" autocomplete="off">
-          <p class="login-hint">Ingresa el correo institucional y tu ID de usuario para generar una contraseña temporal.</p>
+          <p class="login-hint">Ingresa el correo institucional y tu ID de usuario tal como aparecen en tu hoja de asignación para generar una contraseña temporal de acceso inicial.</p>
           <label>
             <span>Correo institucional</span>
             <input type="email" id="resetEmail" autocomplete="username" required />
@@ -1219,12 +1367,12 @@
             <input type="text" id="resetUserId" autocomplete="off" required />
           </label>
           <div class="login-actions">
-            <button type="submit" class="btn primary w100" id="resetSubmit">Generar contraseña</button>
+            <button type="submit" class="btn primary w100" id="resetSubmit">Crear contraseña temporal</button>
             <button type="button" class="btn w100" id="resetCancel">Volver a iniciar sesión</button>
           </div>
         </form>
         <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
-        <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Cámbiala desde Configuración después de entrar.</p>
+        <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
       </div>
     </div>
   </div>
@@ -1288,11 +1436,11 @@
 
     <!-- Main -->
     <main class="main" role="main">
-      <header class="mobile-topbar hidden" id="mobileTopbar" aria-hidden="true">
+      <header class="mobile-topbar" id="mobileTopbar" aria-hidden="false">
         <button class="menu-btn menu-trigger" type="button" aria-label="Abrir menú principal" aria-expanded="false">
           <i class="bi bi-list"></i>
         </button>
-        <span class="mobile-topbar__label" id="mobileViewLabel">KPI’s</span>
+        <span class="mobile-topbar__label" id="mobileViewLabel">Vista actual</span>
       </header>
       <section id="view-kpis" class="view-section is-visible">
         <div class="card" style="margin:18px">
@@ -1305,7 +1453,7 @@
           </div>
         </div>
       </section>
-      <section id="view-leads" class="view-section hidden" data-hide-mobile-topbar="true">
+      <section id="view-leads" class="view-section hidden" data-mobile-title="Leads · Tablero">
       <header class="topbar">
         <div class="topbar-inner">
           <button class="menu-btn menu-trigger" type="button" id="menuBtn" aria-label="Abrir menú principal" aria-expanded="false">
@@ -1347,6 +1495,11 @@
                 </select>
               </label>
             </div>
+            <aside class="preferences-callout" id="preferencesCallout" role="note">
+              <div class="preferences-callout__heading">Ajusta tu experiencia</div>
+              <p>Configura la densidad del tablero o muestra el ID en cada tarjeta para adaptarte al volumen de contactos diarios.</p>
+              <button type="button" class="preferences-callout__action" id="preferencesShortcut">Abrir preferencias personales</button>
+            </aside>
           </div>
         </div>
         <div class="panel-section">
@@ -1379,25 +1532,31 @@
             <div class="kv-label" id="lab-estado">Estado</div><div id="d-estado">—</div>
             <div class="kv-label" id="lab-asesor">Asesor</div><div id="d-asesor">—</div>
           </div>
-          <div class="row gap12 stage-group">
-            <label>Etapa
-              <select id="selEtapa"></select>
+          <section class="panel-quick" aria-labelledby="panelQuickTitle">
+            <div class="panel-quick__header">
+              <h4 id="panelQuickTitle">Actualiza y contacta</h4>
+              <p>Registra etapa, estado y nota antes de usar los accesos rápidos para contactar al lead.</p>
+            </div>
+            <div class="panel-quick__grid">
+              <label class="panel-quick__field">Etapa
+                <select id="selEtapa"></select>
+              </label>
+              <label class="panel-quick__field">Estado
+                <select id="selEstado"></select>
+              </label>
+            </div>
+            <label class="panel-quick__field panel-quick__comment">Comentario
+              <textarea id="txtComentario" class="w100" rows="3"></textarea>
             </label>
-            <label>Estado
-              <select id="selEstado"></select>
-            </label>
-          </div>
-          <label style="display:block;margin-top:10px">Comentario
-            <textarea id="txtComentario" class="w100" rows="3"></textarea>
-          </label>
-          <div class="actions" style="margin-top:10px">
-            <button class="btn primary" id="updateBtn">Guardar</button>
-          </div>
-          <div class="actions" style="margin-top:10px">
-              <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
-              <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-              <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
-          </div>
+            <div class="panel-quick__actions">
+              <button class="btn primary" id="updateBtn">Guardar actualización</button>
+              <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
+                <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
+                <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
+              </div>
+            </div>
+          </section>
         </aside>
       </div>
       <!-- Drawer for mobile details -->
@@ -2336,8 +2495,8 @@
     preferences: 'pulsePreferences',
     password: 'pulsePasswordRequest'
   };
-  const DEFAULT_LOGIN_HINT = '¿Olvidaste tu contraseña?';
-  const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Cámbiala desde Configuración después de entrar.';
+  const DEFAULT_LOGIN_HINT = '¿Es tu primer ingreso o olvidaste tu contraseña?';
+  const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración > Seguridad después de entrar.';
   const DEFAULT_PROFILE = {
     userId: '',
     name: '',
@@ -4284,7 +4443,7 @@
 
   function renderDefaultLoginHint(target){
     if(!target) return;
-    target.innerHTML = '¿Olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Recupérala aquí</button>.';
+    target.innerHTML = '¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.';
     attachForgotPasswordHandler();
   }
 
@@ -6325,19 +6484,52 @@
     d.setAttribute('role','button');
     d.dataset.id = r.id;
     d.dataset.step = etapaGroup(r.etapa);
+    const campusModalidad = [r.campus, r.modalidad].filter(Boolean).join(' · ') || '—';
+    const programaDisplay = r.programa || '—';
+    const estadoAsesorDisplay = [r.estado, displayAsesorName(r.asesor)].filter(Boolean).join(' · ') || '—';
+    const phoneDisplay = fmtPhone(r.telefono || r.telefonoNormalizado);
+    const emailDisplay = (r.correo || '').trim();
+    const contacts = [];
+    if(phoneDisplay){
+      contacts.push({ type: 'phone', value: phoneDisplay });
+    }
+    if(emailDisplay){
+      contacts.push({ type: 'mail', value: emailDisplay });
+    }
+    const primaryContact = contacts[0];
+    const secondaryContacts = contacts.slice(1);
+    const iconFor = type => type === 'phone' ? 'bi-telephone-fill' : 'bi-envelope-fill';
+    const labelFor = type => type === 'phone' ? 'Llamar' : 'Correo';
+    const chip = (contact, variant = 'primary') => `
+      <span class="contact-chip contact-chip--${variant} contact-chip--${contact.type}" data-label="${labelFor(contact.type)}">
+        <i class="bi ${iconFor(contact.type)}" aria-hidden="true"></i>
+        <span>${contact.value}</span>
+      </span>`;
+    const contactSection = primaryContact ? `
+      <div class="card-lead__contact" aria-label="Datos de contacto prioritarios">
+        <span class="contact-label">Contacto recomendado</span>
+        <div class="card-lead__contact-row">
+          ${chip(primaryContact)}
+          ${secondaryContacts.map(secondary => chip(secondary, 'secondary')).join('')}
+        </div>
+      </div>` : '';
     const idPill = userPreferences.showLeadId && r.id ? `<span class="pill id-pill">ID ${r.id}</span>` : '';
+    const extraPills = [idPill];
+    const detailsFooter = extraPills.filter(Boolean).length ? `
+      <div class="card-lead__footer">
+        ${extraPills.filter(Boolean).join('')}
+      </div>` : '';
     d.innerHTML = `
-      <div class="row between">
+      <div class="card-lead__header">
         <strong>${r.nombre}</strong>
-        <span class="tag">${r.campus} · ${r.modalidad}</span>
+        <span class="tag">${campusModalidad}</span>
       </div>
-      <div class="muted">${r.programa}</div>
-      <div class="muted">${r.estado} · ${displayAsesorName(r.asesor)}</div>
-      <div class="row gap8" style="margin-top:8px">
-        ${idPill}
-        <span class="pill">${fmtPhone(r.telefono || r.telefonoNormalizado)}</span>
-        <span class="pill">${r.correo}</span>
+      ${contactSection}
+      <div class="card-lead__meta">
+        <div class="muted">${programaDisplay}</div>
+        <div class="muted">${estadoAsesorDisplay}</div>
       </div>
+      ${detailsFooter}
     `;
     d.addEventListener('click', ()=>openDetails(r));
     d.addEventListener('keypress',e=>{ if(e.key==="Enter") openDetails(r) });
@@ -6657,23 +6849,26 @@
           <div class="muted">Etapa</div><div id="drawerEtapaVal">${r.etapa || '—'}</div>
           <div class="muted">Estado</div><div id="drawerEstadoVal">${r.estado || '—'}</div>
         </div>
-        <div class="actions">
-          ${hasCallLink?`<a class="btn" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
-          ${hasWaLink?`<a class="btn" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
-          ${hasMailLink?`<a class="btn" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
-        </div>
-        <label style="display:block;margin-top:12px">Etapa
-          <select id="drawerEtapa" class="w100"></select>
-        </label>
-        <label style="display:block;margin-top:12px">Estado
-          <select id="drawerEstado" class="w100"></select>
-        </label>
-        <label style="display:block;margin-top:12px">Comentario
-          <textarea id="drawerComentario" class="w100" rows="3"></textarea>
-        </label>
-        <div class="actions" style="margin-top:12px">
-          <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar</button>
-        </div>`;
+        <section class="drawer-quick" aria-label="Actualiza y contacta">
+          <p class="drawer-quick__hint">Actualiza etapa y estado antes de abrir un nuevo contacto.</p>
+          <div class="drawer-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
+            ${hasCallLink?`<a class="btn" target="_blank" rel="noopener" href="${callHref}"><i class='bi bi-telephone'></i> Llamar</a>`:''}
+            ${hasWaLink?`<a class="btn" target="_blank" rel="noopener" href="${waHref}"><i class='bi bi-whatsapp'></i> WhatsApp</a>`:''}
+            ${hasMailLink?`<a class="btn" target="_blank" rel="noopener" href="${mailHref}"><i class='bi bi-envelope'></i> Email</a>`:''}
+          </div>
+          <label class="drawer-quick__field">Etapa
+            <select id="drawerEtapa" class="w100"></select>
+          </label>
+          <label class="drawer-quick__field">Estado
+            <select id="drawerEstado" class="w100"></select>
+          </label>
+          <label class="drawer-quick__field">Comentario
+            <textarea id="drawerComentario" class="w100" rows="3"></textarea>
+          </label>
+          <div class="drawer-quick__actions">
+            <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
+          </div>
+        </section>`;
       registerForm({
         etapaSelect: el('#drawerEtapa'),
         estadoSelect: el('#drawerEstado'),
@@ -7423,6 +7618,24 @@
         updateCollapsedBrandInteractivity();
       }
     };
+    const preferencesShortcut = el('#preferencesShortcut');
+    if(preferencesShortcut){
+      preferencesShortcut.addEventListener('click', event => {
+        event.preventDefault();
+        const targetLink = document.querySelector('.nav-link[data-nav="configuracion"]');
+        if(targetLink){
+          activateView('configuracion', targetLink);
+          setSidebarOpen(false);
+          const focusTarget = el('#prefBoardDensity') || el('#prefDensity');
+          if(focusTarget && typeof focusTarget.focus === 'function'){
+            focusTarget.focus();
+            if(typeof focusTarget.scrollIntoView === 'function'){
+              focusTarget.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          }
+        }
+      });
+    }
     menuTriggers.forEach(btn => {
       btn.addEventListener('click', toggleSidebar);
       btn.setAttribute('aria-expanded','false');
@@ -7822,12 +8035,15 @@
     const mobileTopbar = el('#mobileTopbar');
     if(!mobileTopbar) return;
     const labelEl = el('#mobileViewLabel');
+    const explicitLabel = targetSection ? (targetSection.getAttribute('data-mobile-title') || '').trim() : '';
     const labelSource = sourceLink && (sourceLink.querySelector('span') || sourceLink);
-    const labelText = labelSource ? (labelSource.textContent || '').trim() : '';
-    if(labelEl && labelText){
-      labelEl.textContent = labelText;
+    const fallbackLabel = labelSource ? (labelSource.textContent || '').trim() : '';
+    const labelText = explicitLabel || fallbackLabel || 'Vista actual';
+    if(labelEl){
+      labelEl.textContent = `Vista: ${labelText}`;
     }
-    const shouldHide = targetSection && targetSection.hasAttribute('data-hide-mobile-topbar');
+    const hideAttr = targetSection ? targetSection.getAttribute('data-hide-mobile-topbar') : null;
+    const shouldHide = typeof hideAttr === 'string' && hideAttr !== '' && hideAttr !== 'false';
     mobileTopbar.classList.toggle('hidden', Boolean(shouldHide));
     mobileTopbar.setAttribute('aria-hidden', shouldHide ? 'true' : 'false');
   }
