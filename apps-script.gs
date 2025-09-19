@@ -145,7 +145,7 @@ const REQUIRED_HEADER_LABELS = {
   telefono: 'Teléfono',
   etapa: 'Etapa'
 };
-const NEGATIVE_STATES = ['no contesta whatsapp','cuelga','buzon de voz'];
+const NEGATIVE_STATES = ['no contesta','mensaje no respondido','pendiente de reintento'];
 const OPTIONAL_HEADER_NAMES = [
   'Telefono','Telefonos','Telefono 1','Telefono 2','Telefono fijo','Telefono celular','Celular','Movil','Whatsapp','Tel',
   'Telefono normalizado','Telefono aircall','Telefono whatsapp','Whatsapp link','Link whatsapp','Resolucion','Resolución',
@@ -156,11 +156,11 @@ const KNOWN_HEADER_NAMES = Array.from(new Set([...COLUMNS, ...OPTIONAL_HEADER_NA
 const KNOWN_HEADER_SET = new Set(KNOWN_HEADER_NAMES.map(normalizeHeader_));
 const VALID_ETAPAS = ['nuevo','contactado','no contactado','inscrito','descartado'];
 const ETAPA_ESTADO_MAP = {
-  'nuevo': ['nuevo'],
-  'contactado': ['interesado','no interesado','en labor de venta'],
-  'no contactado': ['no contesta whatsapp','mensaje no contestado','buzon de voz','cuelga'],
-  'inscrito': ['inscrito'],
-  'descartado': ['spam','no desea informacion','inscrito en otra escuela','limite intentos de contacto']
+  'nuevo': ['sin contactar','nuevo'],
+  'contactado': ['interesado','seguimiento activo','en labor de venta','cita agendada'],
+  'no contactado': ['no contesta','mensaje no respondido','mensaje no contestado','pendiente de reintento','buzon de voz','cuelga'],
+  'inscrito': ['inscrito confirmado','inscrito'],
+  'descartado': ['sin interes','no desea informacion','no interesado','inscrito en otra escuela','datos incorrectos','duplicado','spam','limite intentos de contacto']
 };
 const VALID_ESTADOS_SET = new Set([].concat(...Object.values(ETAPA_ESTADO_MAP)));
 const CANONICAL_ETAPA_LABELS = {
@@ -179,6 +179,17 @@ const CANONICAL_ESTADO_LABELS = (() => {
       map[normalized] = formatTitleCase_(normalized);
     });
   });
+  map['sin interes'] = 'Sin interés';
+  map['no desea informacion'] = 'Sin interés';
+  map['inscrito en otra escuela'] = 'Sin interés';
+  map['datos incorrectos'] = 'Datos incorrectos';
+  map['pendiente de reintento'] = 'Pendiente de reintento';
+  map['no contesta'] = 'No contesta';
+  map['mensaje no respondido'] = 'Mensaje no respondido';
+  map['mensaje no contestado'] = 'Mensaje no respondido';
+  map['seguimiento activo'] = 'Seguimiento activo';
+  map['en labor de venta'] = 'En labor de venta';
+  map['inscrito confirmado'] = 'Inscrito confirmado';
   return map;
 })();
 
