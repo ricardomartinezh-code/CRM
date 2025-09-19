@@ -9387,8 +9387,14 @@
     if(typeof value === 'number') return Number.isFinite(value) ? value : NaN;
     if(Array.isArray(value)) return value.length;
     if(typeof value === 'object'){
-      if(typeof value.total === 'number') return value.total;
-      if(typeof value.count === 'number') return value.count;
+      if('total' in value && value.total !== value){
+        const total = parseNumericValue(value.total);
+        if(Number.isFinite(total)) return total;
+      }
+      if('count' in value && value.count !== value){
+        const count = parseNumericValue(value.count);
+        if(Number.isFinite(count)) return count;
+      }
       if(Array.isArray(value.registros)) return value.registros.length;
     }
     const text = cleanValue(value);
@@ -9481,14 +9487,11 @@
   }
   function formatLosgNumber(value){
     if(value === null || value === undefined) return '';
-    if(typeof value === 'object' && !Array.isArray(value)){
-      if(typeof value.total === 'number') return String(value.total);
-      if(typeof value.count === 'number') return String(value.count);
-      if(Array.isArray(value.registros)) return String(value.registros.length);
-    }
-    if(Array.isArray(value)) return String(value.length);
     if(value instanceof Date) return formatLosgDateTime(value);
     if(typeof value === 'number' && Number.isFinite(value)) return String(value);
+    const numeric = parseNumericValue(value);
+    if(Number.isFinite(numeric)) return String(numeric);
+    if(typeof value === 'object') return formatLosgList(value);
     const text = cleanValue(value);
     if(!text) return '';
     const num = Number(text);
