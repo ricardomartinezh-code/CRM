@@ -4,7 +4,8 @@
   "description": "Static site deployment for ReLead-EDU",
   "scripts": {
     "build": "echo 'Skipping build step'",
-    "start": "serve -s . -l ${PORT:-3000}"
+    "start": "serve -s . -l ${PORT:-3000}",
+    "test": "node --test"
   },
   "keywords": [],
   "author": "",
