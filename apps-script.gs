@@ -56,6 +56,11 @@ function doGet(e){
     if(auth.error) return auth.response;
     return handleReport_(e, auth.user);
   }
+  if(action === 'operationalMetrics'){
+    const auth = requireAuth_(e, { requireActive: true });
+    if(auth.error) return auth.response;
+    return handleOperationalMetrics_(e, auth.user);
+  }
   return jsonResponse({error:'accion no soportada'}, e);
 }
 
@@ -194,6 +199,8 @@ const CANONICAL_ESTADO_LABELS = (() => {
 })();
 
 const ROUND_ROBIN_PROPERTY_PREFIX = 'ROUND_ROBIN_INDEX_';
+const OPERATIONAL_METRICS_SHEET_NAME = 'Operational Metrics';
+const OPERATIONAL_METRICS_HEADERS = ['Timestamp','Base','Asesor','Nivel','Metric','Valor','Total'];
 
 function getSpreadsheet_(){
   let ss = null;
@@ -637,6 +644,255 @@ function handleReport_(e, user){
     filtered.forEach(r=>{ const k = String(r[key]||''); if(k) out[k]=(out[k]||0)+1; });
   }
   return jsonResponse({data:out}, e);
+}
+
+function handleOperationalMetrics_(e, user){
+  e = e || { parameter: {} };
+  const params = e.parameter || {};
+  const type = params.type || 'estado';
+  const etapaFilter = String(params.etapa || '').trim().toLowerCase();
+  const fi = params.fi || '';
+  const ff = params.ff || '';
+  const requestedBases = uniqueList_(parseList_(params.bases || params.base || params.sheet));
+  const requestedAsesores = uniqueList_(parseList_(params.asesores || params.asesor));
+  const ss = getSpreadsheet_();
+  if(!ss) return jsonResponse({ error: SPREADSHEET_ERROR_MESSAGE }, e);
+  const leadSheets = ss.getSheets().filter(isLeadSheet_);
+  const accessibleNames = filterSheetsForUser_(leadSheets.map(sheet => sheet.getName()), user);
+  const accessibleLookup = new Map();
+  accessibleNames.forEach(name => {
+    const key = name.toLowerCase();
+    if(!accessibleLookup.has(key)) accessibleLookup.set(key, name);
+  });
+  const baseCandidates = requestedBases.length ? requestedBases : accessibleNames;
+  const selectedBases = [];
+  const seenBases = new Set();
+  baseCandidates.forEach(name => {
+    const trimmed = String(name || '').trim();
+    if(!trimmed) return;
+    const key = trimmed.toLowerCase();
+    if(seenBases.has(key)) return;
+    if(!accessibleLookup.has(key)) return;
+    selectedBases.push(accessibleLookup.get(key));
+    seenBases.add(key);
+  });
+  const dataset = {
+    generatedAt: new Date().toISOString(),
+    type,
+    filters: {
+      etapa: etapaFilter,
+      fi,
+      ff,
+      bases: selectedBases,
+      asesores: requestedAsesores
+    },
+    bases: []
+  };
+  const requestedAsesorLookup = new Map();
+  requestedAsesores.forEach(name => {
+    const key = name.toLowerCase();
+    if(!requestedAsesorLookup.has(key)) requestedAsesorLookup.set(key, name);
+  });
+  selectedBases.forEach(baseName => {
+    const baseParams = {
+      base: baseName,
+      sheet: baseName,
+      type,
+      etapa: etapaFilter,
+      fi,
+      ff
+    };
+    const baseReport = parseJsonOutput_(handleReport_({ parameter: baseParams }, user));
+    const baseMetrics = baseReport && typeof baseReport === 'object' ? baseReport.data || {} : {};
+    const baseTotal = sumMetricValues_(baseMetrics);
+    const sheet = ss.getSheetByName(baseName);
+    const availableAsesores = collectAsesoresForSheet_(sheet);
+    const asesores = requestedAsesores.length
+      ? requestedAsesores
+          .map(name => {
+            const key = String(name || '').trim().toLowerCase();
+            if(!key) return '';
+            const direct = availableAsesores.find(item => item.toLowerCase() === key);
+            return direct || requestedAsesorLookup.get(key) || name;
+          })
+          .filter(Boolean)
+      : availableAsesores;
+    const uniqueAsesores = uniqueList_(asesores);
+    const asesoresData = uniqueAsesores.map(name => {
+      const advisorReport = parseJsonOutput_(
+        handleReport_({ parameter: Object.assign({}, baseParams, { asesor: name }) }, user)
+      );
+      const advisorMetrics = advisorReport && typeof advisorReport === 'object' ? advisorReport.data || {} : {};
+      return {
+        name,
+        metrics: advisorMetrics,
+        total: sumMetricValues_(advisorMetrics)
+      };
+    });
+    dataset.bases.push({
+      name: baseName,
+      metrics: baseMetrics,
+      total: baseTotal,
+      asesores: asesoresData
+    });
+  });
+  dataset.summary = computeOperationalMetricsSummary_(dataset);
+  return jsonResponse({ data: dataset }, e);
+}
+
+function parseJsonOutput_(response){
+  if(!response) return {};
+  try{
+    if(typeof response.getContent === 'function'){
+      const content = response.getContent();
+      if(!content) return {};
+      return JSON.parse(content);
+    }
+    if(typeof response === 'string'){
+      const trimmed = String(response || '').trim();
+      return trimmed ? JSON.parse(trimmed) : {};
+    }
+  }catch(err){
+    return {};
+  }
+  return {};
+}
+
+function sumMetricValues_(metrics){
+  if(!metrics || typeof metrics !== 'object') return 0;
+  return Object.keys(metrics).reduce((total, key) => {
+    const value = Number(metrics[key] || 0);
+    if(isNaN(value)) return total;
+    return total + value;
+  }, 0);
+}
+
+function collectAsesoresForSheet_(sheet){
+  if(!sheet) return [];
+  const lastRow = sheet.getLastRow();
+  if(lastRow <= 1) return [];
+  const { headers, map } = getColumnMap_(sheet);
+  const asesorIndex = getColumnIndex_(map, 'Asesor');
+  if(asesorIndex === undefined) return [];
+  const values = sheet.getRange(2, 1, Math.max(0, lastRow - 1), headers.length).getValues();
+  const lookup = new Map();
+  values.forEach(row => {
+    const raw = row[asesorIndex];
+    const name = String(raw || '').trim();
+    if(!name) return;
+    if(name.toLowerCase() === 'sistema') return;
+    const key = name.toLowerCase();
+    if(!lookup.has(key)) lookup.set(key, name);
+  });
+  const asesores = Array.from(lookup.values());
+  asesores.sort((a, b) => a.localeCompare(b, 'es', { sensitivity: 'base' }));
+  return asesores;
+}
+
+function computeOperationalMetricsSummary_(dataset){
+  const summary = { totalBases: 0, totalLeads: 0, metrics: {} };
+  if(!dataset || !Array.isArray(dataset.bases)) return summary;
+  summary.totalBases = dataset.bases.length;
+  dataset.bases.forEach(base => {
+    const metrics = base && base.metrics ? base.metrics : {};
+    Object.keys(metrics).forEach(key => {
+      const value = Number(metrics[key] || 0);
+      if(isNaN(value)) return;
+      summary.metrics[key] = (summary.metrics[key] || 0) + value;
+      summary.totalLeads += value;
+    });
+  });
+  return summary;
+}
+
+function buildOperationalMetricRows_(dataset){
+  const rows = [];
+  if(!dataset || !Array.isArray(dataset.bases)) return rows;
+  const timestamp = dataset.generatedAt || new Date().toISOString();
+  dataset.bases.forEach(base => {
+    if(!base) return;
+    const baseName = base.name || '';
+    const baseTotal = Number(base.total || 0) || 0;
+    const metrics = base.metrics || {};
+    Object.keys(metrics).forEach(metricKey => {
+      const value = Number(metrics[metricKey] || 0) || 0;
+      rows.push([timestamp, baseName, '', 'base', metricKey, value, baseTotal]);
+    });
+    (base.asesores || []).forEach(asesor => {
+      if(!asesor) return;
+      const asesorName = asesor.name || asesor.asesor || '';
+      const asesorTotal = Number(asesor.total || 0) || 0;
+      const asesorMetrics = asesor.metrics || {};
+      Object.keys(asesorMetrics).forEach(metricKey => {
+        const value = Number(asesorMetrics[metricKey] || 0) || 0;
+        rows.push([timestamp, baseName, asesorName, 'asesor', metricKey, value, asesorTotal]);
+      });
+    });
+  });
+  return rows;
+}
+
+function ensureOperationalMetricsSheet_(){
+  const ss = getSpreadsheet_();
+  if(!ss) throw new Error(SPREADSHEET_ERROR_MESSAGE);
+  let sheet = ss.getSheetByName(OPERATIONAL_METRICS_SHEET_NAME);
+  if(!sheet){
+    sheet = ss.insertSheet(OPERATIONAL_METRICS_SHEET_NAME);
+  }
+  const headerRange = sheet.getRange(1, 1, 1, OPERATIONAL_METRICS_HEADERS.length);
+  let currentHeaders = [];
+  try{
+    currentHeaders = headerRange.getValues()[0] || [];
+  }catch(err){
+    currentHeaders = [];
+  }
+  const needsHeader = OPERATIONAL_METRICS_HEADERS.some((header, idx) => {
+    return String(currentHeaders[idx] || '').trim() !== header;
+  });
+  if(needsHeader){
+    headerRange.setValues([OPERATIONAL_METRICS_HEADERS]);
+    sheet.getRange(1, 1, 1, OPERATIONAL_METRICS_HEADERS.length).setFontWeight('bold');
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function syncOperationalMetricsJob(){
+  const response = parseJsonOutput_(handleOperationalMetrics_({ parameter: {} }, null));
+  const dataset = response && typeof response === 'object' ? response.data : null;
+  const rows = buildOperationalMetricRows_(dataset);
+  if(!rows.length) return;
+  let sheet;
+  try{
+    sheet = ensureOperationalMetricsSheet_();
+  }catch(err){
+    return;
+  }
+  const startRow = Math.max(2, sheet.getLastRow() + 1);
+  sheet.getRange(startRow, 1, rows.length, OPERATIONAL_METRICS_HEADERS.length).setValues(rows);
+}
+
+function ensureOperationalMetricsTrigger(){
+  const handler = 'syncOperationalMetricsJob';
+  let triggers = [];
+  try{
+    triggers = ScriptApp.getProjectTriggers();
+  }catch(err){
+    triggers = [];
+  }
+  const exists = triggers.some(trigger => {
+    try{
+      return trigger.getHandlerFunction && trigger.getHandlerFunction() === handler;
+    }catch(err){
+      return false;
+    }
+  });
+  if(exists) return;
+  try{
+    ScriptApp.newTrigger(handler).timeBased().everyHours(1).create();
+  }catch(err){
+    // Swallow trigger creation errors to avoid breaking manual executions.
+  }
 }
 
 function handleUpdateLead_(e, user){
@@ -1556,6 +1812,21 @@ function parseList_(value){
     .split(/[;,\n]/)
     .map(v => v.trim())
     .filter(Boolean);
+}
+
+function uniqueList_(values){
+  if(!Array.isArray(values)) return [];
+  const seen = new Set();
+  const list = [];
+  values.forEach(value => {
+    const normalized = String(value || '').trim();
+    if(!normalized) return;
+    const key = normalized.toLowerCase();
+    if(seen.has(key)) return;
+    seen.add(key);
+    list.push(normalized);
+  });
+  return list;
 }
 
 function joinList_(value){
