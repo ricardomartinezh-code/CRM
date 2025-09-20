@@ -3007,14 +3007,32 @@
             </section>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
           </section>
-          <div class="actions" style="margin-top:10px">
-            <button class="btn primary" id="updateBtn">Guardar</button>
-          </div>
-          <div class="actions" style="margin-top:10px">
-              <a class="btn contact-btn contact-call" id="act-call" href="#" target="_blank" rel="noopener"><i class="bi bi-telephone"></i> Llamar</a>
-              <a class="btn contact-btn contact-wa" id="act-wa" href="#" target="_blank" rel="noopener"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-              <a class="btn contact-btn contact-mail" id="act-mail" href="#" target="_blank" rel="noopener"><i class="bi bi-envelope"></i> Email</a>
-          </div
+          <section class="calendar-form" data-calendar-form aria-labelledby="calendarFormTitle">
+            <h4 id="calendarFormTitle">Agendar recordatorio</h4>
+            <p>Programa un seguimiento en Google Calendar con los datos de este lead.</p>
+            <div class="calendar-form__grid">
+              <label>Fecha
+                <input type="date" id="calendarDate" data-calendar-date required />
+              </label>
+              <label>Hora
+                <input type="time" id="calendarTime" data-calendar-time required />
+              </label>
+              <label>Duración
+                <select id="calendarDuration" data-calendar-duration>
+                  <option value="15">15 minutos</option>
+                  <option value="30">30 minutos</option>
+                  <option value="45">45 minutos</option>
+                  <option value="60">60 minutos</option>
+                </select>
+              </label>
+            </div>
+            <div class="calendar-form__actions">
+              <button type="button" class="btn outline" id="calendarCreateBtn" data-calendar-create disabled>
+                <i class="bi bi-calendar-plus"></i> Crear recordatorio
+              </button>
+            </div>
+            <p class="calendar-form__status" id="calendarStatus" data-calendar-status role="status" aria-live="polite"></p>
+          </section>
         </aside>
       </div>
       <!-- Drawer for mobile details -->
@@ -4299,6 +4317,18 @@
   const DEFAULT_TAG_COLOR = '#2563eb';
   const AUTO_REASSIGN_DIFFERENCE_THRESHOLD = 1;
   const CALENDAR_DEFAULT_DURATION = 30;
+  function getCalendarForms(){
+    return Array.from(document.querySelectorAll('[data-calendar-form]'))
+      .map(container => ({
+        container,
+        dateInput: container.querySelector('[data-calendar-date]'),
+        timeInput: container.querySelector('[data-calendar-time]'),
+        durationSelect: container.querySelector('[data-calendar-duration]'),
+        statusEl: container.querySelector('[data-calendar-status]'),
+        button: container.querySelector('[data-calendar-create]')
+      }))
+      .filter(ctx => ctx.dateInput && ctx.timeInput && ctx.durationSelect && ctx.button);
+  }
   const ACCENT_PALETTES = {
     blue: { primary: '#003a5f', secondary: '#8a9ca3', panel: '37,99,235' },
     green: { primary: '#047857', secondary: '#22c55e', panel: '5,150,105' },
@@ -10392,15 +10422,15 @@
     if(leadTagAddBtn){
       leadTagAddBtn.disabled = true;
     }
-    const calendarStatusEl = el('#calendarStatus');
-    if(calendarStatusEl){
-      calendarStatusEl.textContent = '';
-    }
-    const calendarBtn = el('#calendarCreateBtn');
-    if(calendarBtn){
-      calendarBtn.disabled = true;
-      calendarBtn.dataset.href = '';
-    }
+    getCalendarForms().forEach(ctx => {
+      if(ctx.statusEl){
+        ctx.statusEl.textContent = '';
+      }
+      if(ctx.button){
+        ctx.button.disabled = true;
+        ctx.button.dataset.href = '';
+      }
+    });
     if(panelHideTimer){
       clearTimeout(panelHideTimer);
       panelHideTimer = null;
@@ -11244,7 +11274,6 @@
     updateLeadDetailAssignmentDisplay(r);
     updateLeadTagsSection(r);
     updateAutoReassignDetail(r);
-    prepareCalendarForm(r);
 
     const stageEl = el('#d-etapa');
     const panelEl = el('#panelOverlay .panel');
@@ -11745,10 +11774,33 @@
             <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar actualización</button>
           </div>
           <p class="contact-scripts__status hidden" id="drawerContactScriptStatus" role="status" aria-live="polite"></p>
-        </div>
-        <div class="actions" style="margin-top:12px">
-          <button class="btn primary" type="button" id="drawerUpdateBtn">Guardar</button>
-        </div>`;
+        </section>
+        <section class="calendar-form drawer-calendar" data-calendar-form aria-label="Agendar recordatorio">
+          <h4>Agendar recordatorio</h4>
+          <p>Programa un seguimiento en Google Calendar con los datos del lead.</p>
+          <div class="calendar-form__grid">
+            <label>Fecha
+              <input type="date" id="drawerCalendarDate" data-calendar-date required />
+            </label>
+            <label>Hora
+              <input type="time" id="drawerCalendarTime" data-calendar-time required />
+            </label>
+            <label>Duración
+              <select id="drawerCalendarDuration" data-calendar-duration>
+                <option value="15">15 minutos</option>
+                <option value="30">30 minutos</option>
+                <option value="45">45 minutos</option>
+                <option value="60">60 minutos</option>
+              </select>
+            </label>
+          </div>
+          <div class="calendar-form__actions">
+            <button class="btn outline" type="button" id="drawerCalendarCreateBtn" data-calendar-create disabled>
+              <i class='bi bi-calendar-plus'></i> Crear recordatorio
+            </button>
+          </div>
+          <p class="calendar-form__status" id="drawerCalendarStatus" data-calendar-status role="status" aria-live="polite"></p>
+        </section>`;
       applyDrawerContactButtons();
       registerForm({
         etapaSelect: el('#drawerEtapa'),
@@ -11760,6 +11812,7 @@
         feedbackMessageEl: el('#drawerFeedbackMessage')
       });
     }
+    prepareCalendarForm(r);
     applyContactScripts();
     syncSaveAvailability();
   }
@@ -12354,61 +12407,80 @@
   }
 
   function updateCalendarStatusMessage(lead){
-    const dateInput = el('#calendarDate');
-    const timeInput = el('#calendarTime');
-    const durationSelect = el('#calendarDuration');
-    const statusEl = el('#calendarStatus');
-    const button = el('#calendarCreateBtn');
-    if(!dateInput || !timeInput || !durationSelect || !button) return;
-    const duration = Number(durationSelect.value) || CALENDAR_DEFAULT_DURATION;
-    const start = parseCalendarDateTime(dateInput.value, timeInput.value);
-    if(!start){
-      button.disabled = true;
-      button.dataset.href = '';
+    const activeLead = lead || detailLeadContext || null;
+    getCalendarForms().forEach(ctx => {
+      const { dateInput, timeInput, durationSelect, statusEl, button } = ctx;
+      if(!dateInput || !timeInput || !durationSelect || !button) return;
+      const duration = Number(durationSelect.value) || CALENDAR_DEFAULT_DURATION;
+      const start = parseCalendarDateTime(dateInput.value, timeInput.value);
+      if(!start){
+        button.disabled = true;
+        button.dataset.href = '';
+        if(statusEl){
+          statusEl.textContent = 'Selecciona fecha y hora válidas para agendar el seguimiento.';
+        }
+        return;
+      }
+      const end = new Date(start.getTime() + duration * 60000);
+      const url = buildCalendarEventLink(activeLead, start, end);
+      button.disabled = false;
+      button.dataset.href = url;
       if(statusEl){
-        statusEl.textContent = 'Selecciona fecha y hora válidas para agendar el seguimiento.';
+        let formatted;
+        try{
+          formatted = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(start);
+        }catch(err){
+          formatted = `${dateInput.value} ${timeInput.value}`;
+        }
+        statusEl.textContent = `El recordatorio se programará el ${formatted} (${duration} minutos).`;
       }
-      return;
-    }
-    const end = new Date(start.getTime() + duration * 60000);
-    const url = buildCalendarEventLink(lead, start, end);
-    button.disabled = false;
-    button.dataset.href = url;
-    if(statusEl){
-      let formatted;
-      try{
-        formatted = new Intl.DateTimeFormat('es-MX', { dateStyle: 'medium', timeStyle: 'short' }).format(start);
-      }catch(err){
-        formatted = `${dateInput.value} ${timeInput.value}`;
-      }
-      statusEl.textContent = `El recordatorio se programará el ${formatted} (${duration} minutos).`;
-    }
+    });
   }
 
   function prepareCalendarForm(lead){
-    const dateInput = el('#calendarDate');
-    const timeInput = el('#calendarTime');
-    const durationSelect = el('#calendarDuration');
-    const statusEl = el('#calendarStatus');
-    const button = el('#calendarCreateBtn');
-    if(!dateInput || !timeInput || !durationSelect || !button) return;
+    const contexts = getCalendarForms();
+    if(!contexts.length) return;
     const defaultStart = getDefaultCalendarStart();
-    dateInput.value = formatDateInput(defaultStart);
-    timeInput.value = formatTimeInput(defaultStart);
-    durationSelect.value = String(CALENDAR_DEFAULT_DURATION);
-    if(durationSelect.value !== String(CALENDAR_DEFAULT_DURATION) && durationSelect.options.length){
-      durationSelect.value = durationSelect.options[0].value;
-    }
-    if(statusEl){
-      statusEl.textContent = '';
-    }
-    button.disabled = false;
-    button.dataset.href = '';
+    contexts.forEach(ctx => {
+      if(ctx.dateInput){
+        ctx.dateInput.value = formatDateInput(defaultStart);
+      }
+      if(ctx.timeInput){
+        ctx.timeInput.value = formatTimeInput(defaultStart);
+      }
+      if(ctx.durationSelect){
+        const defaultValue = String(CALENDAR_DEFAULT_DURATION);
+        ctx.durationSelect.value = defaultValue;
+        if(ctx.durationSelect.value !== defaultValue && ctx.durationSelect.options.length){
+          ctx.durationSelect.value = ctx.durationSelect.options[0].value;
+        }
+      }
+      if(ctx.statusEl){
+        ctx.statusEl.textContent = '';
+      }
+      if(ctx.button){
+        ctx.button.disabled = true;
+        ctx.button.dataset.href = '';
+      }
+    });
     updateCalendarStatusMessage(lead);
   }
 
-  function handleCalendarCreate(){
-    const button = el('#calendarCreateBtn');
+  function handleCalendarCreate(target){
+    let button = null;
+    if(target){
+      if(typeof target.matches === 'function'){
+        button = target.matches('[data-calendar-create]') ? target : target.closest('[data-calendar-create]');
+      }else if(target.currentTarget && typeof target.currentTarget.matches === 'function'){
+        button = target.currentTarget;
+      }else if(target.target && typeof target.target.closest === 'function'){
+        button = target.target.closest('[data-calendar-create]');
+      }
+    }
+    if(!button){
+      const fallback = el('#calendarCreateBtn');
+      button = fallback && !fallback.disabled ? fallback : null;
+    }
     if(!button || button.disabled) return;
     const href = button.dataset.href;
     if(!href){
@@ -13580,19 +13652,22 @@
         }
       });
     }
-    const calendarInputs = [el('#calendarDate'), el('#calendarTime'), el('#calendarDuration')];
-    calendarInputs.forEach(input => {
-      if(!input) return;
-      const handler = () => updateCalendarStatusMessage(detailLeadContext);
-      input.addEventListener('change', handler);
-      if(input.tagName === 'INPUT'){
-        input.addEventListener('input', handler);
+    document.addEventListener('input', event => {
+      if(event.target && event.target.matches('[data-calendar-date],[data-calendar-time]')){
+        updateCalendarStatusMessage(detailLeadContext);
       }
     });
-    const calendarBtn = el('#calendarCreateBtn');
-    if(calendarBtn){
-      calendarBtn.addEventListener('click', handleCalendarCreate);
-    }
+    document.addEventListener('change', event => {
+      if(event.target && event.target.matches('[data-calendar-duration]')){
+        updateCalendarStatusMessage(detailLeadContext);
+      }
+    });
+    document.addEventListener('click', event => {
+      const button = event.target && event.target.closest ? event.target.closest('[data-calendar-create]') : null;
+      if(!button) return;
+      event.preventDefault();
+      handleCalendarCreate(button);
+    });
 
     // Tamaño de página
     const sizeSel = el('#pageSize');
