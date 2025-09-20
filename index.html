@@ -2516,7 +2516,7 @@
             </label>
             <div class="login-actions">
               <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
-              <button type="button" class="btn outline w100" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
+              <button type="button" class="btn outline w100 hidden" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
             </div>
           </form>
           <p class="login-message login-error hidden" id="loginError" role="alert"></p>
@@ -17193,6 +17193,36 @@
 
   const connectionCheckBtn = document.getElementById('connectionCheckBtn');
   if(connectionCheckBtn){
+    connectionCheckBtn.classList.add('hidden');
+
+    const versionTargets = document.querySelectorAll('.site-footer__version, .login-meta__version');
+    let secretClickCount = 0;
+    let secretClickTimer = null;
+    const SECRET_CLICK_RESET_DELAY_MS = 800;
+
+    const resetSecretClickCounter = () => {
+      secretClickCount = 0;
+      if(secretClickTimer){
+        clearTimeout(secretClickTimer);
+        secretClickTimer = null;
+      }
+    };
+
+    const handleVersionSecretClick = () => {
+      secretClickCount += 1;
+      if(secretClickCount === 1){
+        secretClickTimer = setTimeout(resetSecretClickCounter, SECRET_CLICK_RESET_DELAY_MS);
+      }
+      if(secretClickCount >= 3){
+        connectionCheckBtn.classList.remove('hidden');
+        resetSecretClickCounter();
+      }
+    };
+
+    versionTargets.forEach(node => {
+      node.addEventListener('click', handleVersionSecretClick);
+    });
+
     connectionCheckBtn.addEventListener('click', () => {
       checkAppsScriptConnection();
     });
