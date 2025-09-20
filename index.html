@@ -3897,6 +3897,15 @@
   const appConfig = window.ReLeadConfig || {};
   const API_URL = appConfig.API_URL || 'https://script.google.com/macros/s/AKfycbxsPlLLD3NK3vfbyM4dQ_H7EJERXoyFCPcrK_iFwOTzplzvz8NHrefqxq8M7VrnvA7P/exec';
   const REQUEST_TIMEOUT_MS = Number.isFinite(appConfig.REQUEST_TIMEOUT_MS) ? appConfig.REQUEST_TIMEOUT_MS : 45000;
+  const SESSION_HEARTBEAT_INTERVAL_MS = Number.isFinite(appConfig.SESSION_HEARTBEAT_INTERVAL_MS)
+    ? Math.max(60000, appConfig.SESSION_HEARTBEAT_INTERVAL_MS)
+    : 5 * 60 * 1000;
+  const SESSION_HEARTBEAT_TIMEOUT_MS = Number.isFinite(appConfig.SESSION_HEARTBEAT_TIMEOUT_MS)
+    ? Math.max(5000, Math.min(appConfig.SESSION_HEARTBEAT_TIMEOUT_MS, REQUEST_TIMEOUT_MS))
+    : Math.min(REQUEST_TIMEOUT_MS, 15000);
+  const SESSION_HEARTBEAT_JITTER_MS = Number.isFinite(appConfig.SESSION_HEARTBEAT_JITTER_MS)
+    ? Math.max(0, appConfig.SESSION_HEARTBEAT_JITTER_MS)
+    : 15000;
   const DEFAULT_APP_VERSION = '1.0.0';
   const rawAppVersion = typeof appConfig.VERSION === 'string' ? appConfig.VERSION.trim() : '';
   const APP_VERSION = rawAppVersion || DEFAULT_APP_VERSION;
@@ -4499,6 +4508,7 @@
   const AUTH_STORAGE_KEY = 'pulseAuthState';
   let authToken = '';
   let currentUser = null;
+  let sessionHeartbeatTimer = null;
   let hasBound = false;
   let userProfile = loadStoredProfile();
   let userPreferences = loadStoredPreferences();
@@ -7100,6 +7110,74 @@
     updateUserBadge();
   }
 
+  function stopSessionHeartbeat(){
+    if(sessionHeartbeatTimer){
+      clearTimeout(sessionHeartbeatTimer);
+      sessionHeartbeatTimer = null;
+    }
+  }
+
+  function scheduleSessionHeartbeat(delay){
+    stopSessionHeartbeat();
+    if(!authToken) return;
+    const baseDelay = Number.isFinite(delay) && delay > 0 ? delay : SESSION_HEARTBEAT_INTERVAL_MS;
+    const jitter = SESSION_HEARTBEAT_JITTER_MS > 0
+      ? Math.floor(Math.random() * SESSION_HEARTBEAT_JITTER_MS)
+      : 0;
+    sessionHeartbeatTimer = setTimeout(runSessionHeartbeat, baseDelay + jitter);
+  }
+
+  function startSessionHeartbeat(options = {}){
+    if(!authToken) return;
+    const initialDelay = Number.isFinite(options.delay) && options.delay > 0
+      ? options.delay
+      : SESSION_HEARTBEAT_INTERVAL_MS;
+    scheduleSessionHeartbeat(initialDelay);
+  }
+
+  async function runSessionHeartbeat(){
+    if(!authToken){
+      stopSessionHeartbeat();
+      return;
+    }
+    try{
+      const res = await apiFetch(API_URL, {
+        method: 'POST',
+        body: { action: 'refreshSession' },
+        dedupeKey: 'session:heartbeat',
+        label: 'Session heartbeat',
+        timeout: SESSION_HEARTBEAT_TIMEOUT_MS
+      });
+      if(!res.ok) throw new Error(`HTTP ${res.status}`);
+      let data = null;
+      try{
+        data = await res.json();
+      }catch(_err){
+        data = null;
+      }
+      if(data && data.error){
+        throw new Error(data.error);
+      }
+      if(authToken){
+        const nextToken = data && data.token ? data.token : authToken;
+        const nextUser = data && data.user ? data.user : currentUser;
+        setAuthState(nextToken, nextUser, true);
+        hydrateProfileFromUser();
+      }
+    }catch(err){
+      if(err && err.code === 'UNAUTHORIZED'){
+        return;
+      }
+      console.warn('No se pudo renovar la sesión.', err);
+    }finally{
+      if(authToken){
+        scheduleSessionHeartbeat();
+      }else{
+        stopSessionHeartbeat();
+      }
+    }
+  }
+
   function getUserRole(){
     if(currentUser && currentUser.role){
       return String(currentUser.role).trim().toLowerCase();
@@ -8061,6 +8139,10 @@
   async function onAuthenticated(token, user, options = {}){
     const persist = options.persist !== false;
     setAuthState(token, user, persist);
+    const heartbeatDelay = Number.isFinite(options.heartbeatDelay) && options.heartbeatDelay >= 0
+      ? options.heartbeatDelay
+      : Math.min(SESSION_HEARTBEAT_INTERVAL_MS, 60000);
+    startSessionHeartbeat({ delay: heartbeatDelay });
     resetAppData();
     state = createInitialState();
     hydrateProfileFromUser();
@@ -8100,6 +8182,7 @@
   }
 
   function handleUnauthorized(message){
+    stopSessionHeartbeat();
     clearAuthState();
     authToken = '';
     currentUser = null;
@@ -8112,6 +8195,7 @@
   async function performLogout(){
     const logoutBtn = document.getElementById('logoutBtn');
     if(logoutBtn && logoutBtn.disabled) return;
+    stopSessionHeartbeat();
     if(logoutBtn){
       setNavLinkBusy(logoutBtn, true);
     }
@@ -8130,13 +8214,7 @@
       if(logoutBtn){
         setNavLinkBusy(logoutBtn, false);
       }
-      clearAuthState();
-      authToken = '';
-      currentUser = null;
-      updateUserBadge();
-      resetAppData();
-      state = createInitialState();
-      showLoginScreen('Sesión cerrada.');
+      handleUnauthorized('Sesión cerrada.');
     }
   }
 

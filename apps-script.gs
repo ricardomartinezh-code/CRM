@@ -116,6 +116,11 @@ function doPost(e){
     if(auth.error) return auth.response;
     return handleImportLeads_(e, body, auth.user);
   }
+  if(action === 'refreshSession'){
+    const auth = requireAuth_(e, { body, requireActive: true });
+    if(auth.error) return auth.response;
+    return handleRefreshSession_(e, auth.user);
+  }
   if(action === 'requestPasswordReset'){
     return handlePasswordResetRequest_(e, body);
   }
@@ -134,6 +139,11 @@ function doPost(e){
     const auth = requireAuth_(e, { body, requireActive: true, role: 'admin' });
     if(auth.error) return auth.response;
     return handleRepairSheetStructure_(e, body, auth.user);
+  }
+  if(action === 'logout'){
+    const auth = requireAuth_(e, { body, requireActive: true });
+    if(auth.error) return auth.response;
+    return handleLogout_(e, auth.user);
   }
   return jsonResponse({error:'accion no soportada'}, e);
 }
@@ -216,6 +226,11 @@ const CANONICAL_ESTADO_LABELS = (() => {
 const ROUND_ROBIN_PROPERTY_PREFIX = 'ROUND_ROBIN_INDEX_';
 const OPERATIONAL_METRICS_SHEET_NAME = 'Operational Metrics';
 const OPERATIONAL_METRICS_HEADERS = ['Timestamp','Base','Asesor','Nivel','Metric','Valor','Total'];
+const DIAGNOSTICS_PRIORITY_BASE_PROPERTY = 'DIAGNOSTICS_PRIORITY_BASE';
+const DIAGNOSTICS_CONTROL_SHEET_NAME = 'Diagnostics Control';
+const DIAGNOSTICS_CONTROL_HEADERS = ['Fecha','Base solicitada','Base analizada','Errores','Advertencias','Filas inválidas','Estado','Resumen'];
+const DIAGNOSTICS_ALERT_RECIPIENTS_PROPERTY = 'DIAGNOSTICS_ALERT_RECIPIENTS';
+const DIAGNOSTICS_ALERT_WEBHOOK_PROPERTY = 'DIAGNOSTICS_ALERT_WEBHOOK';
 
 function getSpreadsheet_(){
   let ss = null;
@@ -1595,9 +1610,8 @@ function normalizeGmailThread_(body){
   };
 }
 
-function handleDiagnostics_(e, user){
-  e = e || { parameter: {} };
-  const requestedSheet = e.parameter.sheet || '';
+function computeDiagnosticsReport_(requestedSheet){
+  const requested = String(requestedSheet || '').trim();
   const timezone = Session.getScriptTimeZone() || '';
   const result = {
     timestamp: new Date().toISOString(),
@@ -1616,7 +1630,7 @@ function handleDiagnostics_(e, user){
     sheets: [],
     aggregate: { duplicateIds: [], duplicatePhones: [] },
     login: getAuthDiagnostics_(),
-    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested },
+    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested, analyzedSheet: '', sheetNames: [] },
     summary: { sheetsWithErrors: 0, sheetsWithWarnings: 0, invalidRows: 0 },
     system: { status: 'En espera', timezone }
   };
@@ -1634,7 +1648,7 @@ function handleDiagnostics_(e, user){
   }
   const leadSheets = ss.getSheets().filter(isLeadSheet_);
   result.status.totalSheets = leadSheets.length;
-  result.status.sheetNames = leadSheets.map(s => s.getName());
+  result.status.sheetNames = leadSheets.map(sheet => sheet.getName());
   let targetSheet = requested ? ss.getSheetByName(requested) : null;
   if(requested && !targetSheet){
     result.warnings.push('La hoja solicitada "' + requested + '" no existe. Se utilizará la primera hoja disponible.');
@@ -1652,6 +1666,7 @@ function handleDiagnostics_(e, user){
     return result;
   }
   result.sheet = targetSheet.getName();
+  result.status.analyzedSheet = result.sheet;
   result.connection = true;
   result.checks.connection.ok = true;
   result.checks.connection.message = 'Hoja "' + result.sheet + '" disponible para análisis.';
@@ -1669,7 +1684,7 @@ function handleDiagnostics_(e, user){
   }
 
   try{
-    const cell = targetSheet.getRange(1,1);
+    const cell = targetSheet.getRange(1, 1);
     cell.setValue(cell.getValue());
     result.write = true;
     result.checks.write.ok = true;
@@ -1698,16 +1713,26 @@ function handleDiagnostics_(e, user){
 
   result.summary.sheetsWithErrors = result.sheets.filter(s => !s.ok).length;
   result.summary.sheetsWithWarnings = result.sheets.filter(s => s.hasWarnings).length;
-  result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + s.invalidCount, 0);
-  result.system.status = result.summary.sheetsWithErrors ? 'Con incidencias' : 'Operativo';
+  result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + (Number(s.invalidCount) || 0), 0);
+
+  if(result.summary.sheetsWithErrors){
+    result.system.status = 'Con incidencias';
+  }else if(result.summary.sheetsWithWarnings){
+    result.system.status = 'Con advertencias';
+  }else{
+    result.system.status = 'Operativo';
+  }
 
   return result;
 }
 
 function handleDiagnostics_(e, user){
   e = e || { parameter: {} };
-  const requestedSheet = e.parameter.sheet || '';
+  const requestedSheet = String(e.parameter.sheet || '').trim();
   const report = computeDiagnosticsReport_(requestedSheet);
+  if(report && report.status && !report.status.requestedSheet){
+    report.status.requestedSheet = requestedSheet;
+  }
   return jsonResponse(report, e);
 }
 
@@ -2818,6 +2843,41 @@ function sanitizeUserForClient_(user){
   };
 }
 
+function updateUserAuditFields_(lookup, options){
+  const opts = options || {};
+  if(!lookup || !lookup.user || !lookup.sheet || !lookup.map) return null;
+  const user = lookup.user;
+  const rowIndex = Number(user.rowIndex || 0);
+  if(!rowIndex) return null;
+  const sheet = lookup.sheet;
+  const map = lookup.map;
+  const totalCols = sheet.getLastColumn();
+  const range = sheet.getRange(rowIndex, 1, 1, totalCols);
+  const row = range.getValues()[0];
+  const now = opts.now instanceof Date ? opts.now : new Date();
+  const timestamp = typeof opts.timestamp === 'string' && opts.timestamp
+    ? opts.timestamp
+    : formatDateTime_(now);
+  if(opts.updateLastLogin){
+    setRowValue_(row, map, 'UltimoIngreso', timestamp);
+    user.lastLogin = timestamp;
+  }
+  setRowValue_(row, map, 'ActualizadoEl', timestamp);
+  user.updatedAt = timestamp;
+  if(opts.rotateTokenVersion){
+    const nextVersion = generateTokenVersion_();
+    setRowValue_(row, map, 'TokenVersion', nextVersion);
+    user.tokenVersion = nextVersion;
+  }else if(typeof opts.forceTokenVersion === 'string' && opts.forceTokenVersion){
+    setRowValue_(row, map, 'TokenVersion', opts.forceTokenVersion);
+    user.tokenVersion = opts.forceTokenVersion;
+  }else if(user.tokenVersion){
+    setRowValue_(row, map, 'TokenVersion', user.tokenVersion);
+  }
+  range.setValues([row]);
+  return timestamp;
+}
+
 function mapTeamRow_(row, map){
   const get = name => {
     const idx = getColumnIndex_(map, name);
@@ -3307,27 +3367,55 @@ function handleLogin_(e, body){
   if(!verifyPassword_(password, user.passwordHash, user.salt)){
     return jsonResponse({ error:'Credenciales inválidas.' }, e);
   }
-  const sheet = lookup.sheet;
-  const map = lookup.map;
-  const rowIndex = user.rowIndex;
-  const totalCols = sheet.getLastColumn();
-  const row = sheet.getRange(rowIndex, 1, 1, totalCols).getValues()[0];
-  const now = new Date();
-  const timestamp = formatDateTime_(now);
-  setRowValue_(row, map, 'UltimoIngreso', timestamp);
-  setRowValue_(row, map, 'ActualizadoEl', timestamp);
-  if(!user.tokenVersion){
-    user.tokenVersion = generateTokenVersion_();
-    setRowValue_(row, map, 'TokenVersion', user.tokenVersion);
-  }
-  sheet.getRange(rowIndex, 1, 1, totalCols).setValues([row]);
-  user.lastLogin = timestamp;
-  user.updatedAt = timestamp;
+  updateUserAuditFields_(lookup, { updateLastLogin: true, rotateTokenVersion: !user.tokenVersion });
   const token = createToken_(user);
   const sanitized = sanitizeUserForClient_(user);
-  sanitized.lastLogin = timestamp;
-  sanitized.updatedAt = timestamp;
   return jsonResponse({ ok:true, token, user: sanitized }, e);
+}
+
+function handleRefreshSession_(e, authUser){
+  const userId = String(authUser?.userId || '').trim();
+  if(!userId){
+    return jsonResponse({ error:'Usuario no encontrado.' }, e);
+  }
+  let lookup;
+  try{
+    lookup = findUserById_(userId);
+  }catch(err){
+    const message = err && err.message ? err.message : SPREADSHEET_ERROR_MESSAGE;
+    return jsonResponse({ error: message }, e);
+  }
+  const user = lookup.user;
+  if(!user){
+    return jsonResponse({ error:'Usuario no encontrado.' }, e);
+  }
+  if(user.active === false){
+    return jsonResponse({ error:'Tu usuario está inactivo.' }, e);
+  }
+  updateUserAuditFields_(lookup, { updateLastLogin: true });
+  const token = createToken_(user);
+  const sanitized = sanitizeUserForClient_(user);
+  return jsonResponse({ ok:true, token, user: sanitized }, e);
+}
+
+function handleLogout_(e, authUser){
+  const userId = String(authUser?.userId || '').trim();
+  if(!userId){
+    return jsonResponse({ ok:true }, e);
+  }
+  let lookup;
+  try{
+    lookup = findUserById_(userId);
+  }catch(err){
+    const message = err && err.message ? err.message : SPREADSHEET_ERROR_MESSAGE;
+    return jsonResponse({ error: message }, e);
+  }
+  const user = lookup.user;
+  if(!user){
+    return jsonResponse({ ok:true }, e);
+  }
+  updateUserAuditFields_(lookup, { rotateTokenVersion: true });
+  return jsonResponse({ ok:true }, e);
 }
 
 function handlePasswordResetRequest_(e, body){
