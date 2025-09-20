@@ -182,15 +182,15 @@
       z-index:100;
       display:flex;
       flex-direction:column;
-      gap:calc(var(--space) * 1.5);
+      gap:calc(var(--space) * 1.75);
       align-items:stretch;
       justify-content:center;
-      padding-block:clamp(calc(var(--space) * 2), 8vh, calc(var(--space) * 4));
+      padding-block:clamp(calc(var(--space) * 2.75), 12vh, calc(var(--space) * 5.5));
       padding-inline:clamp(var(--space), 5vw, calc(var(--space) * 4));
-      padding-top:clamp(calc(var(--space) * 2 + constant(safe-area-inset-top)), 8vh, calc(var(--space) * 4 + constant(safe-area-inset-top)));
-      padding-top:clamp(calc(var(--space) * 2 + env(safe-area-inset-top)), 8vh, calc(var(--space) * 4 + env(safe-area-inset-top)));
-      padding-bottom:clamp(calc(var(--space) * 2 + constant(safe-area-inset-bottom)), 6vh, calc(var(--space) * 3.5 + constant(safe-area-inset-bottom)));
-      padding-bottom:clamp(calc(var(--space) * 2 + env(safe-area-inset-bottom)), 6vh, calc(var(--space) * 3.5 + env(safe-area-inset-bottom)));
+      padding-top:clamp(calc(var(--space) * 3 + constant(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + constant(safe-area-inset-top)));
+      padding-top:clamp(calc(var(--space) * 3 + env(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + env(safe-area-inset-top)));
+      padding-bottom:clamp(calc(var(--space) * 2.5 + constant(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + constant(safe-area-inset-bottom)));
+      padding-bottom:clamp(calc(var(--space) * 2.5 + env(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + env(safe-area-inset-bottom)));
       overflow-y:auto;
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
@@ -200,6 +200,36 @@
       grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
       gap:calc(var(--space) * 2);
       align-items:center;
+    }
+    .login-panel{
+      width:min(100%, 540px);
+      margin-inline:auto;
+      padding:clamp(calc(var(--space) * 1.75), 4vw, calc(var(--space) * 3));
+      border-radius:38px;
+      background:linear-gradient(155deg, rgba(11,18,32,0.92), rgba(37,99,235,0.42));
+      border:1px solid rgba(255,255,255,0.18);
+      box-shadow:0 32px 70px rgba(8,15,28,0.5);
+      backdrop-filter:blur(20px);
+      display:flex;
+      flex-direction:column;
+      align-items:stretch;
+    }
+    .login-panel .login-card{
+      width:min(100%, 400px);
+      margin-inline:auto;
+      background:color-mix(in srgb, var(--card) 90%, rgba(37,99,235,0.12) 10%);
+      border-color:rgba(255,255,255,0.22);
+      box-shadow:0 20px 48px rgba(8,15,28,0.35);
+    }
+    html[data-theme="light"] .login-panel{
+      background:linear-gradient(155deg, rgba(248,250,252,0.92), rgba(148,163,184,0.38));
+      border-color:rgba(15,23,42,0.12);
+      box-shadow:0 28px 58px rgba(15,23,42,0.18);
+    }
+    html[data-theme="light"] .login-panel .login-card{
+      background:color-mix(in srgb, #ffffff 94%, rgba(37,99,235,0.08) 6%);
+      border-color:rgba(15,23,42,0.1);
+      box-shadow:0 18px 46px rgba(15,23,42,0.14);
     }
     .landing-hero{
       display:flex;
@@ -352,7 +382,8 @@
       .hero-metrics__track{ gap:var(--space-sm); animation-duration:38s; }
       .hero-metric{ min-width:180px; scroll-snap-align:start; }
       .login-screen{ padding-inline:max(var(--space), 6vw); }
-      .login-card{ max-width:420px; width:100%; margin-inline:auto; padding:calc(var(--space) * 1.3); }
+      .login-panel{ max-width:480px; padding:calc(var(--space) * 1.5); }
+      .login-panel .login-card{ width:100%; padding:calc(var(--space) * 1.3); }
       .login-actions{ gap:var(--space-sm); }
       .mobile-topbar{ padding-inline:var(--space); }
       .topbar-inner{ padding-inline:var(--space); }
@@ -364,8 +395,9 @@
       .hero-note{ font-size:13px; }
       .hero-metrics__viewport{ scroll-snap-type:x mandatory; }
       .hero-metrics__track{ width:max-content; }
-      .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.2); }
-      .login-card{ padding:var(--space); gap:var(--space-sm); }
+      .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.4); }
+      .login-panel{ max-width:440px; padding:calc(var(--space) * 1.35); border-radius:32px; }
+      .login-panel .login-card{ padding:var(--space); gap:var(--space-sm); }
       .login-intro{ font-size:13px; }
       .login-meta{ margin-top:var(--space); }
       .login-actions .btn.primary{ font-size:1rem; padding:12px 16px; }
@@ -382,7 +414,7 @@
     @media (max-width: 720px){
       .login-screen{
         justify-content:flex-start;
-        padding-block:clamp(calc(var(--space) * 1.75), 6vh, calc(var(--space) * 3));
+        padding-block:clamp(calc(var(--space) * 2.25), 10vh, calc(var(--space) * 4));
         padding-inline:clamp(calc(var(--space) * 0.75), 6vw, calc(var(--space) * 2));
       }
       .landing-layout{
@@ -400,14 +432,19 @@
       .hero-metrics{ margin-inline:auto; max-width:100%; }
       .hero-metric{ min-width:160px; padding:16px 18px; }
       .hero-metrics__track{ animation-duration:24s; }
-      .login-card{
+      .login-panel{
         order:-1;
+        width:min(100%, 460px);
         margin-inline:auto;
-        width:min(100%, 420px);
-        padding:calc(var(--space) * 1.25);
+        padding:calc(var(--space) * 1.5);
       }
-      html[data-theme="light"] .login-card{
-        box-shadow:0 18px 48px rgba(15,23,42,0.16);
+      .login-panel .login-card{
+        width:100%;
+        padding:calc(var(--space) * 1.2);
+        box-shadow:none;
+      }
+      html[data-theme="light"] .login-panel{
+        box-shadow:0 22px 54px rgba(15,23,42,0.16);
       }
       .login-intro{ font-size:13px; }
       .login-actions{ margin-top:var(--space); }
@@ -418,10 +455,8 @@
         border-radius:22px;
       }
       .hero-metric{ min-width:150px; padding:14px 16px; }
-      .login-card{
-        padding:calc(var(--space) * 1.1);
-        border-radius:24px;
-      }
+      .login-panel{ padding:calc(var(--space) * 1.2); border-radius:28px; }
+      .login-panel .login-card{ padding:calc(var(--space) * 1.05); border-radius:24px; }
       .login-title{ font-size:1.35rem; }
       .login-actions .btn.primary{
         font-size:1rem;
@@ -2569,54 +2604,56 @@
           </div>
         </div>
       </section>
-      <div class="login-card" role="dialog" aria-labelledby="loginTitle">
-        <div class="login-logo" aria-hidden="true">
-          <img src="./icon-unidep180.png" alt="" width="132" height="132" />
+      <div class="login-panel">
+        <div class="login-card" role="dialog" aria-labelledby="loginTitle">
+          <div class="login-logo" aria-hidden="true">
+            <img src="./icon-unidep180.png" alt="" width="132" height="132" />
+          </div>
+          <h1 id="loginTitle" class="login-title">ReLead EDU</h1>
+          <p class="login-intro">Bienvenido. Si es tu primer acceso, utiliza el correo e ID que te compartió la coordinación para generar tu contraseña y empezar a atender leads de inmediato.</p>
+          <div id="loginSignIn" aria-hidden="false">
+            <form class="login-form" id="loginForm" autocomplete="off">
+              <label>
+                <span>Correo institucional</span>
+                <input type="email" id="loginEmail" autocomplete="username" required />
+              </label>
+              <label>
+                <span>Contraseña</span>
+                <input type="password" id="loginPassword" autocomplete="current-password" required />
+              </label>
+              <div class="login-actions">
+                <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
+                <button type="button" class="btn outline w100 hidden" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
+              </div>
+            </form>
+            <p class="login-message login-error hidden" id="loginError" role="alert"></p>
+            <p class="login-message login-info hidden" id="connectionStatus" role="status" aria-live="polite"></p>
+            <p class="login-hint" id="loginHint">¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.</p>
+          </div>
+          <div id="loginReset" class="hidden" aria-hidden="true">
+            <form class="login-form" id="resetForm" autocomplete="off">
+              <p class="login-hint">Ingresa el correo institucional y tu ID de usuario tal como aparecen en tu hoja de asignación para generar una contraseña temporal de acceso inicial.</p>
+              <label>
+                <span>Correo institucional</span>
+                <input type="email" id="resetEmail" autocomplete="username" required />
+              </label>
+              <label>
+                <span>ID de usuario</span>
+                <input type="text" id="resetUserId" autocomplete="off" required />
+              </label>
+              <div class="login-actions">
+                <button type="submit" class="btn primary w100" id="resetSubmit">Crear contraseña temporal</button>
+                <button type="button" class="btn w100" id="resetCancel">Volver a iniciar sesión</button>
+              </div>
+            </form>
+            <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
+            <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
+          </div>
+          <footer class="login-meta">
+            <span class="login-meta__version" data-version-format="Versión {version}"></span>
+            <span class="login-meta__rights">ReLead<sup>©</sup> Todos los Derechos Reservados</span>
+          </footer>
         </div>
-        <h1 id="loginTitle" class="login-title">ReLead EDU</h1>
-        <p class="login-intro">Bienvenido. Si es tu primer acceso, utiliza el correo e ID que te compartió la coordinación para generar tu contraseña y empezar a atender leads de inmediato.</p>
-        <div id="loginSignIn" aria-hidden="false">
-          <form class="login-form" id="loginForm" autocomplete="off">
-            <label>
-              <span>Correo institucional</span>
-              <input type="email" id="loginEmail" autocomplete="username" required />
-            </label>
-            <label>
-              <span>Contraseña</span>
-              <input type="password" id="loginPassword" autocomplete="current-password" required />
-            </label>
-            <div class="login-actions">
-              <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
-              <button type="button" class="btn outline w100 hidden" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
-            </div>
-          </form>
-          <p class="login-message login-error hidden" id="loginError" role="alert"></p>
-          <p class="login-message login-info hidden" id="connectionStatus" role="status" aria-live="polite"></p>
-          <p class="login-hint" id="loginHint">¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.</p>
-        </div>
-        <div id="loginReset" class="hidden" aria-hidden="true">
-          <form class="login-form" id="resetForm" autocomplete="off">
-            <p class="login-hint">Ingresa el correo institucional y tu ID de usuario tal como aparecen en tu hoja de asignación para generar una contraseña temporal de acceso inicial.</p>
-            <label>
-              <span>Correo institucional</span>
-              <input type="email" id="resetEmail" autocomplete="username" required />
-            </label>
-            <label>
-              <span>ID de usuario</span>
-              <input type="text" id="resetUserId" autocomplete="off" required />
-            </label>
-            <div class="login-actions">
-              <button type="submit" class="btn primary w100" id="resetSubmit">Crear contraseña temporal</button>
-              <button type="button" class="btn w100" id="resetCancel">Volver a iniciar sesión</button>
-            </div>
-          </form>
-          <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
-          <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
-        </div>
-        <footer class="login-meta">
-          <span class="login-meta__version" data-version-format="Versión {version}"></span>
-          <span class="login-meta__rights">ReLead<sup>©</sup> Todos los Derechos Reservados</span>
-        </footer>
       </div>
     </div>
   </div>
