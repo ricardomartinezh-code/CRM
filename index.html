@@ -2340,6 +2340,81 @@
     html[data-theme="light"] .permissions-card{ background:#fff; }
     html[data-theme="light"] .permission-matrix thead th{ border-color:rgba(15,23,42,0.12); }
     html[data-theme="light"] .permission-matrix tbody td{ border-color:rgba(15,23,42,0.08); }
+    .messages-header{ display:flex; flex-direction:column; gap:6px; }
+    .messages-header h3{ margin:0; font-size:18px; font-weight:700; letter-spacing:.3px; display:flex; align-items:center; gap:8px; }
+    .messages-workspace{ display:flex; flex-direction:row; gap:var(--space); align-items:stretch; }
+    .messages-sidebar{ display:flex; flex-direction:column; gap:var(--space-sm); min-width:280px; max-width:360px; background:var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); padding:var(--space); }
+    html[data-theme="light"] .messages-sidebar{ border-color:rgba(15,23,42,0.08); box-shadow:inset 0 1px 0 rgba(255,255,255,0.7); }
+    .messages-sidebar__top{ display:flex; flex-direction:column; gap:var(--space-sm); }
+    .messages-sidebar__top h4{ margin:0; font-size:15px; font-weight:700; letter-spacing:.3px; text-transform:uppercase; color:var(--muted); }
+    .messages-search{ display:flex; align-items:center; gap:8px; padding:8px 12px; border-radius:12px; border:1px solid rgba(255,255,255,0.12); background:rgba(255,255,255,0.04); transition:border-color .2s ease, box-shadow .2s ease; }
+    .messages-search i{ opacity:0.65; }
+    .messages-search input{ flex:1; border:none; background:transparent; color:var(--text); font:600 14px/1.3 var(--font); }
+    .messages-search input:focus{ outline:none; }
+    .messages-search:focus-within{ border-color:var(--accent); box-shadow:var(--ring); background:rgba(255,255,255,0.08); }
+    html[data-theme="light"] .messages-search{ border-color:rgba(15,23,42,0.12); background:rgba(15,23,42,0.04); }
+    html[data-theme="light"] .messages-search:focus-within{ background:#fff; }
+    .messages-thread-list{ flex:1; display:flex; flex-direction:column; gap:4px; overflow-y:auto; padding-right:6px; }
+    .messages-thread-list::-webkit-scrollbar{ width:8px; }
+    .messages-thread-list::-webkit-scrollbar-thumb{ background:rgba(var(--panel-base-rgb),0.35); border-radius:999px; }
+    .messages-thread{ display:flex; align-items:flex-start; gap:12px; width:100%; border:1px solid transparent; background:transparent; color:inherit; padding:10px 12px; border-radius:14px; cursor:pointer; transition:border-color .2s ease, background .2s ease, transform .12s ease; text-align:left; }
+    .messages-thread__avatar{ width:40px; height:40px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-weight:700; background:rgba(var(--panel-base-rgb),0.22); color:var(--panel-stage-text); flex-shrink:0; letter-spacing:.2px; }
+    html[data-theme="light"] .messages-thread__avatar{ background:rgba(var(--panel-base-rgb),0.18); color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 68%, #0f172a 32%); }
+    .messages-thread__body{ flex:1; display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .messages-thread__header{ display:flex; align-items:center; gap:8px; }
+    .messages-thread__name{ font-weight:600; font-size:14px; letter-spacing:.2px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .messages-thread__time{ font-size:12px; color:var(--muted); }
+    .messages-thread__meta{ font-size:12px; color:var(--muted); display:flex; gap:6px; flex-wrap:wrap; }
+    .messages-thread__preview{ font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; min-width:0; }
+    .messages-thread__preview span{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; display:inline-block; }
+    .message-direction{ opacity:0.75; }
+    .messages-thread:hover{ border-color:rgba(var(--panel-base-rgb),0.35); background:rgba(var(--panel-base-rgb),0.12); transform:translateY(-1px); }
+    .messages-thread.is-active{ border-color:var(--accent); background:rgba(var(--panel-base-rgb),0.18); box-shadow:var(--ring), 0 18px 40px rgba(var(--panel-base-rgb),0.22); }
+    .messages-thread.is-active .messages-thread__name{ color:var(--text); }
+    html[data-theme="light"] .messages-thread{ border-color:rgba(15,23,42,0.06); }
+    html[data-theme="light"] .messages-thread:hover{ background:rgba(var(--panel-base-rgb),0.16); border-color:rgba(var(--panel-base-rgb),0.4); }
+    html[data-theme="light"] .messages-thread.is-active{ background:rgba(var(--panel-base-rgb),0.18); border-color:rgba(var(--panel-base-rgb),0.55); }
+    .messages-empty{ margin:0; padding:24px 12px; text-align:center; color:var(--muted); font-size:13px; display:flex; flex-direction:column; gap:8px; align-items:center; }
+    .messages-empty i{ font-size:20px; opacity:0.6; }
+    .messages-conversation{ flex:1; display:flex; flex-direction:column; background:var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius:var(--radius); box-shadow:inset 0 1px 0 rgba(255,255,255,0.04); min-height:420px; }
+    html[data-theme="light"] .messages-conversation{ border-color:rgba(15,23,42,0.08); box-shadow:inset 0 1px 0 rgba(255,255,255,0.7); }
+    .messages-conversation__header{ display:flex; flex-direction:column; gap:12px; padding:var(--space); border-bottom:1px solid rgba(255,255,255,0.08); }
+    html[data-theme="light"] .messages-conversation__header{ border-color:rgba(15,23,42,0.08); }
+    .messages-conversation__identity{ display:flex; align-items:center; gap:12px; }
+    .messages-conversation__avatar{ width:44px; height:44px; border-radius:50%; background:rgba(var(--panel-base-rgb),0.2); color:var(--panel-stage-text); display:inline-flex; align-items:center; justify-content:center; font-weight:700; font-size:18px; }
+    html[data-theme="light"] .messages-conversation__avatar{ background:rgba(var(--panel-base-rgb),0.14); color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 70%, #0f172a 30%); }
+    .messages-conversation__title{ margin:0; font-size:18px; font-weight:700; letter-spacing:.2px; }
+    .messages-conversation__subtitle{ margin:0; color:var(--muted); font-size:13px; }
+    .messages-conversation__chips{ display:flex; flex-wrap:wrap; gap:8px; }
+    .messages-chip{ display:flex; flex-direction:column; gap:2px; padding:8px 12px; border-radius:12px; background:rgba(var(--panel-base-rgb),0.12); border:1px solid rgba(var(--panel-base-rgb),0.25); font-size:12px; min-width:0; }
+    .messages-chip strong{ font-size:13px; letter-spacing:.2px; }
+    .messages-chip span{ color:var(--muted); }
+    .messages-chip--channel{ flex-direction:row; align-items:center; gap:8px; font-weight:600; }
+    .messages-chip--channel i{ font-size:16px; }
+    .messages-chip--channel span{ color:inherit; font-weight:600; }
+    html[data-theme="light"] .messages-chip{ background:rgba(var(--panel-base-rgb),0.08); border-color:rgba(var(--panel-base-rgb),0.25); color:#0f172a; }
+    html[data-theme="light"] .messages-chip span{ color:color-mix(in srgb, #0f172a 70%, rgba(var(--panel-base-rgb),0.4) 30%); }
+    .messages-conversation__body{ flex:1; padding:var(--space); display:flex; flex-direction:column; gap:var(--space-sm); overflow-y:auto; background:linear-gradient(180deg, rgba(var(--panel-base-rgb),0.08), transparent 45%); }
+    .messages-conversation__body::-webkit-scrollbar{ width:10px; }
+    .messages-conversation__body::-webkit-scrollbar-thumb{ background:rgba(var(--panel-base-rgb),0.35); border-radius:999px; }
+    .messages-placeholder{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:var(--space-sm); text-align:center; color:var(--muted); padding:var(--space); }
+    .messages-placeholder i{ font-size:32px; opacity:0.6; }
+    .messages-day-separator{ align-self:center; background:rgba(255,255,255,0.06); border-radius:999px; padding:4px 12px; font-size:12px; font-weight:600; letter-spacing:.25px; color:var(--muted); text-transform:uppercase; }
+    html[data-theme="light"] .messages-day-separator{ background:rgba(15,23,42,0.08); color:#475569; }
+    .message-bubble{ max-width:72%; padding:12px 14px; border-radius:18px; background:rgba(255,255,255,0.05); box-shadow:0 8px 20px rgba(2,10,28,0.28); display:flex; flex-direction:column; gap:6px; position:relative; }
+    .message-bubble.message-incoming{ align-self:flex-start; border-bottom-left-radius:6px; }
+    .message-bubble.message-outgoing{ align-self:flex-end; background:linear-gradient(155deg, var(--accent), color-mix(in srgb, var(--accent) 72%, #0b1220 28%)); color:#fff; border-bottom-right-radius:6px; box-shadow:0 8px 26px rgba(var(--panel-base-rgb),0.35); }
+    .message-bubble.message-status{ align-self:center; background:transparent; box-shadow:none; color:var(--muted); padding:6px 10px; max-width:100%; text-align:center; }
+    .message-text{ white-space:pre-wrap; word-break:break-word; font-size:14px; }
+    .message-meta{ display:flex; justify-content:flex-end; gap:8px; font-size:11px; opacity:0.75; }
+    .message-status-label{ font-weight:600; letter-spacing:.2px; }
+    .message-error{ font-size:12px; color:var(--bad); }
+    html[data-theme="light"] .message-bubble{ background:rgba(15,23,42,0.06); color:#0f172a; }
+    html[data-theme="light"] .message-bubble.message-outgoing{ background:linear-gradient(155deg, var(--accent), color-mix(in srgb, var(--accent) 68%, #1e293b 32%)); color:#fff; }
+    html[data-theme="light"] .message-bubble.message-status{ color:#475569; }
+    @media (max-width: 1100px){ .messages-sidebar{ max-width:320px; } }
+    @media (max-width: 900px){ .messages-workspace{ flex-direction:column; } .messages-sidebar{ width:100%; max-width:none; } .messages-conversation{ min-height:360px; } .message-bubble{ max-width:100%; } }
+    @media (max-width: 520px){ .messages-conversation__identity{ align-items:flex-start; } .messages-conversation__avatar{ width:38px; height:38px; font-size:16px; } }
     @media (max-width: 900px){
       .permissions-grid{ grid-template-columns:1fr; }
     }
@@ -2723,6 +2798,7 @@
         <div class="nav-group">
           <a href="#" class="nav-link active" data-nav="kpis" aria-current="page"><i class="bi bi-speedometer2"></i><span>KPI’s</span></a>
           <a href="#" class="nav-link" data-nav="leads"><i class="bi bi-people"></i><span>Leads</span></a>
+          <a href="#" class="nav-link" data-nav="mensajes"><i class="bi bi-chat-dots"></i><span>Mensajes</span></a>
           <a href="#" class="nav-link" data-nav="importar"><i class="bi bi-box-arrow-down"></i><span>Importar</span></a>
           <a href="#" class="nav-link" data-nav="exportar"><i class="bi bi-box-arrow-up"></i><span>Exportar</span></a>
           <a href="#" class="nav-link" data-nav="sistema"><i class="bi bi-cpu"></i><span>Sistema</span></a>
@@ -3042,6 +3118,39 @@
           <div id="drawerContent"></div>
         </div>
       </div>
+      </section>
+
+      <section id="view-mensajes" class="view-section hidden" data-mobile-title="Mensajes · Bandeja">
+        <div class="card" style="margin:18px">
+          <div class="panel-section">
+            <div class="messages-header">
+              <h3><span aria-hidden="true">💬</span> Mensajes</h3>
+              <p class="muted">Bandeja unificada con los eventos recibidos de los webhooks de Meta para WhatsApp Business y Facebook Messenger.</p>
+            </div>
+          </div>
+          <div class="panel-section messages-workspace">
+            <aside class="messages-sidebar" aria-label="Conversaciones disponibles">
+              <div class="messages-sidebar__top">
+                <div>
+                  <h4>Conversaciones</h4>
+                  <p class="muted small" id="messageThreadSummary">Sin sincronizar.</p>
+                </div>
+                <label class="messages-search" for="messageSearch">
+                  <i class="bi bi-search" aria-hidden="true"></i>
+                  <input type="search" id="messageSearch" placeholder="Buscar por nombre, teléfono o base" autocomplete="off" />
+                </label>
+              </div>
+              <div class="messages-thread-list" id="messageThreadList" role="list"></div>
+            </aside>
+            <article class="messages-conversation" id="messageConversation" aria-live="polite">
+              <div class="messages-placeholder">
+                <i class="bi bi-chat-dots" aria-hidden="true"></i>
+                <p>Sin conversaciones registradas.</p>
+                <p class="muted small">Cuando lleguen mensajes o estados nuevos desde Meta (WhatsApp o Facebook), se agruparán aquí por contacto.</p>
+              </div>
+            </article>
+          </div>
+        </div>
       </section>
 
       <section id="view-importar" class="view-section hidden">
@@ -3975,6 +4084,896 @@
 
   const CONTACT_SCRIPT_TYPES = ['call','whatsapp','email'];
   const CONTACT_CHANNEL_LABELS = { call: 'Llamada', whatsapp: 'WhatsApp', email: 'Correo' };
+  const messageInboxState = {
+    threads: [],
+    filtered: [],
+    search: '',
+    activeId: ''
+  };
+  const MESSAGE_DAY_MS = 24 * 60 * 60 * 1000;
+  const createMessageFormatter = options => {
+    try{
+      return new Intl.DateTimeFormat('es-MX', options);
+    }catch(_err){
+      return null;
+    }
+  };
+  const MESSAGE_LIST_TIME_FORMAT = createMessageFormatter({ hour: '2-digit', minute: '2-digit' });
+  const MESSAGE_LIST_DAY_FORMAT = createMessageFormatter({ weekday: 'short' });
+  const MESSAGE_LIST_DATE_FORMAT = createMessageFormatter({ month: 'short', day: 'numeric' });
+  const MESSAGE_FULL_DAY_FORMAT = createMessageFormatter({ dateStyle: 'long' });
+  const MESSAGE_CHANNEL_LABELS = { whatsapp: 'WhatsApp', facebook: 'Facebook' };
+  const MESSAGE_CHANNEL_ICONS = { whatsapp: 'bi-whatsapp', facebook: 'bi-facebook' };
+
+  function sanitizeText(value){
+    return value === undefined || value === null ? '' : String(value).trim();
+  }
+
+  function tryParseJson(text){
+    if(!text) return null;
+    try{
+      return JSON.parse(text);
+    }catch(_err){
+      return null;
+    }
+  }
+
+  function detectMessageChannel(log){
+    if(!log || typeof log !== 'object') return '';
+    const candidates = [];
+    const pushCandidate = value => {
+      const text = sanitizeText(value);
+      if(text) candidates.push(text);
+    };
+    pushCandidate(log.channel);
+    pushCandidate(log.source);
+    pushCandidate(log.platform);
+    pushCandidate(log.provider);
+    pushCandidate(log.type);
+    pushCandidate(log.transport);
+    pushCandidate(log.integration && log.integration.channel);
+    pushCandidate(log.integration && log.integration.type);
+    pushCandidate(log.metadata && log.metadata.channel);
+    pushCandidate(log.metadata && log.metadata.source);
+    const message = log.message && typeof log.message === 'object' ? log.message : null;
+    if(message){
+      pushCandidate(message.channel);
+      pushCandidate(message.platform);
+      pushCandidate(message.provider);
+      pushCandidate(message.type);
+    }
+    for(let i = 0; i < candidates.length; i += 1){
+      const normalized = candidates[i].toLowerCase();
+      if(!normalized) continue;
+      if(normalized.includes('whatsapp')) return 'whatsapp';
+      if(normalized.includes('messenger') || normalized.includes('facebook')) return 'facebook';
+    }
+    if(log.waId || log.wa_id || (message && (message.waId || message.wa_id || (sanitizeText(message.id).toLowerCase().startsWith('wamid'))))){
+      return 'whatsapp';
+    }
+    if(log.psid || log.fbUserId || log.fb_user_id || log.userId || (message && (message.mid || message.sender || message.participants))){
+      return 'facebook';
+    }
+    const summary = sanitizeText(log.summary).toLowerCase();
+    if(summary.includes('whatsapp')) return 'whatsapp';
+    if(summary.includes('facebook') || summary.includes('messenger')) return 'facebook';
+    return '';
+  }
+
+  function normalizeThreadIdentifier(value){
+    return sanitizeText(value)
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-z0-9@._:+-]/gi, '')
+      .toLowerCase();
+  }
+
+  function buildMessageThreadKey(channel, identifier){
+    const normalizedChannel = sanitizeText(channel).toLowerCase() || 'meta';
+    const normalizedIdentifier = normalizeThreadIdentifier(identifier);
+    if(!normalizedIdentifier) return '';
+    return `${normalizedChannel}:${normalizedIdentifier}`;
+  }
+
+  function parseIntegrationMetadataObject(value){
+    if(value && typeof value === 'object'){
+      if(Array.isArray(value.integrationLogs)) return value;
+      if(typeof value.integrationLogs === 'string'){
+        const parsedLogs = tryParseJson(value.integrationLogs);
+        if(parsedLogs && Array.isArray(parsedLogs)){
+          return Object.assign({}, value, { integrationLogs: parsedLogs });
+        }
+      }
+      return value;
+    }
+    if(typeof value === 'string'){
+      const trimmed = value.trim();
+      if(!trimmed) return { integrationLogs: [] };
+      let parsed = tryParseJson(trimmed);
+      if(!parsed && trimmed.includes('{') && trimmed.includes('}')){
+        const start = trimmed.indexOf('{');
+        const end = trimmed.lastIndexOf('}');
+        if(start !== -1 && end !== -1 && end > start){
+          parsed = tryParseJson(trimmed.slice(start, end + 1));
+        }
+      }
+      if(!parsed && trimmed.includes('integrationLogs')){
+        const match = trimmed.match(/\{[\s\S]*"integrationLogs"[\s\S]*\}/);
+        if(match) parsed = tryParseJson(match[0]);
+      }
+      if(parsed && typeof parsed === 'object'){
+        return parsed;
+      }
+    }
+    return { integrationLogs: [] };
+  }
+
+  function extractIntegrationLogsFromLead(lead){
+    if(!lead) return [];
+    const metadata = parseIntegrationMetadataObject(lead.metadatos !== undefined ? lead.metadatos : '');
+    const logs = Array.isArray(metadata.integrationLogs) ? metadata.integrationLogs : [];
+    return logs.filter(Boolean);
+  }
+
+  function extractMessageContactName(log, channel){
+    if(!log || typeof log !== 'object') return '';
+    const safeChannel = sanitizeText(channel).toLowerCase();
+    const direct = sanitizeText(log.contact && (log.contact.name || log.contact.fullName || log.contact.display || log.contact.username));
+    if(direct) return direct;
+    const conversation = log.conversation && typeof log.conversation === 'object' ? log.conversation : null;
+    if(conversation){
+      const conversationName = sanitizeText(conversation.name || conversation.title);
+      if(conversationName) return conversationName;
+    }
+    const message = log.message && typeof log.message === 'object' ? log.message : null;
+    if(message){
+      const profileName = sanitizeText(message.profile && (message.profile.name || message.profile.full_name));
+      if(profileName) return profileName;
+      const contactName = sanitizeText(message.contact && (message.contact.name || message.contact.fullName));
+      if(contactName) return contactName;
+      const fromName = typeof message.from === 'object' ? sanitizeText(message.from.name || message.from.fullName) : sanitizeText(message.fromName || message.from);
+      if(fromName) return fromName;
+      const senderName = sanitizeText(message.sender && (message.sender.name || message.sender.full_name));
+      if(senderName) return senderName;
+      const threadName = sanitizeText(message.thread && message.thread.name);
+      if(threadName) return threadName;
+      if(Array.isArray(message.contacts)){
+        for(let i = 0; i < message.contacts.length; i += 1){
+          const contact = message.contacts[i];
+          if(!contact || typeof contact !== 'object') continue;
+          const candidate = sanitizeText(contact.name || (contact.profile && (contact.profile.name || contact.profile.full_name)));
+          if(candidate) return candidate;
+        }
+      }
+      if(Array.isArray(message.participants)){
+        for(let i = 0; i < message.participants.length; i += 1){
+          const participant = message.participants[i];
+          if(!participant || typeof participant !== 'object') continue;
+          const candidate = sanitizeText(participant.name || participant.fullName);
+          if(candidate) return candidate;
+        }
+      }
+    }
+    const summary = sanitizeText(log.summary);
+    if(summary){
+      const normalized = summary.toLowerCase();
+      if(normalized.startsWith('whatsapp recibido') || normalized.startsWith('facebook recibido') || normalized.startsWith('messenger recibido')){
+        const parts = summary.split('·').map(part => sanitizeText(part)).filter(Boolean);
+        if(parts.length >= 2){
+          const candidate = parts[1];
+          if(candidate && candidate.toLowerCase() !== 'whatsapp recibido' && candidate.toLowerCase() !== 'facebook recibido' && candidate.toLowerCase() !== 'messenger recibido'){
+            return candidate;
+          }
+        }
+      }
+      if(!safeChannel && summary.includes('·')){
+        const parts = summary.split('·').map(part => sanitizeText(part)).filter(Boolean);
+        if(parts.length >= 2) return parts[1];
+      }
+    }
+    return '';
+  }
+
+  function extractWhatsappErrorText(error){
+    if(!error || typeof error !== 'object') return '';
+    const fields = [
+      error.error_data && (error.error_data.details || error.error_data.message),
+      error.detail,
+      error.message,
+      error.title,
+      error.description,
+      error.error_message,
+      error.code
+    ];
+    for(let i = 0; i < fields.length; i += 1){
+      const text = sanitizeText(fields[i]);
+      if(text) return text;
+    }
+    return '';
+  }
+
+  function formatStatusLabel(value){
+    const text = sanitizeText(value);
+    if(!text) return '';
+    return text.charAt(0).toUpperCase() + text.slice(1);
+  }
+
+  function describeMessageContent(log){
+    if(!log || typeof log !== 'object') return '';
+    const message = log.message && typeof log.message === 'object' ? log.message : null;
+    if(message){
+      if(typeof message.text === 'string') return sanitizeText(message.text);
+      if(message.text && typeof message.text === 'object'){
+        if(message.text.body) return sanitizeText(message.text.body);
+        if(message.text.value) return sanitizeText(message.text.value);
+        if(message.text.message) return sanitizeText(message.text.message);
+      }
+      if(typeof message.message === 'string') return sanitizeText(message.message);
+      if(message.button && message.button.text) return sanitizeText(message.button.text);
+      if(message.interactive){
+        const interactive = message.interactive;
+        if(interactive.body && interactive.body.text) return sanitizeText(interactive.body.text);
+        if(interactive.button_reply && interactive.button_reply.title) return sanitizeText(interactive.button_reply.title);
+        if(interactive.list_reply && interactive.list_reply.title) return sanitizeText(interactive.list_reply.title);
+      }
+      if(message.quick_reply && message.quick_reply.payload) return sanitizeText(message.quick_reply.payload);
+      if(message.image){
+        if(message.image.caption) return sanitizeText(message.image.caption);
+        if(message.image.url || message.image.link) return '[Imagen]';
+      }
+      if(message.audio) return '[Audio]';
+      if(message.document){
+        if(message.document.filename) return `[Documento] ${sanitizeText(message.document.filename)}`;
+        return '[Documento]';
+      }
+      if(message.video){
+        if(message.video.caption) return sanitizeText(message.video.caption);
+        return '[Video]';
+      }
+      if(message.sticker) return '[Sticker]';
+      if(message.location) return '[Ubicación]';
+      if(Array.isArray(message.attachments) && message.attachments.length){
+        const attachmentTypes = Array.from(new Set(message.attachments.map(att => sanitizeText(att.type || att.mime_type || att.attachmentType || '').toLowerCase()).filter(Boolean)));
+        if(attachmentTypes.length){
+          return `[Adjunto] ${attachmentTypes.map(type => type.charAt(0).toUpperCase() + type.slice(1)).join(', ')}`;
+        }
+        return '[Adjunto]';
+      }
+    }
+    if(log.status){
+      const label = formatStatusLabel(log.status);
+      const errors = Array.isArray(log.errors) ? log.errors.map(extractWhatsappErrorText).filter(Boolean) : [];
+      return errors.length ? `${label} · ${errors.join(' · ')}` : label;
+    }
+    if(typeof log.message === 'string') return sanitizeText(log.message);
+    if(log.messageText) return sanitizeText(log.messageText);
+    return sanitizeText(log.summary);
+  }
+
+  function parseLogTimestamp(log){
+    if(!log || typeof log !== 'object') return Date.now();
+    const timestampSources = [log.timestamp, log.timestampText];
+    for(let i = 0; i < timestampSources.length; i += 1){
+      const source = sanitizeText(timestampSources[i]);
+      if(!source) continue;
+      const parsed = Date.parse(source);
+      if(!Number.isNaN(parsed)) return parsed;
+    }
+    if(log.message && log.message.timestamp){
+      const rawTs = Number(log.message.timestamp);
+      if(Number.isFinite(rawTs)){
+        return rawTs > 1e12 ? rawTs : rawTs * 1000;
+      }
+    }
+    return Date.now();
+  }
+
+  function resolveMessageContact(log, lead, channel){
+    const normalizedChannel = sanitizeText(channel).toLowerCase() || 'meta';
+    const channelLabel = MESSAGE_CHANNEL_LABELS[normalizedChannel] || 'Meta';
+    const channelIcon = MESSAGE_CHANNEL_ICONS[normalizedChannel] || 'bi-chat-dots';
+    const leadName = lead ? sanitizeText(lead.nombre) : '';
+    if(normalizedChannel === 'whatsapp'){
+      const candidates = [];
+      const pushCandidate = value => {
+        const text = sanitizeText(value);
+        if(text) candidates.push(text);
+      };
+      if(log && typeof log === 'object'){
+        pushCandidate(log.waId || log.wa_id);
+        const message = log.message && typeof log.message === 'object' ? log.message : null;
+        if(message){
+          pushCandidate(message.from);
+          pushCandidate(message.to);
+          if(message.context && typeof message.context === 'object'){
+            pushCandidate(message.context.from);
+            pushCandidate(message.context.to);
+          }
+          if(Array.isArray(message.contacts)){
+            message.contacts.forEach(contact => {
+              if(contact && typeof contact === 'object'){
+                pushCandidate(contact.wa_id || contact.waId);
+              }
+            });
+          }
+        }
+      }
+      if(lead){
+        pushCandidate(lead.telefonoNormalizado);
+        pushCandidate(lead.telefono);
+      }
+      for(let i = 0; i < candidates.length; i += 1){
+        const candidate = candidates[i];
+        const identifier = normalizePhoneKey(candidate);
+        if(!identifier) continue;
+        const key = buildMessageThreadKey(normalizedChannel, identifier);
+        if(!key) continue;
+        const phone = parsePhone(candidate);
+        const displayPhone = fmtPhone(phone.raw || phone.digits || candidate);
+        return {
+          key,
+          identifier,
+          display: displayPhone || candidate || leadName || identifier,
+          raw: candidate,
+          channel: normalizedChannel,
+          channelLabel,
+          channelIcon
+        };
+      }
+      if(lead){
+        const fallbackIdentifier = normalizePhoneKey(lead.telefonoNormalizado || lead.telefono);
+        if(fallbackIdentifier){
+          const key = buildMessageThreadKey(normalizedChannel, fallbackIdentifier);
+          if(key){
+            const displayPhone = fmtPhone(lead.telefono || lead.telefonoNormalizado || fallbackIdentifier);
+            const contactName = extractMessageContactName(log, normalizedChannel) || leadName;
+            return {
+              key,
+              identifier: fallbackIdentifier,
+              display: contactName || displayPhone || fallbackIdentifier,
+              raw: lead.telefono || lead.telefonoNormalizado || fallbackIdentifier,
+              channel: normalizedChannel,
+              channelLabel,
+              channelIcon
+            };
+          }
+        }
+      }
+      return null;
+    }
+    if(normalizedChannel === 'facebook'){
+      const userCandidates = [];
+      const pageCandidates = new Set();
+      const pushUserCandidate = value => {
+        const raw = sanitizeText(value);
+        const normalized = normalizeThreadIdentifier(raw);
+        if(normalized){
+          userCandidates.push({ raw, normalized });
+        }
+      };
+      const pushPageCandidate = value => {
+        const normalized = normalizeThreadIdentifier(value);
+        if(normalized) pageCandidates.add(normalized);
+      };
+      if(log && typeof log === 'object'){
+        pushUserCandidate(log.contact && (log.contact.id || log.contact.psid || log.contact.uid));
+        pushUserCandidate(log.psid);
+        pushUserCandidate(log.userId || log.user_id);
+        pushUserCandidate(log.senderId || log.sender_id);
+        const conversation = log.conversation && typeof log.conversation === 'object' ? log.conversation : null;
+        if(conversation){
+          pushUserCandidate(conversation.id);
+          pushPageCandidate(conversation.pageId || conversation.page_id);
+        }
+        pushUserCandidate(log.threadId);
+        pushUserCandidate(log.conversationId);
+      }
+      const message = log && log.message && typeof log.message === 'object' ? log.message : null;
+      if(message){
+        const sender = message.sender;
+        if(sender){
+          if(typeof sender === 'object'){
+            pushUserCandidate(sender.id || sender.user_id);
+            if((sender.category || sender.type || '').toLowerCase() === 'page'){ pushPageCandidate(sender.id || sender.user_id); }
+          }else{
+            pushUserCandidate(sender);
+          }
+        }
+        const from = message.from;
+        if(from){
+          if(typeof from === 'object'){
+            pushUserCandidate(from.id || from.user_id);
+            if((from.category || from.type || '').toLowerCase() === 'page'){ pushPageCandidate(from.id || from.user_id); }
+          }else{
+            pushUserCandidate(from);
+          }
+        }
+        const recipient = message.recipient;
+        if(recipient){
+          if(typeof recipient === 'object'){
+            pushPageCandidate(recipient.id || recipient.user_id || recipient.page_id);
+          }else{
+            pushPageCandidate(recipient);
+          }
+        }
+        if(Array.isArray(message.participants)){
+          message.participants.forEach(participant => {
+            if(!participant || typeof participant !== 'object') return;
+            const normalized = normalizeThreadIdentifier(participant.id || participant.user_id);
+            if(!normalized) return;
+            if((participant.role || participant.type || '').toLowerCase() === 'page'){
+              pageCandidates.add(normalized);
+            }else{
+              userCandidates.push({ raw: sanitizeText(participant.id || participant.user_id), normalized });
+            }
+          });
+        }
+        if(message.conversation && typeof message.conversation === 'object'){
+          pushUserCandidate(message.conversation.id);
+          pushPageCandidate(message.conversation.thread_key || message.conversation.threadKey);
+        }
+        pushUserCandidate(message.mid);
+      }
+      let contactCandidate = null;
+      for(let i = 0; i < userCandidates.length; i += 1){
+        const candidate = userCandidates[i];
+        if(!candidate || !candidate.normalized) continue;
+        if(pageCandidates.has(candidate.normalized)) continue;
+        contactCandidate = candidate;
+        break;
+      }
+      if(!contactCandidate && userCandidates.length){
+        contactCandidate = userCandidates[0];
+      }
+      if(contactCandidate){
+        const key = buildMessageThreadKey(normalizedChannel, contactCandidate.normalized);
+        if(key){
+          const contactName = extractMessageContactName(log, normalizedChannel) || leadName;
+          return {
+            key,
+            identifier: contactCandidate.normalized,
+            display: contactName || contactCandidate.raw || leadName || contactCandidate.normalized,
+            raw: contactCandidate.raw || contactCandidate.normalized,
+            channel: normalizedChannel,
+            channelLabel,
+            channelIcon
+          };
+        }
+      }
+      if(lead){
+        const fallbackIdentifier = normalizeThreadIdentifier(lead.id || lead.matricula || lead.telefonoNormalizado || lead.telefono);
+        if(fallbackIdentifier){
+          const key = buildMessageThreadKey(normalizedChannel, fallbackIdentifier);
+          if(key){
+            const contactName = extractMessageContactName(log, normalizedChannel) || leadName;
+            return {
+              key,
+              identifier: fallbackIdentifier,
+              display: contactName || fmtPhone(lead.telefono || lead.telefonoNormalizado) || fallbackIdentifier,
+              raw: fallbackIdentifier,
+              channel: normalizedChannel,
+              channelLabel,
+              channelIcon
+            };
+          }
+        }
+      }
+      return null;
+    }
+    if(lead){
+      const fallbackIdentifier = normalizeThreadIdentifier(lead.id || lead.matricula || lead.telefonoNormalizado || lead.telefono);
+      if(fallbackIdentifier){
+        const key = buildMessageThreadKey(normalizedChannel, fallbackIdentifier);
+        if(key){
+          const contactName = extractMessageContactName(log, normalizedChannel) || leadName;
+          return {
+            key,
+            identifier: fallbackIdentifier,
+            display: contactName || fmtPhone(lead.telefono || lead.telefonoNormalizado) || fallbackIdentifier,
+            raw: fallbackIdentifier,
+            channel: normalizedChannel,
+            channelLabel,
+            channelIcon
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  function finalizeThread(thread){
+    thread.messages.sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+    const last = thread.messages.length ? thread.messages[thread.messages.length - 1] : null;
+    thread.lastTimestamp = last ? last.timestamp : 0;
+    thread.lastPreview = last ? sanitizeText(last.preview) : '';
+    thread.lastDirection = last ? last.direction : 'incoming';
+    thread.leads = Array.from(thread.leads.values());
+    const contactNames = Array.from(thread.contactNames || []).filter(Boolean);
+    const leadNames = thread.leads.map(item => sanitizeText(item.nombre)).filter(Boolean);
+    const displayContact = thread.contact ? sanitizeText(thread.contact.display) : '';
+    thread.displayContact = displayContact;
+    thread.contactName = contactNames[0] || leadNames[0] || displayContact || 'Sin nombre';
+    const tokens = new Set();
+    [thread.contactName, displayContact, thread.key, thread.channelLabel, thread.contact && thread.contact.identifier]
+      .forEach(token => {
+        const cleaned = sanitizeText(token).toLowerCase();
+        if(cleaned) tokens.add(cleaned);
+      });
+    thread.leads.forEach(item => {
+      const nameToken = sanitizeText(item.nombre).toLowerCase();
+      if(nameToken) tokens.add(nameToken);
+      const baseToken = sanitizeText(item.base).toLowerCase();
+      if(baseToken) tokens.add(baseToken);
+      const asesorToken = sanitizeText(item.asesor).toLowerCase();
+      if(asesorToken) tokens.add(asesorToken);
+    });
+    thread.searchTokens = Array.from(tokens).filter(Boolean);
+  }
+
+  function buildMessageThreadsFromLeads(list){
+    const entries = Array.isArray(list) ? list : [];
+    const threads = new Map();
+    entries.forEach(lead => {
+      const logs = extractIntegrationLogsFromLead(lead);
+      if(!logs.length) return;
+      logs.forEach(log => {
+        if(!log || typeof log !== 'object') return;
+        const detectedChannel = detectMessageChannel(log);
+        const contact = resolveMessageContact(log, lead, detectedChannel || 'meta');
+        if(!contact || !contact.key) return;
+        const key = contact.key;
+        if(!threads.has(key)){
+          threads.set(key, {
+            id: key,
+            key,
+            contact,
+            channel: contact.channel || detectedChannel || 'meta',
+            channelLabel: contact.channelLabel || MESSAGE_CHANNEL_LABELS[detectedChannel] || MESSAGE_CHANNEL_LABELS[contact.channel] || 'Meta',
+            channelIcon: contact.channelIcon || MESSAGE_CHANNEL_ICONS[detectedChannel] || MESSAGE_CHANNEL_ICONS[contact.channel] || 'bi-chat-dots',
+            contactNames: new Set(),
+            messageIds: new Set(),
+            leads: new Map(),
+            messages: []
+          });
+        }
+        const thread = threads.get(key);
+        if(contact.display){
+          thread.contact = contact;
+        }
+        if(contact.channel){
+          thread.channel = contact.channel;
+        }
+        if(contact.channelLabel){
+          thread.channelLabel = contact.channelLabel;
+        }
+        if(contact.channelIcon){
+          thread.channelIcon = contact.channelIcon;
+        }
+        const messageId = sanitizeText(log.id) || `${key}:${log.timestamp || ''}`;
+        if(thread.messageIds.has(messageId)) return;
+        thread.messageIds.add(messageId);
+        const timestamp = parseLogTimestamp(log);
+        const direction = log.status
+          ? 'status'
+          : (String(log.direction || '').toLowerCase() === 'outgoing' ? 'outgoing' : 'incoming');
+        const messageText = describeMessageContent(log);
+        thread.messages.push({
+          id: messageId,
+          timestamp,
+          direction,
+          preview: messageText || sanitizeText(log.summary) || 'Sin contenido',
+          text: messageText,
+          summary: sanitizeText(log.summary),
+          status: sanitizeText(log.status),
+          errors: Array.isArray(log.errors) ? log.errors.slice() : [],
+          raw: log,
+          channel: thread.channel
+        });
+        const contactName = extractMessageContactName(log, thread.channel);
+        if(contactName) thread.contactNames.add(contactName);
+        if(lead){
+          const leadId = sanitizeText(lead.id) || `${lead.nombre || ''}:${key}`;
+          if(!thread.leads.has(leadId)){
+            thread.leads.set(leadId, {
+              id: sanitizeText(lead.id),
+              nombre: lead.nombre || '',
+              base: lead.base || '',
+              etapa: lead.etapa || '',
+              asesor: lead.asesor || ''
+            });
+          }
+        }
+      });
+    });
+    const result = Array.from(threads.values());
+    result.forEach(thread => finalizeThread(thread));
+    result.sort((a, b) => (b.lastTimestamp || 0) - (a.lastTimestamp || 0));
+    return result;
+  }
+
+  function startOfDay(timestamp){
+    const date = new Date(timestamp);
+    if(Number.isNaN(date.getTime())) return 0;
+    date.setHours(0, 0, 0, 0);
+    return date.getTime();
+  }
+
+  function formatMessageListTime(timestamp){
+    if(!timestamp) return '';
+    const date = new Date(timestamp);
+    if(Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diff = Math.floor((startOfDay(now) - startOfDay(date)) / MESSAGE_DAY_MS);
+    if(diff === 0 && MESSAGE_LIST_TIME_FORMAT){
+      return MESSAGE_LIST_TIME_FORMAT.format(date);
+    }
+    if(diff === 1) return 'Ayer';
+    if(diff > 1 && diff < 7){
+      return MESSAGE_LIST_DAY_FORMAT ? MESSAGE_LIST_DAY_FORMAT.format(date) : date.toLocaleDateString('es-MX', { weekday: 'short' });
+    }
+    if(MESSAGE_LIST_DATE_FORMAT){
+      return MESSAGE_LIST_DATE_FORMAT.format(date);
+    }
+    return date.toLocaleDateString();
+  }
+
+  function formatConversationDay(timestamp){
+    if(!timestamp) return '';
+    const date = new Date(timestamp);
+    if(Number.isNaN(date.getTime())) return '';
+    const now = new Date();
+    const diff = Math.floor((startOfDay(now) - startOfDay(date)) / MESSAGE_DAY_MS);
+    if(diff === 0) return 'Hoy';
+    if(diff === 1) return 'Ayer';
+    if(MESSAGE_FULL_DAY_FORMAT){
+      return MESSAGE_FULL_DAY_FORMAT.format(date);
+    }
+    return date.toLocaleDateString();
+  }
+
+  function formatMessageTimeOfDay(timestamp){
+    if(!timestamp) return '';
+    const date = new Date(timestamp);
+    if(Number.isNaN(date.getTime())) return '';
+    if(MESSAGE_LIST_TIME_FORMAT){
+      return MESSAGE_LIST_TIME_FORMAT.format(date);
+    }
+    return date.toLocaleTimeString();
+  }
+
+  function syncMessageSearchInput(){
+    const searchInput = el('#messageSearch');
+    if(searchInput && searchInput.value !== messageInboxState.search){
+      searchInput.value = messageInboxState.search;
+    }
+  }
+
+  function updateMessageSummary(){
+    const summaryEl = el('#messageThreadSummary');
+    if(!summaryEl) return;
+    const total = messageInboxState.threads.length;
+    const filtered = messageInboxState.filtered.length;
+    if(!total){
+      summaryEl.textContent = 'Sin conversaciones registradas.';
+      return;
+    }
+    if(sanitizeText(messageInboxState.search)){
+      summaryEl.textContent = `${filtered} de ${total} conversación${total === 1 ? '' : 'es'} coinciden con la búsqueda.`;
+      return;
+    }
+    summaryEl.textContent = `${total} conversación${total === 1 ? '' : 'es'} sincronizada${total === 1 ? '' : 's'}.`;
+  }
+
+  function renderMessagePlaceholder(mode){
+    const container = el('#messageConversation');
+    if(!container) return;
+    let icon = 'bi-chat-dots';
+    let lines = [];
+    if(mode === 'no-results'){
+      icon = 'bi-search';
+      lines = ['Sin coincidencias.', 'Ajusta la búsqueda para ver otras conversaciones.'];
+    }else if(mode === 'empty'){
+      lines = ['Sin conversaciones registradas.', 'Cuando Meta envíe mensajes o estados (WhatsApp o Facebook), se agruparán aquí por contacto.'];
+    }else{
+      lines = ['Selecciona una conversación para revisar el detalle.'];
+    }
+    const items = lines.map((line, index) => {
+      if(index === 0){
+        return '<p>' + escapeHtml(line) + '</p>';
+      }
+      return '<p class="muted small">' + escapeHtml(line) + '</p>';
+    }).join('');
+    container.innerHTML = `<div class="messages-placeholder"><i class="bi ${icon}" aria-hidden="true"></i>${items}</div>`;
+  }
+
+  function renderMessageThreads(){
+    const listEl = el('#messageThreadList');
+    if(!listEl) return;
+    const threads = messageInboxState.filtered;
+    const total = messageInboxState.threads.length;
+    if(!threads.length){
+      if(total){
+        listEl.innerHTML = '<div class="messages-empty"><i class="bi bi-search"></i><p>No hay conversaciones que coincidan con la búsqueda.</p></div>';
+        renderMessagePlaceholder('no-results');
+      }else{
+        listEl.innerHTML = '<div class="messages-empty"><i class="bi bi-inboxes"></i><p>Aún no hay conversaciones registradas.</p></div>';
+        renderMessagePlaceholder('empty');
+      }
+      return;
+    }
+    const html = threads.map(thread => {
+      const active = thread.id === messageInboxState.activeId;
+      const classes = ['messages-thread'];
+      if(active) classes.push('is-active');
+      const initials = sanitizeText(thread.contactName).charAt(0).toUpperCase() || '#';
+      const extraLeads = thread.leads.length > 1 ? ` · +${thread.leads.length - 1} coincidencia${thread.leads.length - 1 === 1 ? '' : 's'}` : '';
+      const baseLabel = thread.leads.length ? sanitizeText(thread.leads[0].base) : '';
+      const metaParts = [];
+      if(thread.channelLabel) metaParts.push(thread.channelLabel);
+      if(thread.displayContact) metaParts.push(thread.displayContact);
+      if(baseLabel) metaParts.push(baseLabel);
+      if(extraLeads) metaParts.push(extraLeads.trim());
+      const metaHtml = metaParts.length ? `<div class="messages-thread__meta">${escapeHtml(metaParts.join(' · '))}</div>` : '';
+      const directionIcon = thread.lastDirection === 'outgoing'
+        ? '<i class="bi bi-arrow-up-right message-direction" aria-hidden="true"></i>'
+        : thread.lastDirection === 'status'
+          ? '<i class="bi bi-check2-all message-direction" aria-hidden="true"></i>'
+          : '<i class="bi bi-arrow-down-left message-direction" aria-hidden="true"></i>';
+      const preview = thread.lastPreview ? escapeHtml(thread.lastPreview) : 'Sin contenido';
+      const timeLabel = thread.lastTimestamp ? escapeHtml(formatMessageListTime(thread.lastTimestamp)) : '';
+      return `<button type="button" class="${classes.join(' ')}" data-thread-id="${escapeHtml(thread.id)}" aria-pressed="${active ? 'true' : 'false'}">
+        <span class="messages-thread__avatar" aria-hidden="true">${escapeHtml(initials)}</span>
+        <span class="messages-thread__body">
+          <span class="messages-thread__header">
+            <span class="messages-thread__name">${escapeHtml(thread.contactName || 'Sin nombre')}</span>
+            <span class="messages-thread__time">${timeLabel}</span>
+          </span>
+          ${metaHtml}
+          <span class="messages-thread__preview">${directionIcon}<span>${preview}</span></span>
+        </span>
+      </button>`;
+    }).join('');
+    listEl.innerHTML = html;
+  }
+
+  function renderActiveConversation(){
+    const container = el('#messageConversation');
+    if(!container) return;
+    const thread = messageInboxState.filtered.find(item => item.id === messageInboxState.activeId);
+    if(!thread){
+      if(messageInboxState.filtered.length){
+        renderMessagePlaceholder('prompt');
+      }
+      return;
+    }
+    const initials = sanitizeText(thread.contactName).charAt(0).toUpperCase() || '#';
+    const subtitleParts = [];
+    if(thread.channelLabel) subtitleParts.push(thread.channelLabel);
+    if(thread.displayContact) subtitleParts.push(thread.displayContact);
+    const subtitleText = subtitleParts.join(' · ') || 'Identificador no disponible';
+    const channelChip = thread.channelLabel
+      ? `<span class="messages-chip messages-chip--channel"><i class="bi ${escapeHtml(thread.channelIcon || 'bi-chat-dots')}" aria-hidden="true"></i><span>${escapeHtml(thread.channelLabel)}</span></span>`
+      : '';
+    const leadChipsHtml = thread.leads.length
+      ? thread.leads.map(lead => {
+          const details = [sanitizeText(lead.base), sanitizeText(lead.etapa), sanitizeText(lead.asesor)].filter(Boolean).join(' · ');
+          return `<span class="messages-chip"><strong>${escapeHtml(lead.nombre || lead.id || 'Lead sin nombre')}</strong>${details ? `<span>${escapeHtml(details)}</span>` : ''}</span>`;
+        }).join('')
+      : '';
+    const chipsHtml = channelChip || leadChipsHtml
+      ? `<div class="messages-conversation__chips">${channelChip}${leadChipsHtml}</div>`
+      : '';
+    container.innerHTML = `
+      <header class="messages-conversation__header">
+        <div class="messages-conversation__identity">
+          <div class="messages-conversation__avatar" aria-hidden="true">${escapeHtml(initials)}</div>
+          <div>
+            <p class="messages-conversation__title">${escapeHtml(thread.contactName)}</p>
+            <p class="messages-conversation__subtitle">${escapeHtml(subtitleText)}</p>
+          </div>
+        </div>
+        ${chipsHtml}
+      </header>
+      <div class="messages-conversation__body"></div>
+    `;
+    const body = container.querySelector('.messages-conversation__body');
+    if(!body) return;
+    body.innerHTML = '';
+    let lastDayKey = '';
+    thread.messages.forEach(message => {
+      const dayKey = startOfDay(message.timestamp || Date.now());
+      if(dayKey && dayKey !== lastDayKey){
+        const dayLabel = formatConversationDay(message.timestamp);
+        if(dayLabel){
+          const separator = document.createElement('div');
+          separator.className = 'messages-day-separator';
+          separator.textContent = dayLabel;
+          body.appendChild(separator);
+        }
+        lastDayKey = dayKey;
+      }
+      const directionClass = message.direction === 'outgoing'
+        ? 'message-outgoing'
+        : message.direction === 'status'
+          ? 'message-status'
+          : 'message-incoming';
+      const bubble = document.createElement('div');
+      bubble.className = `message-bubble ${directionClass}`;
+      const text = sanitizeText(message.text) || sanitizeText(message.summary) || 'Sin contenido';
+      const timeLabel = formatMessageTimeOfDay(message.timestamp);
+      const statusLabel = directionClass === 'message-outgoing' ? formatStatusLabel(message.status) : '';
+      const metaParts = [];
+      if(timeLabel) metaParts.push(`<span>${escapeHtml(timeLabel)}</span>`);
+      if(statusLabel) metaParts.push(`<span class="message-status-label">${escapeHtml(statusLabel)}</span>`);
+      bubble.innerHTML = `<div class="message-text">${escapeHtml(text)}</div>${metaParts.length ? `<div class="message-meta">${metaParts.join('')}</div>` : ''}`;
+      if(message.errors && message.errors.length){
+        const errorText = message.errors.map(extractWhatsappErrorText).filter(Boolean).join(' · ');
+        if(errorText){
+          const errorEl = document.createElement('div');
+          errorEl.className = 'message-error';
+          errorEl.textContent = errorText;
+          bubble.appendChild(errorEl);
+        }
+      }
+      body.appendChild(bubble);
+    });
+    body.scrollTop = body.scrollHeight;
+  }
+
+  function selectMessageThread(threadId){
+    if(!threadId) return;
+    if(messageInboxState.activeId !== threadId){
+      messageInboxState.activeId = threadId;
+    }
+    renderMessageThreads();
+    renderActiveConversation();
+    const listEl = el('#messageThreadList');
+    if(listEl){
+      const activeButton = listEl.querySelector(`.messages-thread[data-thread-id="${threadId}"]`);
+      if(activeButton && typeof activeButton.focus === 'function'){
+        activeButton.focus();
+      }
+    }
+  }
+
+  function applyMessageFilters(options = {}){
+    const preserveActive = options.preserveActive !== undefined ? options.preserveActive : true;
+    const query = sanitizeText(messageInboxState.search).toLowerCase();
+    let filtered = messageInboxState.threads.slice();
+    if(query){
+      filtered = filtered.filter(thread => Array.isArray(thread.searchTokens) && thread.searchTokens.some(token => token.includes(query)));
+    }
+    messageInboxState.filtered = filtered;
+    if(!filtered.length){
+      if(!preserveActive){
+        messageInboxState.activeId = '';
+      }
+      return;
+    }
+    if(preserveActive && filtered.some(thread => thread.id === messageInboxState.activeId)){
+      return;
+    }
+    messageInboxState.activeId = filtered[0].id;
+  }
+
+  function syncMessageInbox(options = {}){
+    const preserveActive = options.preserveActive !== undefined ? options.preserveActive : true;
+    if(options.reset){
+      messageInboxState.search = '';
+      messageInboxState.activeId = '';
+    }
+    const threads = buildMessageThreadsFromLeads(leads);
+    messageInboxState.threads = threads;
+    if(!preserveActive || !threads.some(thread => thread.id === messageInboxState.activeId)){
+      messageInboxState.activeId = threads.length ? threads[0].id : '';
+    }
+    applyMessageFilters({ preserveActive });
+    syncMessageSearchInput();
+    updateMessageSummary();
+    renderMessageThreads();
+    renderActiveConversation();
+  }
+
   const DAILY_SHORTCUT_LIMIT = 3;
   const LEAD_PRIORITY_THRESHOLDS = { high: 6, medium: 3 };
   const CONTACT_TIMESTAMP_FORMAT = (() => {
@@ -4340,6 +5339,7 @@
   const VIEW_PERMISSIONS = {
     kpis: ['admin','coordinador','asesor','viewer'],
     leads: ['admin','coordinador','asesor','viewer'],
+    mensajes: ['admin','coordinador','asesor','viewer'],
     importar: ['admin','coordinador'],
     exportar: ['admin','coordinador','viewer'],
     sistema: ['admin','coordinador','viewer'],
@@ -7295,6 +8295,9 @@
     currentDiagnosticsRunId = 0;
     clearSolverLog();
     updateProblemSolverPanel();
+    messageInboxState.search = '';
+    messageInboxState.activeId = '';
+    syncMessageInbox({ preserveActive: false, reset: true });
   }
 
   function setLoginError(message){
@@ -8462,13 +9465,18 @@
       state.columnLimits = {};
       state.columnLimitSignature = '';
     }catch(err){
-      if(err && err.code === 'UNAUTHORIZED') return;
+      if(err && err.code === 'UNAUTHORIZED'){
+        leads = [];
+        syncMessageInbox({ preserveActive: false, reset: true });
+        return;
+      }
       console.error('Error al cargar leads', err);
       leads = [];
       syncQuickAccessWithLeads();
       state.columnLimits = {};
       state.columnLimitSignature = '';
     }
+    syncMessageInbox();
   }
 
   function invalidateGlobalLeadIndex(){
@@ -13252,6 +14260,27 @@
         link.addEventListener('keydown', handleTabKeydown);
       }
     });
+    const messageSearchInput = el('#messageSearch');
+    if(messageSearchInput){
+      messageSearchInput.addEventListener('input', event => {
+        messageInboxState.search = sanitizeText(event.target.value);
+        applyMessageFilters({ preserveActive: true });
+        renderMessageThreads();
+        renderActiveConversation();
+        updateMessageSummary();
+      });
+    }
+    const messageThreadList = el('#messageThreadList');
+    if(messageThreadList){
+      messageThreadList.addEventListener('click', event => {
+        const button = event.target && event.target.closest ? event.target.closest('.messages-thread') : null;
+        if(!button) return;
+        const threadId = button.dataset.threadId;
+        if(threadId){
+          selectMessageThread(threadId);
+        }
+      });
+    }
     const logoutBtn = el('#logoutBtn');
     if(logoutBtn){
       logoutBtn.addEventListener('click', event => {
@@ -13729,6 +14758,7 @@
         await withGlobalLoading('Cargando leads…', () => loadLeads());
       }else{
         leads = [];
+        syncMessageInbox({ preserveActive: false, reset: true });
       }
     }catch(err){
       if(!(err && err.code === 'UNAUTHORIZED')){
