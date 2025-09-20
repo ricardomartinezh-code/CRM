@@ -61,6 +61,9 @@ function doGet(e){
     if(auth.error) return auth.response;
     return handleOperationalMetrics_(e, auth.user);
   }
+  if(action === 'metaWebhook'){
+    return handleMetaWebhookVerification_(e);
+  }
   return jsonResponse({error:'accion no soportada'}, e);
 }
 
@@ -135,6 +138,9 @@ function doPost(e){
   if(action === 'logGmailThread'){
     return handleLogGmailThread_(e, body);
   }
+  if(action === 'metaWebhook'){
+    return handleMetaWebhook_(e, body);
+  }
   if(action === 'repairSheetStructure'){
     const auth = requireAuth_(e, { body, requireActive: true, role: 'admin' });
     if(auth.error) return auth.response;
@@ -166,6 +172,12 @@ const SPREADSHEET_ID_PROPERTY = 'APP_SPREADSHEET_ID';
 const SPREADSHEET_ERROR_MESSAGE = 'No se encontró la hoja de cálculo principal. Configura el ID del libro en la propiedad de script "APP_SPREADSHEET_ID".';
 const AIRCALL_WEBHOOK_TOKEN_PROPERTY = 'AIRCALL_WEBHOOK_TOKEN';
 const GMAIL_WEBHOOK_TOKEN_PROPERTY = 'GMAIL_WEBHOOK_TOKEN';
+const META_WEBHOOK_VERIFY_TOKEN_PROPERTY = 'META_WEBHOOK_VERIFY_TOKEN';
+const META_APP_SECRET_PROPERTY = 'META_APP_SECRET';
+const META_LEAD_ACCESS_TOKEN_PROPERTY = 'META_LEAD_ACCESS_TOKEN';
+const META_DEFAULT_LEAD_SHEET_PROPERTY = 'META_DEFAULT_LEAD_SHEET';
+const META_WHATSAPP_DEFAULT_SHEET_PROPERTY = 'META_WHATSAPP_DEFAULT_SHEET';
+const META_LEAD_SHEET_PROPERTY_PREFIX = 'META_LEAD_SHEET_';
 let ACTIVE_USER = null;
 const COLUMNS = ['ID','Nombre','Matricula','Correo','Teléfono','Plantel','Modalidad','Programa','Etapa','Estado','Asesor','Comentario','Asignación','Toque 1','Toque 2','Toque 3','Toque 4','CRM','Resolución','Metadatos'];
 const REQUIRED_HEADERS = ['id','nombre','telefono','etapa'];
@@ -1036,15 +1048,576 @@ function handleLogGmailThread_(e, body){
   return applyTouchUpdateFromIntegration_(normalized, e);
 }
 
-function applyTouchUpdateFromIntegration_(normalized, e){
+function handleMetaWebhookVerification_(e){
+  const params = e && e.parameter ? e.parameter : {};
+  const mode = String(params['hub.mode'] || params['hub_mode'] || params.mode || '').trim().toLowerCase();
+  const challenge = params['hub.challenge'] || params['hub_challenge'] || params.challenge || '';
+  const verifyToken = String(params['hub.verify_token'] || params['hub_verify_token'] || params.verify_token || params.token || '').trim();
+  const props = PropertiesService.getScriptProperties();
+  const expected = String(props.getProperty(META_WEBHOOK_VERIFY_TOKEN_PROPERTY) || '').trim();
+  if(!expected){
+    return ContentService.createTextOutput('Configura la propiedad META_WEBHOOK_VERIFY_TOKEN').setMimeType(ContentService.MimeType.TEXT);
+  }
+  if(mode === 'subscribe' && verifyToken && verifyToken === expected){
+    return ContentService.createTextOutput(String(challenge || '')).setMimeType(ContentService.MimeType.TEXT);
+  }
+  return ContentService.createTextOutput('Token inválido').setMimeType(ContentService.MimeType.TEXT);
+}
+
+function handleMetaWebhook_(e, body){
+  if(!body || typeof body !== 'object'){
+    return jsonResponse({ ok:false, error:'Payload inválido.' }, e);
+  }
+  const rawBody = e && e.postData && typeof e.postData.contents === 'string' ? e.postData.contents : '';
+  const signatureCheck = verifyMetaSignature_(e, rawBody);
+  if(signatureCheck && signatureCheck.error){
+    return jsonResponse({ ok:false, error: signatureCheck.message, code: signatureCheck.code || 'INVALID_SIGNATURE' }, e);
+  }
+  const entries = Array.isArray(body.entry) ? body.entry : [];
+  if(!entries.length){
+    return jsonResponse({ ok:true, message:'Sin eventos.' }, e);
+  }
+  const response = { ok:true, leads: [], touches: [] };
+  const errors = [];
+  entries.forEach(entry => {
+    const changes = Array.isArray(entry && entry.changes) ? entry.changes : [];
+    changes.forEach(change => {
+      const field = String(change && change.field || '').trim().toLowerCase();
+      const value = change && typeof change.value === 'object' ? change.value : {};
+      if(field === 'leadgen'){
+        const leadResult = processMetaLeadChange_(entry, change);
+        if(leadResult && leadResult.ok){
+          response.leads.push(leadResult);
+        }else if(leadResult && leadResult.skip){
+          // omitido deliberadamente
+        }else if(leadResult){
+          errors.push(Object.assign({ source:'facebook', field }, leadResult));
+        }
+        return;
+      }
+      const messagingProduct = String(value && (value.messaging_product || value.messagingProduct || value.product) || '').trim().toLowerCase();
+      if(messagingProduct === 'whatsapp'){
+        const normalizedMessages = normalizeWhatsappChange_(entry, change);
+        normalizedMessages.forEach(payload => {
+          const result = performTouchUpdateFromIntegration_(payload);
+          if(result && result.ok){
+            response.touches.push(result);
+          }else if(result){
+            errors.push({ source:'whatsapp', error: result.error || 'No se pudo registrar el toque.', id: payload && payload.logEntry && payload.logEntry.id });
+          }
+        });
+      }
+    });
+  });
+  if(!response.leads.length) delete response.leads;
+  if(!response.touches.length) delete response.touches;
+  if(errors.length) response.errors = errors;
+  return jsonResponse(response, e);
+}
+
+function verifyMetaSignature_(e, rawBody){
+  const props = PropertiesService.getScriptProperties();
+  const secret = String(props.getProperty(META_APP_SECRET_PROPERTY) || '').trim();
+  if(!secret){
+    return { ok:true, skipped:true };
+  }
+  const headers = e && e.headers ? e.headers : {};
+  const signatureHeader = headers['X-Hub-Signature-256'] || headers['x-hub-signature-256'] || headers['X-Hub-Signature'] || headers['x-hub-signature'];
+  if(!signatureHeader){
+    return { error:true, message:'Falta encabezado X-Hub-Signature-256.', code:'MISSING_SIGNATURE' };
+  }
+  const provided = String(signatureHeader || '').trim();
+  const parts = provided.split('=');
+  const providedHash = (parts.length === 2 ? parts[1] : parts[0] || '').toLowerCase();
+  if(!providedHash){
+    return { error:true, message:'Firma inválida.', code:'INVALID_SIGNATURE' };
+  }
+  const digest = Utilities.computeHmacSha256Signature(rawBody || '', secret, Utilities.Charset.UTF_8);
+  const expectedHash = digest.map(byte => (byte & 0xff).toString(16).padStart(2, '0')).join('');
+  if(expectedHash.toLowerCase() !== providedHash){
+    return { error:true, message:'Firma X-Hub-Signature-256 no coincide.', code:'INVALID_SIGNATURE' };
+  }
+  return { ok:true };
+}
+
+function processMetaLeadChange_(entry, change){
+  const normalized = normalizeMetaLeadChange_(entry, change);
+  if(normalized && normalized.error){
+    return normalized;
+  }
+  if(!normalized || typeof normalized !== 'object'){
+    return { error:'Evento inválido.' };
+  }
+  const result = applyLeadCreateFromIntegration_(normalized);
+  if(result && result.ok){
+    result.source = 'facebook';
+  }
+  return result;
+}
+
+function normalizeMetaLeadChange_(entry, change){
+  const value = change && typeof change.value === 'object' ? change.value : {};
+  const leadgenId = String(value.leadgen_id || value.lead_id || value.leadId || '').trim();
+  if(!leadgenId){
+    return { error:'El evento de Facebook no incluye `leadgen_id`.' };
+  }
+  const leadDataResult = fetchMetaLeadData_(leadgenId);
+  if(leadDataResult && leadDataResult.error){
+    return { error: leadDataResult.message || 'No se pudo consultar el lead en Facebook.', code: leadDataResult.code, details: leadDataResult.details };
+  }
+  const leadData = leadDataResult && leadDataResult.data ? leadDataResult.data : {};
+  const fieldData = Array.isArray(leadData.field_data) ? leadData.field_data : [];
+  const nameValues = collectMetaFieldValues_(fieldData, ['full_name','name','nombre']);
+  const phoneValues = collectMetaFieldValues_(fieldData, ['phone_number','telefono','phone','whatsapp','celular','mobile','tel']);
+  const emailValues = collectMetaFieldValues_(fieldData, ['email','correo','correo electronico','correo_electronico']);
+  const campusValue = extractMetaFieldValue_(fieldData, ['campus','plantel','sede','campus_interes']);
+  const modalidadValue = extractMetaFieldValue_(fieldData, ['modalidad','modality','tipo_de_programa']);
+  const programaValue = extractMetaFieldValue_(fieldData, ['programa','program','carrera','licenciatura']);
+  const sheetField = extractMetaFieldValue_(fieldData, ['sheet','base','hoja','base_destino']);
+  const props = PropertiesService.getScriptProperties();
+  const formId = String(leadData.form_id || value.form_id || '').trim();
+  const targetSheet = resolveMetaLeadSheet_(props, formId, sheetField);
+  if(!targetSheet){
+    return { error:'No se pudo determinar la base de destino para el lead de Facebook.' };
+  }
+  const formName = String(leadData.form_name || value.form_name || '').trim();
+  const commentParts = ['Lead generado en Facebook'];
+  if(formName) commentParts.push(formName);
+  const comment = commentParts.join(' · ');
+  const timestampValue = leadData.created_time || value.created_time || value.createdTime || new Date().toISOString();
+  const timestamp = safeDate_(timestampValue);
+  const timestampText = formatDateTime_(timestamp);
+  const phoneSet = new Set();
+  phoneValues.forEach(val => {
+    const normalized = normalizePhoneKey_(val);
+    if(normalized) phoneSet.add(normalized);
+  });
+  const emailSet = new Set();
+  emailValues.forEach(val => {
+    const normalized = normalizeEmailKey_(val);
+    if(normalized) emailSet.add(normalized);
+  });
+  const idSet = new Set();
+  const leadKey = normalizeIdentifierKey_(leadgenId);
+  if(leadKey) idSet.add(leadKey);
+  const externalIds = collectMetaFieldValues_(fieldData, ['id','lead_id','folio','matricula','identificador']);
+  externalIds.forEach(val => {
+    const normalized = normalizeIdentifierKey_(val);
+    if(normalized) idSet.add(normalized);
+  });
+  const match = {
+    id: Array.from(idSet).filter(Boolean),
+    matricula: [],
+    phone: Array.from(phoneSet).filter(Boolean),
+    email: Array.from(emailSet).filter(Boolean)
+  };
+  const metadataFieldData = fieldData.map(item => ({
+    name: item && item.name ? String(item.name).trim() : '',
+    values: Array.isArray(item && item.values) ? item.values : (item && item.value !== undefined ? [item.value] : [])
+  }));
+  const metadataMerge = {
+    facebookLead: {
+      id: leadgenId,
+      formId,
+      formName,
+      adId: leadData.ad_id || value.ad_id || '',
+      adsetId: leadData.adset_id || value.adset_id || '',
+      campaignId: leadData.campaign_id || value.campaign_id || '',
+      campaignName: leadData.campaign_name || value.campaign_name || '',
+      adName: leadData.ad_name || value.ad_name || '',
+      createdTime: new Date(timestamp.getTime()).toISOString(),
+      pageId: value.page_id || (entry && entry.id) || '',
+      fieldData: metadataFieldData
+    }
+  };
+  const leadIdValue = leadKey ? `FB-${leadKey.toUpperCase()}` : `FB-${leadgenId}`;
+  const lead = {
+    id: leadIdValue,
+    nombre: nameValues.length ? nameValues[0] : '',
+    telefono: phoneValues.length ? phoneValues[0] : '',
+    correo: emailValues.length ? emailValues[0] : '',
+    campus: campusValue,
+    modalidad: modalidadValue,
+    programa: programaValue,
+    etapa: 'Nuevo',
+    comentario: comment,
+    asignacion: timestampText,
+    createdAt: timestampText,
+    updatedAt: timestampText
+  };
+  const logEntry = {
+    source: 'facebook',
+    id: `facebook:${leadgenId}`,
+    timestamp: new Date(timestamp.getTime()).toISOString(),
+    summary: comment,
+    leadId: leadgenId,
+    formId,
+    formName,
+    pageId: metadataMerge.facebookLead.pageId,
+    adId: metadataMerge.facebookLead.adId,
+    adsetId: metadataMerge.facebookLead.adsetId,
+    campaignId: metadataMerge.facebookLead.campaignId,
+    campaignName: metadataMerge.facebookLead.campaignName,
+    adName: metadataMerge.facebookLead.adName
+  };
+  return {
+    sheet: targetSheet,
+    match,
+    lead,
+    comment,
+    timestamp,
+    timestampText,
+    metadataMerge,
+    logEntry,
+    source: 'facebook'
+  };
+}
+
+function resolveMetaLeadSheet_(props, formId, sheetField){
+  const direct = String(sheetField || '').trim();
+  if(direct) return direct;
+  const trimmedForm = String(formId || '').trim();
+  if(trimmedForm){
+    const key = META_LEAD_SHEET_PROPERTY_PREFIX + trimmedForm;
+    const configured = String(props.getProperty(key) || '').trim();
+    if(configured) return configured;
+  }
+  return String(props.getProperty(META_DEFAULT_LEAD_SHEET_PROPERTY) || '').trim();
+}
+
+function fetchMetaLeadData_(leadgenId){
+  const props = PropertiesService.getScriptProperties();
+  const token = String(props.getProperty(META_LEAD_ACCESS_TOKEN_PROPERTY) || '').trim();
+  if(!token){
+    return { error:true, message:'Configura el token META_LEAD_ACCESS_TOKEN para consultar el lead.', code:'TOKEN_NOT_CONFIGURED' };
+  }
+  const endpoint = `https://graph.facebook.com/v19.0/${encodeURIComponent(leadgenId)}?access_token=${encodeURIComponent(token)}&fields=field_data,created_time,form_id,form_name,ad_id,ad_name,adset_id,campaign_id,campaign_name`;
+  try{
+    const response = UrlFetchApp.fetch(endpoint, { method:'get', muteHttpExceptions:true });
+    const status = response.getResponseCode();
+    const content = response.getContentText();
+    if(status < 200 || status >= 300){
+      return { error:true, message:`Facebook respondió ${status} al consultar el lead.`, details: content, code:'HTTP_'+status };
+    }
+    let data;
+    try{
+      data = JSON.parse(content);
+    }catch(parseErr){
+      return { error:true, message:'No se pudo interpretar la respuesta de Facebook.', details: content };
+    }
+    return { ok:true, data };
+  }catch(err){
+    return { error:true, message:'Error al consultar el lead en Facebook.', details: String(err) };
+  }
+}
+
+function collectMetaFieldValues_(fieldData, names){
+  const normalizedNames = names.map(name => String(name || '').trim().toLowerCase());
+  const values = [];
+  fieldData.forEach(item => {
+    if(!item || typeof item !== 'object') return;
+    const key = String(item.name || '').trim().toLowerCase();
+    if(!key || normalizedNames.indexOf(key) === -1) return;
+    if(Array.isArray(item.values)){
+      item.values.forEach(val => {
+        if(val === undefined || val === null) return;
+        const str = String(val).trim();
+        if(str) values.push(str);
+      });
+    }else if(item.value !== undefined){
+      const str = String(item.value).trim();
+      if(str) values.push(str);
+    }
+  });
+  return values;
+}
+
+function extractMetaFieldValue_(fieldData, names){
+  const values = collectMetaFieldValues_(fieldData, names);
+  return values.length ? values[0] : '';
+}
+
+function mergeIntegrationMetadataObject_(target, source){
+  if(!target || typeof target !== 'object') return;
+  if(!source || typeof source !== 'object') return;
+  Object.keys(source).forEach(key => {
+    if(key === 'integrationLogs') return;
+    const value = source[key];
+    if(value === undefined) return;
+    if(value && typeof value === 'object' && !Array.isArray(value)){
+      if(!target[key] || typeof target[key] !== 'object' || Array.isArray(target[key])){
+        target[key] = {};
+      }
+      mergeIntegrationMetadataObject_(target[key], value);
+    }else{
+      target[key] = value;
+    }
+  });
+}
+
+function applyLeadCreateFromIntegration_(normalized){
+  if(!normalized || typeof normalized !== 'object'){
+    return { ok:false, error:'Payload inválido para creación de lead.' };
+  }
+  const sheetName = String(normalized.sheet || '').trim();
+  if(!sheetName){
+    return { ok:false, error:'No se especificó la base destino.' };
+  }
   const ss = getSpreadsheet_();
-  if(!ss) return jsonResponse({ ok:false, error: SPREADSHEET_ERROR_MESSAGE }, e);
+  if(!ss) return { ok:false, error: SPREADSHEET_ERROR_MESSAGE };
+  const sheet = ss.getSheetByName(sheetName);
+  if(!sheet || !isLeadSheet_(sheet)){
+    return { ok:false, error:`La hoja "${sheetName}" no existe o no es una base válida.` };
+  }
+  const { headers, map } = getColumnMap_(sheet);
+  const totalCols = sheet.getLastColumn();
+  const dataRowCount = Math.max(0, sheet.getLastRow() - 1);
+  const existingValues = dataRowCount > 0 ? sheet.getRange(2, 1, dataRowCount, headers.length).getValues() : [];
+  const indexes = buildSheetLeadIndex_(existingValues, map);
+  if(hasMatchKeys_(normalized.match)){
+    const match = findLeadRefWithKeys_(indexes, normalized.match);
+    if(match.error){
+      return { ok:false, error: match.reason };
+    }
+    if(match.ref){
+      const rowValues = match.ref.row;
+      let metadataInfo = null;
+      if(normalized.logEntry){
+        metadataInfo = prepareIntegrationMetadata_(rowValues, map, normalized.logEntry);
+        if(metadataInfo && metadataInfo.duplicate){
+          return { ok:true, duplicate:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, via: match.via || '' };
+        }
+      }
+      if(metadataInfo){
+        if(normalized.metadataMerge) mergeIntegrationMetadataObject_(metadataInfo.object, normalized.metadataMerge);
+        metadataInfo.object.integrationLogs.push(normalized.logEntry);
+        rowValues[metadataInfo.index] = JSON.stringify(metadataInfo.object);
+      }else if(normalized.metadataMerge || normalized.logEntry){
+        const idx = getColumnIndex_(map, 'Metadatos');
+        if(idx !== undefined){
+          const parsed = parseIntegrationMetadataValue_(rowValues[idx]);
+          if(normalized.metadataMerge) mergeIntegrationMetadataObject_(parsed.object, normalized.metadataMerge);
+          if(normalized.logEntry){
+            const duplicate = parsed.object.integrationLogs.some(entry => entry && entry.id === normalized.logEntry.id && entry.source === normalized.logEntry.source);
+            if(duplicate){
+              return { ok:true, duplicate:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, via: match.via || '' };
+            }
+            parsed.object.integrationLogs.push(normalized.logEntry);
+          }
+          rowValues[idx] = JSON.stringify(parsed.object);
+        }
+      }
+      if(normalized.comment){
+        appendCommentIfMissing_(rowValues, map, normalized.comment);
+      }
+      updateAsignacionIfNeeded_(rowValues, map, normalized.timestampText);
+      updateUpdatedAt_(rowValues, map, normalized.timestampText);
+      sheet.getRange(match.ref.rowNumber, 1, 1, headers.length).setValues([rowValues]);
+      return { ok:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, updated:true, via: match.via || '' };
+    }
+  }
+  const lead = normalized.lead || {};
+  const row = new Array(totalCols).fill('');
+  const leadIdValue = String(lead.id || '').trim() || generateLeadId_();
+  const correo = lead.correo || lead.email || '';
+  const telefono = lead.telefono || lead.phone || '';
+  const etapa = lead.etapa || 'Nuevo';
+  setRowValue_(row, map, 'ID', leadIdValue);
+  setRowValue_(row, map, 'Nombre', lead.nombre || '');
+  setRowValue_(row, map, 'Matricula', lead.matricula || '');
+  setRowValue_(row, map, 'Correo', correo);
+  setRowValue_(row, map, 'Teléfono', telefono);
+  setRowValue_(row, map, 'Telefono', telefono);
+  setRowValue_(row, map, 'Plantel', lead.campus || '');
+  setRowValue_(row, map, 'Modalidad', lead.modalidad || '');
+  setRowValue_(row, map, 'Programa', lead.programa || lead.program || '');
+  setRowValue_(row, map, 'Etapa', etapa);
+  if(lead.estado){
+    setRowValue_(row, map, 'Estado', lead.estado);
+  }
+  if(lead.asesor){
+    setRowValue_(row, map, 'Asesor', lead.asesor);
+  }
+  const comentario = lead.comentario || normalized.comment || '';
+  if(comentario){
+    setRowValue_(row, map, 'Comentario', comentario);
+  }
+  let metadataValue = lead.metadata !== undefined ? coerceMetadataValue_(lead.metadata) : '';
+  const metadataParsed = parseIntegrationMetadataValue_(metadataValue);
+  if(normalized.metadataMerge){
+    mergeIntegrationMetadataObject_(metadataParsed.object, normalized.metadataMerge);
+  }
+  if(normalized.logEntry){
+    const duplicate = metadataParsed.object.integrationLogs.some(entry => entry && entry.id === normalized.logEntry.id && entry.source === normalized.logEntry.source);
+    if(!duplicate){
+      metadataParsed.object.integrationLogs.push(normalized.logEntry);
+    }
+  }
+  try{
+    metadataValue = JSON.stringify(metadataParsed.object);
+  }catch(err){
+    metadataValue = metadataParsed.raw || metadataValue;
+  }
+  if(metadataValue){
+    setRowValue_(row, map, 'Metadatos', metadataValue);
+  }
+  const asignacion = lead.asignacion || normalized.timestampText || formatDateTime_(new Date());
+  setRowValue_(row, map, 'Asignación', asignacion);
+  setRowValue_(row, map, 'Asignacion', asignacion);
+  const resolucion = lead.resolucion || computeResolutionForLead_(sheet.getName(), etapa, lead.estado || etapa);
+  if(resolucion){
+    setRowValue_(row, map, 'Resolución', resolucion);
+    setRowValue_(row, map, 'Resolucion', resolucion);
+  }
+  applyContactLinksToRow_(row, map, telefono, correo, lead.nombre || '');
+  const createdAt = lead.createdAt || normalized.timestampText || formatDateTime_(new Date());
+  const updatedAt = lead.updatedAt || createdAt;
+  setRowValue_(row, map, 'CreadoEl', createdAt);
+  setRowValue_(row, map, 'ActualizadoEl', updatedAt);
+  const insertRow = sheet.getLastRow() + 1;
+  sheet.getRange(insertRow, 1, 1, totalCols).setValues([row]);
+  return { ok:true, sheet: sheet.getName(), rowNumber: insertRow, created:true, leadId: leadIdValue };
+}
+
+function normalizeWhatsappChange_(entry, change){
+  const value = change && typeof change.value === 'object' ? change.value : {};
+  const props = PropertiesService.getScriptProperties();
+  const defaultSheet = String(props.getProperty(META_WHATSAPP_DEFAULT_SHEET_PROPERTY) || '').trim();
+  const sheet = String(value.sheet || value.base || defaultSheet || '').trim();
+  const metadata = value && typeof value.metadata === 'object' ? value.metadata : {};
+  const contacts = Array.isArray(value.contacts) ? value.contacts : [];
+  const contactNames = new Map();
+  contacts.forEach(contact => {
+    if(!contact || typeof contact !== 'object') return;
+    const waId = String(contact.wa_id || contact.waId || '').trim();
+    if(!waId) return;
+    const name = contact.profile && contact.profile.name ? String(contact.profile.name).trim() : '';
+    if(name) contactNames.set(waId, name);
+  });
+  const results = [];
+  const messages = Array.isArray(value.messages) ? value.messages : [];
+  messages.forEach(message => {
+    if(!message || typeof message !== 'object') return;
+    const waId = String(message.from || '').trim();
+    const phoneCandidates = new Set();
+    if(waId) phoneCandidates.add(normalizePhoneKey_(waId));
+    if(message.to) phoneCandidates.add(normalizePhoneKey_(message.to));
+    const phones = Array.from(phoneCandidates).filter(Boolean);
+    if(!phones.length) return;
+    const timestamp = parseWhatsappTimestamp_(message.timestamp);
+    const timestampText = formatDateTime_(timestamp);
+    const name = waId ? (contactNames.get(waId) || '') : '';
+    const summary = buildWhatsappMessageSummary_(message);
+    const commentParts = ['WhatsApp recibido'];
+    if(name) commentParts.push(name);
+    if(summary) commentParts.push(summary);
+    const comment = commentParts.join(' · ');
+    const logEntry = {
+      source: 'whatsapp',
+      id: `whatsapp:${message.id || Utilities.getUuid()}`,
+      timestamp: new Date(timestamp.getTime()).toISOString(),
+      direction: 'incoming',
+      waId,
+      phoneNumberId: metadata.phone_number_id || metadata.phoneNumberId || '',
+      type: message.type || '',
+      summary: comment,
+      message
+    };
+    results.push({
+      sheet,
+      match: { id: [], matricula: [], phone: phones, email: [] },
+      timestamp,
+      timestampText,
+      state: 'WhatsApp recibido',
+      comment,
+      logEntry,
+      source: 'whatsapp'
+    });
+  });
+  const statuses = Array.isArray(value.statuses) ? value.statuses : [];
+  statuses.forEach(status => {
+    if(!status || typeof status !== 'object') return;
+    const waId = String(status.recipient_id || status.recipientId || '').trim();
+    const phone = normalizePhoneKey_(waId);
+    if(!phone) return;
+    const timestamp = parseWhatsappTimestamp_(status.timestamp || status.timestamp_ms || status.timestampMs);
+    const timestampText = formatDateTime_(timestamp);
+    const statusLabel = String(status.status || '').trim();
+    const commentParts = ['WhatsApp enviado'];
+    if(statusLabel) commentParts.push(formatTitleCase_(statusLabel));
+    const comment = commentParts.join(' · ');
+    const logEntry = {
+      source: 'whatsapp',
+      id: `whatsapp-status:${status.id || status.message_id || Utilities.getUuid()}`,
+      timestamp: new Date(timestamp.getTime()).toISOString(),
+      direction: 'outgoing',
+      waId,
+      phoneNumberId: metadata.phone_number_id || metadata.phoneNumberId || '',
+      status: statusLabel,
+      errors: status.errors || [],
+      summary: comment
+    };
+    results.push({
+      sheet,
+      match: { id: [], matricula: [], phone: [phone], email: [] },
+      timestamp,
+      timestampText,
+      state: 'WhatsApp enviado',
+      comment,
+      logEntry,
+      source: 'whatsapp'
+    });
+  });
+  return results;
+}
+
+function parseWhatsappTimestamp_(value){
+  if(value === undefined || value === null) return new Date();
+  const numeric = Number(value);
+  if(!isNaN(numeric) && numeric > 0 && numeric < 1e13){
+    if(numeric < 1e12){
+      return new Date(numeric * 1000);
+    }
+    return new Date(numeric);
+  }
+  return safeDate_(value);
+}
+
+function buildWhatsappMessageSummary_(message){
+  if(!message || typeof message !== 'object') return '';
+  if(message.text && message.text.body) return String(message.text.body).trim();
+  if(message.button && message.button.text) return String(message.button.text).trim();
+  if(message.interactive){
+    const interactive = message.interactive;
+    if(interactive.body && interactive.body.text) return String(interactive.body.text).trim();
+    if(interactive.button_reply && interactive.button_reply.title) return String(interactive.button_reply.title).trim();
+    if(interactive.list_reply && interactive.list_reply.title) return String(interactive.list_reply.title).trim();
+  }
+  if(message.image){
+    return message.image.caption ? String(message.image.caption).trim() : '[Imagen]';
+  }
+  if(message.audio) return '[Audio]';
+  if(message.document) return message.document.filename ? `[Documento] ${message.document.filename}` : '[Documento]';
+  if(message.video) return message.video.caption ? String(message.video.caption).trim() : '[Video]';
+  if(message.sticker) return '[Sticker]';
+  if(message.location) return '[Ubicación]';
+  return '';
+}
+
+function applyTouchUpdateFromIntegration_(normalized, e){
+  const result = performTouchUpdateFromIntegration_(normalized);
+  return jsonResponse(result, e);
+}
+
+function performTouchUpdateFromIntegration_(normalized){
+  const ss = getSpreadsheet_();
+  if(!ss) return { ok:false, error: SPREADSHEET_ERROR_MESSAGE };
   const sheets = collectCandidateSheets_(ss, normalized.sheet);
   if(!sheets.length){
-    return jsonResponse({ ok:false, error: 'No se encontraron bases válidas para registrar el evento.' }, e);
+    return { ok:false, error: 'No se encontraron bases válidas para registrar el evento.' };
   }
   if(!hasMatchKeys_(normalized.match)){
-    return jsonResponse({ ok:false, error: 'No se proporcionaron identificadores para localizar el lead.' }, e);
+    return { ok:false, error: 'No se proporcionaron identificadores para localizar el lead.' };
   }
   let lastError = '';
   for(let i = 0; i < sheets.length; i++){
@@ -1057,7 +1630,7 @@ function applyTouchUpdateFromIntegration_(normalized, e){
     const indexes = buildSheetLeadIndex_(values, map);
     const match = findLeadRefWithKeys_(indexes, normalized.match);
     if(match.error){
-      return jsonResponse({ ok:false, error: match.reason }, e);
+      return { ok:false, error: match.reason };
     }
     if(!match.ref) continue;
     const rowValues = match.ref.row;
@@ -1065,7 +1638,7 @@ function applyTouchUpdateFromIntegration_(normalized, e){
     if(metadataInfo && metadataInfo.duplicate){
       const toqueColumns = getToqueColumns_(map);
       const toques = toqueColumns.map(idx => rowValues[idx] || '');
-      return jsonResponse({ ok:true, duplicate:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, toques }, e);
+      return { ok:true, duplicate:true, sheet: sheet.getName(), rowNumber: match.ref.rowNumber, toques };
     }
     const toqueColumns = getToqueColumns_(map);
     if(!toqueColumns.length){
@@ -1089,7 +1662,7 @@ function applyTouchUpdateFromIntegration_(normalized, e){
     updateUpdatedAt_(rowValues, map, normalized.timestampText);
     sheet.getRange(match.ref.rowNumber, 1, 1, headers.length).setValues([rowValues]);
     const refreshedToques = toqueColumns.map(idx => rowValues[idx] || '');
-    return jsonResponse({
+    return {
       ok:true,
       sheet: sheet.getName(),
       rowNumber: match.ref.rowNumber,
@@ -1097,10 +1670,10 @@ function applyTouchUpdateFromIntegration_(normalized, e){
       toques: refreshedToques,
       source: normalized.source || '',
       via: match.via || ''
-    }, e);
+    };
   }
   const message = lastError || 'No se encontró el lead para registrar el evento.';
-  return jsonResponse({ ok:false, error: message }, e);
+  return { ok:false, error: message };
 }
 
 function collectCandidateSheets_(ss, targetSheet){
