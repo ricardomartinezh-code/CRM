@@ -200,7 +200,12 @@
       display:flex;
       flex-direction:column;
       gap:var(--space);
+      padding:clamp(calc(var(--space) * 1.5), 4vw, calc(var(--space) * 3));
+      border-radius:32px;
       color:var(--panel-stage-text);
+      background:linear-gradient(145deg, rgba(248,250,252,0.28), rgba(59,130,246,0.12));
+      box-shadow:0 32px 64px rgba(8,15,28,0.45);
+      backdrop-filter:blur(12px);
     }
     .hero-kicker{
       display:inline-flex;
@@ -226,22 +231,26 @@
     .hero-subtitle{
       margin:0;
       font-size:clamp(16px, 2.2vw, 20px);
-      color:color-mix(in srgb, var(--panel-stage-text) 82%, rgba(255,255,255,0.32) 18%);
+      color:color-mix(in srgb, var(--panel-stage-text) 92%, rgba(15,23,42,0.18) 8%);
       max-width:46ch;
+      text-wrap: balance;
     }
     html[data-theme="light"] .hero-subtitle{
       color:color-mix(in srgb, #0f172a 78%, rgba(15,23,42,0.32) 22%);
     }
-    .hero-cta{
-      display:flex;
-      flex-wrap:wrap;
-      gap:var(--space-sm);
-      align-items:center;
+    .hero-note{
+      margin:0;
+      font-size:15px;
+      line-height:1.6;
+      max-width:48ch;
+      color:color-mix(in srgb, var(--panel-stage-text) 80%, rgba(15,23,42,0.15) 20%);
     }
-    .hero-cta .btn{
-      min-width:180px;
-      justify-content:center;
-      font-weight:700;
+    html[data-theme="light"] .landing-hero{
+      background:linear-gradient(145deg, rgba(15,23,42,0.04), rgba(59,130,246,0.12));
+      box-shadow:0 28px 54px rgba(15,23,42,0.12);
+    }
+    html[data-theme="light"] .hero-note{
+      color:color-mix(in srgb, #0f172a 82%, rgba(59,130,246,0.26) 18%);
     }
     .btn.outline{
       background:transparent;
@@ -2322,10 +2331,7 @@
         <span class="hero-kicker"><i class="bi bi-stars" aria-hidden="true"></i> Plataforma de reactivación</span>
         <h1 id="heroTitle">Impulsa la retención con decisiones basadas en datos</h1>
         <p class="hero-subtitle">ReLead EDU centraliza seguimiento, priorización y comunicación para que cada plantel recupere leads dormidos en menos tiempo.</p>
-        <div class="hero-cta">
-          <a class="btn primary" href="mailto:hola@relead.edu?subject=Quiero%20una%20demo" data-cta="demo">Solicitar demo guiada</a>
-          <a class="btn outline" href="mailto:ventas@relead.edu" data-cta="contacto">Contactar a ventas</a>
-        </div>
+        <p class="hero-note">Activa campañas automatizadas, enfoca a tus asesores en los leads con mayor probabilidad de respuesta y recupera oportunidades en pausa sin fricción.</p>
         <div class="hero-metrics" aria-label="Resultados destacados">
           <div class="hero-metrics__viewport" role="list">
             <div class="hero-metrics__track">
