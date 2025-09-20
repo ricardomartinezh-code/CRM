@@ -182,15 +182,15 @@
       z-index:100;
       display:flex;
       flex-direction:column;
-      gap:calc(var(--space) * 1.5);
+      gap:calc(var(--space) * 1.75);
       align-items:stretch;
       justify-content:center;
-      padding-block:clamp(calc(var(--space) * 2), 8vh, calc(var(--space) * 4));
+      padding-block:clamp(calc(var(--space) * 2.75), 12vh, calc(var(--space) * 5.5));
       padding-inline:clamp(var(--space), 5vw, calc(var(--space) * 4));
-      padding-top:clamp(calc(var(--space) * 2 + constant(safe-area-inset-top)), 8vh, calc(var(--space) * 4 + constant(safe-area-inset-top)));
-      padding-top:clamp(calc(var(--space) * 2 + env(safe-area-inset-top)), 8vh, calc(var(--space) * 4 + env(safe-area-inset-top)));
-      padding-bottom:clamp(calc(var(--space) * 2 + constant(safe-area-inset-bottom)), 6vh, calc(var(--space) * 3.5 + constant(safe-area-inset-bottom)));
-      padding-bottom:clamp(calc(var(--space) * 2 + env(safe-area-inset-bottom)), 6vh, calc(var(--space) * 3.5 + env(safe-area-inset-bottom)));
+      padding-top:clamp(calc(var(--space) * 3 + constant(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + constant(safe-area-inset-top)));
+      padding-top:clamp(calc(var(--space) * 3 + env(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + env(safe-area-inset-top)));
+      padding-bottom:clamp(calc(var(--space) * 2.5 + constant(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + constant(safe-area-inset-bottom)));
+      padding-bottom:clamp(calc(var(--space) * 2.5 + env(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + env(safe-area-inset-bottom)));
       overflow-y:auto;
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
@@ -342,7 +342,7 @@
         --radius: 12px;
       }
       body{ line-height:1.55; }
-      .landing-layout{ gap:calc(var(--space) * 1.25); }
+      .landing-layout{ gap:calc(var(--space) * 1.15); }
       .landing-hero{ padding:calc(var(--space) * 1.5); border-radius:26px; }
       .hero-note{ font-size:14px; }
       .hero-metrics{ margin-inline:-4px; }
@@ -352,7 +352,7 @@
       .hero-metrics__track{ gap:var(--space-sm); animation-duration:38s; }
       .hero-metric{ min-width:180px; scroll-snap-align:start; }
       .login-screen{ padding-inline:max(var(--space), 6vw); }
-      .login-card{ max-width:420px; width:100%; margin-inline:auto; padding:calc(var(--space) * 1.3); }
+      .login-card{ width:min(100%, 420px); margin-inline:auto; padding:calc(var(--space) * 1.35); }
       .login-actions{ gap:var(--space-sm); }
       .mobile-topbar{ padding-inline:var(--space); }
       .topbar-inner{ padding-inline:var(--space); }
@@ -364,8 +364,8 @@
       .hero-note{ font-size:13px; }
       .hero-metrics__viewport{ scroll-snap-type:x mandatory; }
       .hero-metrics__track{ width:max-content; }
-      .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.2); }
-      .login-card{ padding:var(--space); gap:var(--space-sm); }
+      .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.4); }
+      .login-card{ width:100%; padding:calc(var(--space) * 1.25); gap:var(--space-sm); border-radius:28px; }
       .login-intro{ font-size:13px; }
       .login-meta{ margin-top:var(--space); }
       .login-actions .btn.primary{ font-size:1rem; padding:12px 16px; }
@@ -382,11 +382,11 @@
     @media (max-width: 720px){
       .login-screen{
         justify-content:flex-start;
-        padding-block:clamp(calc(var(--space) * 1.75), 6vh, calc(var(--space) * 3));
+        padding-block:clamp(calc(var(--space) * 2.25), 10vh, calc(var(--space) * 4));
         padding-inline:clamp(calc(var(--space) * 0.75), 6vw, calc(var(--space) * 2));
       }
       .landing-layout{
-        gap:calc(var(--space) * 1.25);
+        gap:calc(var(--space) * 1.05);
       }
       .landing-hero{
         text-align:center;
@@ -402,12 +402,9 @@
       .hero-metrics__track{ animation-duration:24s; }
       .login-card{
         order:-1;
-        margin-inline:auto;
         width:min(100%, 420px);
-        padding:calc(var(--space) * 1.25);
-      }
-      html[data-theme="light"] .login-card{
-        box-shadow:0 18px 48px rgba(15,23,42,0.16);
+        margin-inline:auto;
+        padding:calc(var(--space) * 1.35);
       }
       .login-intro{ font-size:13px; }
       .login-actions{ margin-top:var(--space); }
@@ -418,10 +415,8 @@
         border-radius:22px;
       }
       .hero-metric{ min-width:150px; padding:14px 16px; }
-      .login-card{
-        padding:calc(var(--space) * 1.1);
-        border-radius:24px;
-      }
+      .landing-layout{ gap:calc(var(--space) * 0.9); }
+      .login-card{ padding:calc(var(--space) * 1.2); border-radius:26px; width:100%; }
       .login-title{ font-size:1.35rem; }
       .login-actions .btn.primary{
         font-size:1rem;
