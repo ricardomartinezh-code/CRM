@@ -332,6 +332,56 @@
       .landing-layout{ grid-template-columns:1fr; }
       .hero-cta .btn{ flex:1 1 140px; }
     }
+    @media (max-width: 720px){
+      .login-screen{
+        justify-content:flex-start;
+        padding-block:clamp(calc(var(--space) * 1.75), 6vh, calc(var(--space) * 3));
+        padding-inline:clamp(calc(var(--space) * 0.75), 6vw, calc(var(--space) * 2));
+      }
+      .landing-layout{
+        gap:calc(var(--space) * 1.25);
+      }
+      .landing-hero{
+        text-align:center;
+        align-items:center;
+        padding:calc(var(--space) * 1.5);
+        border-radius:26px;
+      }
+      .hero-kicker{ margin-inline:auto; }
+      .hero-subtitle,
+      .hero-note{ text-align:center; }
+      .hero-metrics{ margin-inline:auto; max-width:100%; }
+      .hero-metric{ min-width:160px; padding:16px 18px; }
+      .hero-metrics__track{ animation-duration:24s; }
+      .login-card{
+        order:-1;
+        margin-inline:auto;
+        width:min(100%, 420px);
+        padding:calc(var(--space) * 1.25);
+      }
+      html[data-theme="light"] .login-card{
+        box-shadow:0 18px 48px rgba(15,23,42,0.16);
+      }
+      .login-intro{ font-size:13px; }
+      .login-actions{ margin-top:var(--space); }
+    }
+    @media (max-width: 480px){
+      .landing-hero{
+        padding:calc(var(--space) * 1.25);
+        border-radius:22px;
+      }
+      .hero-metric{ min-width:150px; padding:14px 16px; }
+      .login-card{
+        padding:calc(var(--space) * 1.1);
+        border-radius:24px;
+      }
+      .login-title{ font-size:1.35rem; }
+      .login-actions .btn.primary{
+        font-size:1rem;
+        padding:12px 16px;
+      }
+      .login-actions .btn{ font-size:.95rem; }
+    }
     .login-card{
       width:min(100%, 360px);
       background: var(--card);
