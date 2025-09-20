@@ -8,12 +8,12 @@
   const config = {
     API_URL:
       source.API_URL ||
-      'https://script.google.com/macros/s/AKfycbz_DsHnZdKlQ0a19SELkTqYTUUgXEnvKpn14nCjsGCt1fxTK0vcFxWzL9iraxSFNK3R/exec',
+      'https://script.google.com/macros/s/AKfycbxsPlLLD3NK3vfbyM4dQ_H7EJERXoyFCPcrK_iFwOTzplzvz8NHrefqxq8M7VrnvA7P/exec',
     REQUEST_TIMEOUT_MS: Number.isFinite(source.REQUEST_TIMEOUT_MS)
       ? source.REQUEST_TIMEOUT_MS
       : 45000,
     VERSION:
-      typeof source.VERSION === 'string' && source.VERSION.trim() ? source.VERSION.trim() : '2.6.2',
+      typeof source.VERSION === 'string' && source.VERSION.trim() ? source.VERSION.trim() : '2.8.0',
   };
   if (typeof module === 'object' && module.exports) {
     module.exports = config;
