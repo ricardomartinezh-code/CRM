@@ -226,6 +226,11 @@ const CANONICAL_ESTADO_LABELS = (() => {
 const ROUND_ROBIN_PROPERTY_PREFIX = 'ROUND_ROBIN_INDEX_';
 const OPERATIONAL_METRICS_SHEET_NAME = 'Operational Metrics';
 const OPERATIONAL_METRICS_HEADERS = ['Timestamp','Base','Asesor','Nivel','Metric','Valor','Total'];
+const DIAGNOSTICS_PRIORITY_BASE_PROPERTY = 'DIAGNOSTICS_PRIORITY_BASE';
+const DIAGNOSTICS_CONTROL_SHEET_NAME = 'Diagnostics Control';
+const DIAGNOSTICS_CONTROL_HEADERS = ['Fecha','Base solicitada','Base analizada','Errores','Advertencias','Filas inválidas','Estado','Resumen'];
+const DIAGNOSTICS_ALERT_RECIPIENTS_PROPERTY = 'DIAGNOSTICS_ALERT_RECIPIENTS';
+const DIAGNOSTICS_ALERT_WEBHOOK_PROPERTY = 'DIAGNOSTICS_ALERT_WEBHOOK';
 
 function getSpreadsheet_(){
   let ss = null;
@@ -1605,9 +1610,8 @@ function normalizeGmailThread_(body){
   };
 }
 
-function handleDiagnostics_(e, user){
-  e = e || { parameter: {} };
-  const requestedSheet = e.parameter.sheet || '';
+function computeDiagnosticsReport_(requestedSheet){
+  const requested = String(requestedSheet || '').trim();
   const timezone = Session.getScriptTimeZone() || '';
   const result = {
     timestamp: new Date().toISOString(),
@@ -1626,7 +1630,7 @@ function handleDiagnostics_(e, user){
     sheets: [],
     aggregate: { duplicateIds: [], duplicatePhones: [] },
     login: getAuthDiagnostics_(),
-    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested },
+    status: { spreadsheet: '', totalSheets: 0, requestedSheet: requested, analyzedSheet: '', sheetNames: [] },
     summary: { sheetsWithErrors: 0, sheetsWithWarnings: 0, invalidRows: 0 },
     system: { status: 'En espera', timezone }
   };
@@ -1644,7 +1648,7 @@ function handleDiagnostics_(e, user){
   }
   const leadSheets = ss.getSheets().filter(isLeadSheet_);
   result.status.totalSheets = leadSheets.length;
-  result.status.sheetNames = leadSheets.map(s => s.getName());
+  result.status.sheetNames = leadSheets.map(sheet => sheet.getName());
   let targetSheet = requested ? ss.getSheetByName(requested) : null;
   if(requested && !targetSheet){
     result.warnings.push('La hoja solicitada "' + requested + '" no existe. Se utilizará la primera hoja disponible.');
@@ -1662,6 +1666,7 @@ function handleDiagnostics_(e, user){
     return result;
   }
   result.sheet = targetSheet.getName();
+  result.status.analyzedSheet = result.sheet;
   result.connection = true;
   result.checks.connection.ok = true;
   result.checks.connection.message = 'Hoja "' + result.sheet + '" disponible para análisis.';
@@ -1679,7 +1684,7 @@ function handleDiagnostics_(e, user){
   }
 
   try{
-    const cell = targetSheet.getRange(1,1);
+    const cell = targetSheet.getRange(1, 1);
     cell.setValue(cell.getValue());
     result.write = true;
     result.checks.write.ok = true;
@@ -1708,16 +1713,26 @@ function handleDiagnostics_(e, user){
 
   result.summary.sheetsWithErrors = result.sheets.filter(s => !s.ok).length;
   result.summary.sheetsWithWarnings = result.sheets.filter(s => s.hasWarnings).length;
-  result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + s.invalidCount, 0);
-  result.system.status = result.summary.sheetsWithErrors ? 'Con incidencias' : 'Operativo';
+  result.summary.invalidRows = result.sheets.reduce((acc, s) => acc + (Number(s.invalidCount) || 0), 0);
+
+  if(result.summary.sheetsWithErrors){
+    result.system.status = 'Con incidencias';
+  }else if(result.summary.sheetsWithWarnings){
+    result.system.status = 'Con advertencias';
+  }else{
+    result.system.status = 'Operativo';
+  }
 
   return result;
 }
 
 function handleDiagnostics_(e, user){
   e = e || { parameter: {} };
-  const requestedSheet = e.parameter.sheet || '';
+  const requestedSheet = String(e.parameter.sheet || '').trim();
   const report = computeDiagnosticsReport_(requestedSheet);
+  if(report && report.status && !report.status.requestedSheet){
+    report.status.requestedSheet = requestedSheet;
+  }
   return jsonResponse(report, e);
 }
 
