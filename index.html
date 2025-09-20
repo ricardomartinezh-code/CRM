@@ -361,34 +361,67 @@
       gap:var(--space);
     }
     .success-card{
+      position:relative;
       display:flex;
       flex-direction:column;
       gap:var(--space-sm);
-      padding:var(--space);
+      padding:calc(var(--space) * 1.1);
       border-radius:var(--radius);
-      background:var(--card);
+      background:linear-gradient(155deg, color-mix(in srgb, var(--card) 86%, rgba(var(--panel-base-rgb),0.16) 14%), rgba(var(--panel-base-rgb),0.08));
       border:1px solid rgba(255,255,255,0.12);
       box-shadow:var(--shadow);
+      overflow:hidden;
     }
     html[data-theme="light"] .success-card{
+      background:linear-gradient(160deg, color-mix(in srgb, #ffffff 88%, rgba(var(--panel-base-rgb),0.12) 12%), color-mix(in srgb, rgba(var(--panel-base-rgb),0.08) 54%, #ffffff 46%));
       border-color:rgba(15,23,42,0.08);
+    }
+    .success-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      border-radius:inherit;
+      border:1px solid rgba(255,255,255,0.08);
+      pointer-events:none;
+      opacity:0.65;
+    }
+    html[data-theme="light"] .success-card::after{
+      border-color:rgba(15,23,42,0.06);
+    }
+    .success-card__icon{
+      width:40px;
+      height:40px;
+      display:grid;
+      place-items:center;
+      border-radius:12px;
+      background:rgba(var(--panel-base-rgb),0.22);
+      color:var(--panel-stage-text);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.35);
+      font-size:18px;
+    }
+    html[data-theme="light"] .success-card__icon{
+      background:color-mix(in srgb, rgba(var(--panel-base-rgb),0.18) 62%, #ffffff 38%);
+      color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 70%, #0f172a 30%);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.75);
+    }
+    .success-card blockquote{
+      margin:0;
+      font-size:15px;
+      line-height:1.6;
+      font-weight:600;
+      color:color-mix(in srgb, currentColor 82%, rgba(255,255,255,0.26) 18%);
+    }
+    html[data-theme="light"] .success-card blockquote{
+      color:color-mix(in srgb, currentColor 80%, rgba(15,23,42,0.18) 20%);
     }
     .success-card__meta{
       display:flex;
       flex-direction:column;
       gap:4px;
     }
-    .success-card__quote{
-      margin:0;
-      font-size:15px;
-      line-height:1.55;
-      color:color-mix(in srgb, currentColor 80%, rgba(255,255,255,0.26) 20%);
-    }
-    html[data-theme="light"] .success-card__quote{
-      color:color-mix(in srgb, currentColor 80%, rgba(15,23,42,0.18) 20%);
-    }
     .success-card__author{
-      font-weight:700;
+      font-weight:800;
+      letter-spacing:.2px;
       color:var(--panel-base-bright);
     }
     html[data-theme="light"] .success-card__author{
@@ -2508,27 +2541,36 @@
         <p>Instituciones que combinan datos, automatización y seguimiento omnicanal con ReLead EDU para sostener su matrícula.</p>
       </header>
       <div class="success-grid" role="list">
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Sincronizamos ReLead con el ERP académico y recuperamos el 30% de los prospectos inactivos antes del inicio de ciclo.”</p>
-          <div class="success-card__meta">
+        <figure class="success-card" role="listitem">
+          <div class="success-card__icon" aria-hidden="true">
+            <i class="bi bi-chat-quote"></i>
+          </div>
+          <blockquote>“Sincronizamos ReLead con el ERP académico y recuperamos el 30% de los prospectos inactivos antes del inicio de ciclo.”</blockquote>
+          <figcaption class="success-card__meta">
             <span class="success-card__author">Universidad Horizonte</span>
             <p class="success-card__role">Dirección de Admisiones</p>
+          </figcaption>
+        </figure>
+        <figure class="success-card" role="listitem">
+          <div class="success-card__icon" aria-hidden="true">
+            <i class="bi bi-bar-chart"></i>
           </div>
-        </article>
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Los tableros de productividad nos ayudaron a priorizar llamadas y duplicar el volumen de entrevistas completadas.”</p>
-          <div class="success-card__meta">
+          <blockquote>“Los tableros de productividad nos ayudaron a priorizar llamadas y duplicar el volumen de entrevistas completadas.”</blockquote>
+          <figcaption class="success-card__meta">
             <span class="success-card__author">Red Instituto Valle</span>
             <p class="success-card__role">Coordinación Comercial</p>
+          </figcaption>
+        </figure>
+        <figure class="success-card" role="listitem">
+          <div class="success-card__icon" aria-hidden="true">
+            <i class="bi bi-whatsapp"></i>
           </div>
-        </article>
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Automatizamos recordatorios por WhatsApp y correo; ahora cada asesor dispone de un histórico único por lead.”</p>
-          <div class="success-card__meta">
+          <blockquote>“Automatizamos recordatorios por WhatsApp y correo; ahora cada asesor dispone de un histórico único por lead.”</blockquote>
+          <figcaption class="success-card__meta">
             <span class="success-card__author">Colegio Delta</span>
             <p class="success-card__role">Gerencia de Experiencia</p>
-          </div>
-        </article>
+          </figcaption>
+        </figure>
       </div>
     </section>
   </div>
