@@ -8439,28 +8439,26 @@
       return;
     }
     try{
+      let loadedLeads = [];
       if(state.sheet === ALL_SHEETS_VALUE){
         const sheetNames = sheets.filter(Boolean);
-        const results = [];
         for(const sheetName of sheetNames){
           try{
             const list = await fetchLeadsForSheet(sheetName);
-            results.push(...list);
+            if(Array.isArray(list) && list.length){
+              loadedLeads.push(...list);
+            }
           }catch(err){
             if(err && err.code === 'UNAUTHORIZED') throw err;
           }
         }
-        leads = mapped;
-        autoReassignmentPlan = buildAutoReassignmentPlan(leads);
-        applyAutoReassignmentAnnotations();
-        state.columnLimits = {};
-        state.columnLimitSignature = '';
-      }else if(data && data.error){
-        throw new Error(data.error);
       }else{
-        leads = [];
-        syncQuickAccessWithLeads();
+        loadedLeads = await fetchLeadsForSheet(state.sheet);
       }
+      leads = Array.isArray(loadedLeads) ? loadedLeads : [];
+      autoReassignmentPlan = buildAutoReassignmentPlan(leads);
+      applyAutoReassignmentAnnotations();
+      syncQuickAccessWithLeads();
       state.columnLimits = {};
       state.columnLimitSignature = '';
     }catch(err){
@@ -8468,6 +8466,8 @@
       console.error('Error al cargar leads', err);
       leads = [];
       syncQuickAccessWithLeads();
+      state.columnLimits = {};
+      state.columnLimitSignature = '';
     }
   }
 
