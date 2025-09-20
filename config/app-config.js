@@ -8,7 +8,7 @@
   const config = {
     API_URL:
       source.API_URL ||
-      'https://script.google.com/macros/s/AKfycbxsPlLLD3NK3vfbyM4dQ_H7EJERXoyFCPcrK_iFwOTzplzvz8NHrefqxq8M7VrnvA7P/exec',
+      'https://script.google.com/macros/s/AKfycbxAbz6lojrPvMqhLkBlrDE16jQpq3G8ix6ox8c9zDKYnmaTtn9MXCWDBwOlJ_0lVQlp/exec',
     REQUEST_TIMEOUT_MS: Number.isFinite(source.REQUEST_TIMEOUT_MS)
       ? source.REQUEST_TIMEOUT_MS
       : 45000,
