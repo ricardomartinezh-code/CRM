@@ -16035,9 +16035,6 @@
       try{
         const response = await fetch(API_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify({ action: 'requestPasswordReset', email, userId })
         });
         let data = null;
@@ -16094,9 +16091,6 @@
       try{
         const response = await fetch(API_URL, {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
           body: JSON.stringify({ action: 'login', email, password })
         });
         let data = null;
