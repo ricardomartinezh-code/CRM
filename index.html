@@ -325,88 +325,9 @@
     @media (prefers-reduced-motion: reduce){
       .hero-metrics__track{ animation:none; }
     }
-    .success-stories{
-      display:flex;
-      flex-direction:column;
-      gap:calc(var(--space) * 1.5);
-      padding:calc(var(--space) * 1.5) clamp(var(--space), 6vw, calc(var(--space) * 4));
-      border-radius:calc(var(--radius) * 1.25);
-      background:rgba(15,23,42,0.32);
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:0 28px 60px rgba(2,10,28,0.35);
-      color:var(--panel-stage-text);
-    }
-    html[data-theme="light"] .success-stories{
-      background:linear-gradient(135deg, rgba(var(--panel-base-rgb),0.12), #ffffff);
-      border-color:rgba(15,23,42,0.08);
-      box-shadow:0 32px 72px rgba(var(--panel-base-rgb),0.18);
-      color:#0f172a;
-    }
-    .success-header h2{
-      margin:0 0 6px;
-      font-size:clamp(26px, 3vw, 32px);
-      font-weight:800;
-    }
-    .success-header p{
-      margin:0;
-      max-width:60ch;
-      color:color-mix(in srgb, currentColor 78%, rgba(255,255,255,0.32) 22%);
-    }
-    html[data-theme="light"] .success-header p{
-      color:color-mix(in srgb, currentColor 68%, rgba(15,23,42,0.32) 32%);
-    }
-    .success-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:var(--space);
-    }
-    .success-card{
-      display:flex;
-      flex-direction:column;
-      gap:var(--space-sm);
-      padding:var(--space);
-      border-radius:var(--radius);
-      background:var(--card);
-      border:1px solid rgba(255,255,255,0.12);
-      box-shadow:var(--shadow);
-    }
-    html[data-theme="light"] .success-card{
-      border-color:rgba(15,23,42,0.08);
-    }
-    .success-card__meta{
-      display:flex;
-      flex-direction:column;
-      gap:4px;
-    }
-    .success-card__quote{
-      margin:0;
-      font-size:15px;
-      line-height:1.55;
-      color:color-mix(in srgb, currentColor 80%, rgba(255,255,255,0.26) 20%);
-    }
-    html[data-theme="light"] .success-card__quote{
-      color:color-mix(in srgb, currentColor 80%, rgba(15,23,42,0.18) 20%);
-    }
-    .success-card__author{
-      font-weight:700;
-      color:var(--panel-base-bright);
-    }
-    html[data-theme="light"] .success-card__author{
-      color:color-mix(in srgb, rgb(var(--panel-base-rgb)) 60%, #0f172a 40%);
-    }
-    .success-card__role{
-      margin:0;
-      font-size:13px;
-      color:var(--muted);
-    }
     @media (max-width: 900px){
       .landing-layout{ grid-template-columns:1fr; }
       .hero-cta .btn{ flex:1 1 140px; }
-    }
-    @media (max-width: 600px){
-      .success-stories{
-        padding:calc(var(--space) * 1.25);
-      }
     }
     .login-card{
       width:min(100%, 360px);
@@ -2502,35 +2423,6 @@
         </footer>
       </div>
     </div>
-    <section class="success-stories" aria-labelledby="successTitle">
-      <header class="success-header">
-        <h2 id="successTitle">Casos de éxito</h2>
-        <p>Instituciones que combinan datos, automatización y seguimiento omnicanal con ReLead EDU para sostener su matrícula.</p>
-      </header>
-      <div class="success-grid" role="list">
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Sincronizamos ReLead con el ERP académico y recuperamos el 30% de los prospectos inactivos antes del inicio de ciclo.”</p>
-          <div class="success-card__meta">
-            <span class="success-card__author">Universidad Horizonte</span>
-            <p class="success-card__role">Dirección de Admisiones</p>
-          </div>
-        </article>
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Los tableros de productividad nos ayudaron a priorizar llamadas y duplicar el volumen de entrevistas completadas.”</p>
-          <div class="success-card__meta">
-            <span class="success-card__author">Red Instituto Valle</span>
-            <p class="success-card__role">Coordinación Comercial</p>
-          </div>
-        </article>
-        <article class="success-card" role="listitem">
-          <p class="success-card__quote">“Automatizamos recordatorios por WhatsApp y correo; ahora cada asesor dispone de un histórico único por lead.”</p>
-          <div class="success-card__meta">
-            <span class="success-card__author">Colegio Delta</span>
-            <p class="success-card__role">Gerencia de Experiencia</p>
-          </div>
-        </article>
-      </div>
-    </section>
   </div>
   <div class="loading-overlay hidden" id="globalLoading" role="status" aria-live="polite" aria-hidden="true">
     <div class="loading-card">
