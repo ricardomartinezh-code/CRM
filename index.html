@@ -5371,6 +5371,10 @@
     showLeadId: false,
     appliedPreset: ''
   };
+  const THEME_SURFACE_COLORS = {
+    light: '#f6f8fb',
+    dark: '#0b1220'
+  };
   const DEFAULT_TAG_COLOR = '#2563eb';
   const AUTO_REASSIGN_DIFFERENCE_THRESHOLD = 1;
   const CALENDAR_DEFAULT_DURATION = 30;
@@ -10783,9 +10787,9 @@
     }
     return { ...DEFAULT_PASSWORD_REQUEST };
   }
-  function handleSystemThemeChange(event){
+  function handleSystemThemeChange(){
     if((userPreferences.theme || 'system') === 'system'){
-      document.documentElement.setAttribute('data-theme', event.matches ? 'dark' : 'light');
+      applyTheme();
     }
   }
   function resolveTheme(themePref){
@@ -10809,6 +10813,19 @@
     const resolved = resolveTheme(pref);
     document.documentElement.setAttribute('data-theme', resolved);
     document.documentElement.setAttribute('data-theme-pref', pref);
+    document.documentElement.style.setProperty('color-scheme', resolved === 'dark' ? 'dark' : 'light');
+    const body = document.body;
+    if(body){
+      body.dataset.theme = resolved;
+    }
+    updateThemeMeta(resolved);
+  }
+  function updateThemeMeta(resolved){
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+    const surface = THEME_SURFACE_COLORS[resolved] || THEME_SURFACE_COLORS.dark;
+    if(themeMeta && themeMeta.getAttribute('content') !== surface){
+      themeMeta.setAttribute('content', surface);
+    }
   }
   function applyLanguage(){
     const lang = userPreferences.language || 'es';
@@ -10890,7 +10907,21 @@
     showSettingsMessage(`Se aplicó el preset ${preset.name || 'institucional'}.`, 'success');
   }
   function updatePreferences(partial){
-    userPreferences = { ...userPreferences, ...partial };
+    const updates = partial && typeof partial === 'object' ? { ...partial } : {};
+    const keys = Object.keys(updates);
+    if(keys.length === 0){
+      return;
+    }
+    const touchesOnlyPreset = keys.length === 1 && keys[0] === 'appliedPreset';
+    if(!touchesOnlyPreset && !('appliedPreset' in updates)){
+      updates.appliedPreset = '';
+    }
+    const nextPreferences = { ...userPreferences, ...updates };
+    const hasChanges = Object.keys(nextPreferences).some(key => nextPreferences[key] !== userPreferences[key]);
+    if(!hasChanges){
+      return;
+    }
+    userPreferences = nextPreferences;
     writeStorageJSON(STORAGE_KEYS.preferences, userPreferences);
     clearLegacyThemeKey();
     applyPreferences();
@@ -10913,6 +10944,7 @@
     applyPreferences();
     if(settingsReady){
       syncPreferencesForm();
+      renderPreferencePresets();
     }
     if(typeof refresh === 'function'){
       try{
