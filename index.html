@@ -181,68 +181,204 @@
       inset:0;
       z-index:100;
       display:flex;
-      flex-direction:column;
-      gap:calc(var(--space) * 1.75);
-      align-items:stretch;
+      align-items:center;
       justify-content:center;
-      padding-block:clamp(calc(var(--space) * 2.75), 12vh, calc(var(--space) * 5.5));
-      padding-inline:clamp(var(--space), 5vw, calc(var(--space) * 4));
-      padding-top:clamp(calc(var(--space) * 3 + constant(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + constant(safe-area-inset-top)));
-      padding-top:clamp(calc(var(--space) * 3 + env(safe-area-inset-top)), 14vh, calc(var(--space) * 5.5 + env(safe-area-inset-top)));
-      padding-bottom:clamp(calc(var(--space) * 2.5 + constant(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + constant(safe-area-inset-bottom)));
-      padding-bottom:clamp(calc(var(--space) * 2.5 + env(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4.5 + env(safe-area-inset-bottom)));
+      padding:clamp(calc(var(--space) * 2.5), 12vh, calc(var(--space) * 5));
+      padding-top:clamp(calc(var(--space) * 2.5 + constant(safe-area-inset-top)), 12vh, calc(var(--space) * 5 + constant(safe-area-inset-top)));
+      padding-top:clamp(calc(var(--space) * 2.5 + env(safe-area-inset-top)), 12vh, calc(var(--space) * 5 + env(safe-area-inset-top)));
+      padding-bottom:clamp(calc(var(--space) * 2 + constant(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4 + constant(safe-area-inset-bottom)));
+      padding-bottom:clamp(calc(var(--space) * 2 + env(safe-area-inset-bottom)), 8vh, calc(var(--space) * 4 + env(safe-area-inset-bottom)));
       overflow-y:auto;
-      background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
+      background: radial-gradient(1200px 620px at 50% -20%, rgba(148,163,184,0.24), transparent 65%), radial-gradient(900px 540px at 10% 20%, rgba(2,12,29,0.55), transparent 70%), linear-gradient(160deg, rgba(6,12,24,0.95), rgba(15,23,42,0.88));
       backdrop-filter: blur(8px);
     }
     .login-panel{
-      width:min(100%, 540px);
+      width:min(100%, 420px);
       margin-inline:auto;
-      padding:0;
-      border-radius:0;
-      background:none;
-      border:none;
-      box-shadow:none;
-      backdrop-filter:none;
+    }
+    .login-card{
+      width:100%;
+      background:color-mix(in srgb, var(--card) 92%, rgba(96,165,250,0.08) 8%);
+      border:1px solid rgba(255,255,255,0.14);
+      border-radius:28px;
+      box-shadow:0 32px 64px rgba(8,15,28,0.38);
+      padding:calc(var(--space) * 1.75);
       display:flex;
       flex-direction:column;
+      gap:calc(var(--space) * 1.15);
       align-items:stretch;
+      text-align:center;
     }
-    .login-panel .login-card{
-      width:min(100%, 400px);
-      margin-inline:auto;
-      background:color-mix(in srgb, var(--card) 90%, rgba(37,99,235,0.12) 10%);
-      border-color:rgba(255,255,255,0.22);
-      box-shadow:0 20px 48px rgba(8,15,28,0.35);
-    }
-    html[data-theme="light"] .login-panel{
-      background:none;
-      border:none;
-      box-shadow:none;
-    }
-    html[data-theme="light"] .login-panel .login-card{
-      background:color-mix(in srgb, #ffffff 94%, rgba(37,99,235,0.08) 6%);
+    html[data-theme="light"] .login-card{
+      background:color-mix(in srgb, #ffffff 96%, rgba(37,99,235,0.08) 4%);
       border-color:rgba(15,23,42,0.1);
-      box-shadow:0 18px 46px rgba(15,23,42,0.14);
+      box-shadow:0 28px 60px rgba(15,23,42,0.18);
     }
-    .btn.outline{
-      background:transparent;
-      border:1px solid rgba(255,255,255,0.5);
-      color:var(--panel-stage-text);
+    .login-brand{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:var(--space-sm);
     }
-    .btn.outline:hover,
-    .btn.outline:focus-visible{
-      background:rgba(var(--panel-base-rgb),0.12);
-      color:var(--panel-stage-text);
+    .login-brand__logo{
+      width:132px;
+      height:132px;
+      border-radius:28px;
+      background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), transparent 60%), linear-gradient(160deg, rgba(15,23,42,0.95), rgba(37,99,235,0.75));
+      box-shadow:0 24px 48px rgba(8,15,28,0.48), inset 0 1px 0 rgba(255,255,255,0.3);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
     }
-    html[data-theme="light"] .btn.outline{
-      border-color:rgba(15,23,42,0.16);
+    html[data-theme="light"] .login-brand__logo{
+      background:radial-gradient(circle at 35% 30%, rgba(255,255,255,0.8), transparent 65%), linear-gradient(160deg, rgba(226,232,240,0.95), rgba(148,163,184,0.6));
+      box-shadow:0 20px 40px rgba(148,163,184,0.32), inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+    .login-brand__logo svg{
+      width:100%;
+      height:100%;
+      filter:drop-shadow(0 16px 28px rgba(11,18,32,0.45));
+    }
+    .login-brand__wordmark{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:2px;
+      letter-spacing:.6px;
+      color:#f8fafc;
+      text-transform:uppercase;
+      font-weight:700;
+    }
+    .login-brand__name{
+      font-size:1.35rem;
+      letter-spacing:.4px;
+      text-transform:none;
+    }
+    .login-brand__tag{
+      font-size:.85rem;
+      letter-spacing:.6px;
+      color:rgba(226,232,240,0.85);
+    }
+    html[data-theme="light"] .login-brand__wordmark{
+      color:#0f172a;
+    }
+    html[data-theme="light"] .login-brand__tag{
+      color:#1e293b;
+    }
+    .login-title{
+      margin:0;
+      font-size:1.25rem;
+      font-weight:700;
+      letter-spacing:.45px;
       color:var(--text);
     }
-    html[data-theme="light"] .btn.outline:hover,
-    html[data-theme="light"] .btn.outline:focus-visible{
-      background:rgba(var(--panel-base-rgb),0.12);
+    .login-form{
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+      text-align:left;
     }
+    .login-form label{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      font-size:13px;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .login-actions{
+      margin-top:var(--space-sm);
+      display:flex;
+      flex-direction:column;
+      gap:var(--space-sm);
+    }
+    .login-actions .btn.primary{
+      font-size:1.05rem;
+      font-weight:700;
+      padding:14px 18px;
+      letter-spacing:.5px;
+      box-shadow:0 20px 44px rgba(0,58,95,0.32);
+      transition:transform .18s ease, box-shadow .2s ease;
+    }
+    .login-actions .btn.primary:hover{
+      transform:translateY(-1px);
+      box-shadow:0 24px 52px rgba(0,58,95,0.36);
+    }
+    .login-actions .btn.primary:focus-visible{
+      outline:none;
+      box-shadow:var(--ring), 0 24px 52px rgba(0,58,95,0.38);
+    }
+    .login-support{
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      align-items:center;
+      margin-top:var(--space-xs);
+    }
+    .login-support__label{
+      margin:0;
+      font-size:.85rem;
+      letter-spacing:.3px;
+      color:var(--muted);
+    }
+    .link-button{
+      background:none;
+      border:none;
+      color:var(--accent);
+      font:inherit;
+      font-weight:600;
+      padding:0;
+      cursor:pointer;
+      text-decoration:underline;
+    }
+    .link-button:hover,
+    .link-button:focus-visible{
+      color:var(--text);
+      outline:none;
+      text-decoration:none;
+    }
+    .login-message{
+      margin:0;
+      font-size:13px;
+      text-align:center;
+      min-height:1.2em;
+    }
+    .login-error{ color:var(--bad); }
+    .login-success{ color:var(--ok); }
+    .login-info{ color:var(--info); }
+    .login-hint{
+      margin:var(--space-xs) 0 0;
+      font-size:12px;
+      text-align:center;
+      color:var(--muted);
+    }
+    .login-meta{
+      margin-top:calc(var(--space) * 1.25);
+      padding-top:var(--space-sm);
+      border-top:1px solid rgba(255,255,255,0.12);
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      font-size:12px;
+      text-align:center;
+      color:var(--muted);
+      letter-spacing:.35px;
+    }
+    .login-meta__version{ font-weight:700; color:var(--accent); }
+    .login-meta__rights{ font-weight:600; font-size:11px; letter-spacing:.35px; }
+    .login-meta__rights sup,
+    .nav-footer__rights sup,
+    .site-footer__rights sup{
+      font-size:.65em;
+      line-height:1;
+      margin-left:1px;
+    }
+    html[data-theme="light"] .login-meta{
+      border-color:rgba(15,23,42,0.12);
+      color:#475569;
+    }
+    html[data-theme="light"] .login-meta__rights{ color:#475569; }
     @media (max-width: 768px){
       :root{
         --font-size-base: 14px;
@@ -253,134 +389,27 @@
       }
       body{ line-height:1.55; }
       .login-screen{ padding-inline:max(var(--space), 6vw); }
-      .login-card{ width:min(100%, 420px); margin-inline:auto; padding:calc(var(--space) * 1.35); }
-      .login-actions{ gap:var(--space-sm); }
-      .mobile-topbar{ padding-inline:var(--space); }
-      .topbar-inner{ padding-inline:var(--space); }
-    }
-    @media (max-width: 540px){
-      .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.4); }
-      .login-card{ width:100%; padding:calc(var(--space) * 1.25); gap:var(--space-sm); border-radius:28px; }
-      .login-intro{ font-size:13px; }
-      .login-meta{ margin-top:var(--space); }
-      .login-actions .btn.primary{ font-size:1rem; padding:12px 16px; }
-      .mobile-topbar__label{ font-size:13px; letter-spacing:.4px; }
-      .view-section > .card,
-      .main .card{ margin:var(--space) !important; }
-      .kpi-group{ padding:calc(var(--space) * 0.85); }
-      .kpi-metric{ min-height:0; }
+      .login-card{ padding:calc(var(--space) * 1.5); }
+      .login-brand__logo{ width:120px; height:120px; padding:20px; }
     }
     @media (max-width: 720px){
       .login-screen{
         justify-content:flex-start;
-        padding-block:clamp(calc(var(--space) * 2.25), 10vh, calc(var(--space) * 4));
+        padding-block:clamp(calc(var(--space) * 2), 12vh, calc(var(--space) * 4));
         padding-inline:clamp(calc(var(--space) * 0.75), 6vw, calc(var(--space) * 2));
       }
-      .login-panel{
-        order:-1;
-        width:min(100%, 420px);
-        margin-inline:auto;
-        padding:calc(var(--space) * 1.35);
-      }
-      .login-intro{ font-size:13px; }
-      .login-actions{ margin-top:var(--space); }
+      .login-card{ border-radius:24px; }
+    }
+    @media (max-width: 540px){
+      .login-card{ padding:calc(var(--space) * 1.3); }
+      .login-brand__logo{ width:108px; height:108px; padding:18px; border-radius:24px; }
+      .login-title{ font-size:1.15rem; }
     }
     @media (max-width: 480px){
-      .login-card{ padding:calc(var(--space) * 1.2); border-radius:26px; width:100%; }
-      .login-title{ font-size:1.35rem; }
-      .login-actions .btn.primary{
-        font-size:1rem;
-        padding:12px 16px;
-      }
-      .login-actions .btn{ font-size:.95rem; }
+      .login-card{ padding:calc(var(--space) * 1.2); border-radius:22px; }
+      .login-brand__logo{ width:96px; height:96px; padding:16px; border-radius:22px; }
+      .login-title{ font-size:1.1rem; }
     }
-    .login-card{
-      width:min(100%, 360px);
-      background: var(--card);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: calc(var(--space) * 1.5);
-      display:flex;
-      flex-direction:column;
-      gap:var(--space);
-      align-items:stretch;
-      text-align:left;
-    }
-    html[data-theme="light"] .login-card{
-      background:#fff;
-      border-color:rgba(15,23,42,0.1);
-      box-shadow: 0 20px 60px rgba(15,23,42,0.18);
-    }
-    .login-logo{ display:flex; justify-content:center; }
-    .login-logo img{ max-width:132px; width:100%; height:auto; filter: drop-shadow(0 12px 24px rgba(15,23,42,0.24)); }
-    .login-title{
-      margin:0 0 var(--space-xs);
-      text-align:center;
-      font-size:1.45rem;
-      letter-spacing:.5px;
-      font-weight:800;
-      color:var(--text);
-    }
-    .login-intro{
-      margin:0 0 var(--space);
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.55;
-      text-align:center;
-    }
-    .login-form{ display:flex; flex-direction:column; gap:var(--space-sm); }
-    .login-form label{ display:flex; flex-direction:column; gap:6px; font-size:13px; font-weight:600; color:var(--muted); }
-    .login-actions{ margin-top:var(--space-sm); display:flex; flex-direction:column; gap:var(--space-sm); }
-    .login-actions .btn.primary{
-      font-size:1.05rem;
-      font-weight:700;
-      padding:14px 18px;
-      letter-spacing:.5px;
-      box-shadow:0 18px 38px rgba(0,58,95,0.32);
-      transition:transform .18s ease, box-shadow .2s ease;
-    }
-    .login-actions .btn.primary:hover{
-      transform:translateY(-1px);
-      box-shadow:0 22px 45px rgba(0,58,95,0.36);
-    }
-    .login-actions .btn.primary:focus-visible{
-      outline:none;
-      box-shadow:var(--ring), 0 22px 45px rgba(0,58,95,0.38);
-    }
-    .login-message{ margin:0; font-size:13px; text-align:center; min-height:1.2em; }
-    .login-error{ color:var(--bad); }
-    .login-success{ color:var(--ok); }
-    .login-info{ color:var(--info); }
-    .login-hint{ margin:0; font-size:12px; text-align:center; color:var(--muted); }
-    .login-hint .link-button{
-      background:none;
-      border:none;
-      color:var(--accent);
-      font:inherit;
-      font-weight:600;
-      padding:0;
-      cursor:pointer;
-      text-decoration:underline;
-    }
-    .login-hint .link-button:hover,
-    .login-hint .link-button:focus-visible{
-      color:var(--text);
-      outline:none;
-      text-decoration:none;
-    }
-    .login-meta{ margin-top:calc(var(--space) * 1.25); padding-top:var(--space-sm); border-top:1px solid rgba(255,255,255,0.12); display:flex; flex-direction:column; gap:4px; font-size:12px; text-align:center; color:var(--muted); letter-spacing:.35px; }
-    .login-meta__version{ font-weight:700; color:var(--accent); }
-    .login-meta__rights{ font-weight:600; font-size:11px; letter-spacing:.35px; }
-    .login-meta__rights sup,
-    .nav-footer__rights sup,
-    .site-footer__rights sup{
-      font-size:.65em;
-      line-height:1;
-      margin-left:1px;
-    }
-    html[data-theme="light"] .login-meta{ border-color:rgba(15,23,42,0.12); color:#475569; }
-    html[data-theme="light"] .login-meta__rights{ color:#475569; }
     /* Layout */
     .app {
       --sidebar-width: 280px;
@@ -2396,55 +2425,77 @@
 <body>
   <div class="login-screen" id="loginScreen" aria-hidden="false">
     <div class="login-panel">
-        <div class="login-card" role="dialog" aria-labelledby="loginTitle">
-          <div class="login-logo" aria-hidden="true">
-            <img src="./icon-unidep180.png" alt="" width="132" height="132" />
+      <div class="login-card" role="dialog" aria-labelledby="loginTitle">
+        <div class="login-brand" aria-hidden="true">
+          <div class="login-brand__logo">
+            <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="releadLogoGradient" x1="12%" y1="8%" x2="88%" y2="88%">
+                  <stop offset="0%" stop-color="#f8fafc" />
+                  <stop offset="50%" stop-color="#dbeafe" />
+                  <stop offset="100%" stop-color="#60a5fa" />
+                </linearGradient>
+                <linearGradient id="releadLogoEdge" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="rgba(15,23,42,0.35)" />
+                  <stop offset="100%" stop-color="rgba(15,23,42,0.05)" />
+                </linearGradient>
+              </defs>
+              <path fill="url(#releadLogoGradient)" d="M24 18h46c19.6 0 34 12.9 34 31.3 0 14.3-7.7 24.7-19.8 29.1l21.8 23.6H82L64.4 82H48v20H24V18Zm24 46h28c8.5 0 14-5.4 14-14.4 0-8.9-5.5-14.6-14-14.6H48v29Z" />
+              <path fill="url(#releadLogoEdge)" d="M48 18h22c19.6 0 34 12.9 34 31.3 0 14.3-7.7 24.7-19.8 29.1l21.8 23.6h-9.6L74.5 78.7C88.1 74.2 96 63.7 96 49.3 96 30.9 81.6 18 62 18H48Z" opacity=".35" />
+            </svg>
           </div>
-          <h1 id="loginTitle" class="login-title">ReLead EDU</h1>
-          <p class="login-intro">Bienvenido. Si es tu primer acceso, utiliza el correo e ID que te compartió la coordinación para generar tu contraseña y empezar a atender leads de inmediato.</p>
-          <div id="loginSignIn" aria-hidden="false">
-            <form class="login-form" id="loginForm" autocomplete="off">
-              <label>
-                <span>Correo institucional</span>
-                <input type="email" id="loginEmail" autocomplete="username" required />
-              </label>
-              <label>
-                <span>Contraseña</span>
-                <input type="password" id="loginPassword" autocomplete="current-password" required />
-              </label>
-              <div class="login-actions">
-                <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
-                <button type="button" class="btn outline w100 hidden" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
-              </div>
-            </form>
-            <p class="login-message login-error hidden" id="loginError" role="alert"></p>
-            <p class="login-message login-info hidden" id="connectionStatus" role="status" aria-live="polite"></p>
-            <p class="login-hint" id="loginHint">¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.</p>
+          <div class="login-brand__wordmark">
+            <span class="login-brand__name">ReLead</span>
+            <span class="login-brand__tag">CRM</span>
           </div>
-          <div id="loginReset" class="hidden" aria-hidden="true">
-            <form class="login-form" id="resetForm" autocomplete="off">
-              <p class="login-hint">Ingresa el correo institucional y tu ID de usuario tal como aparecen en tu hoja de asignación para generar una contraseña temporal de acceso inicial.</p>
-              <label>
-                <span>Correo institucional</span>
-                <input type="email" id="resetEmail" autocomplete="username" required />
-              </label>
-              <label>
-                <span>ID de usuario</span>
-                <input type="text" id="resetUserId" autocomplete="off" required />
-              </label>
-              <div class="login-actions">
-                <button type="submit" class="btn primary w100" id="resetSubmit">Crear contraseña temporal</button>
-                <button type="button" class="btn w100" id="resetCancel">Volver a iniciar sesión</button>
-              </div>
-            </form>
-            <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
-            <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
-          </div>
-          <footer class="login-meta">
-            <span class="login-meta__version" data-version-format="Versión {version}"></span>
-            <span class="login-meta__rights">ReLead<sup>©</sup> Todos los Derechos Reservados</span>
-          </footer>
         </div>
+        <h1 id="loginTitle" class="login-title">Inicia sesión con tu cuenta asignada</h1>
+        <div id="loginSignIn" aria-hidden="false">
+          <form class="login-form" id="loginForm" autocomplete="off">
+            <label>
+              <span>Correo institucional</span>
+              <input type="email" id="loginEmail" autocomplete="username" required />
+            </label>
+            <label>
+              <span>Contraseña</span>
+              <input type="password" id="loginPassword" autocomplete="current-password" required />
+            </label>
+            <div class="login-actions">
+              <button type="submit" class="btn primary w100" id="loginSubmit">Entrar a mi tablero</button>
+              <button type="button" class="btn outline w100 hidden" id="connectionCheckBtn">Verificar conexión con Apps Script</button>
+            </div>
+          </form>
+          <div class="login-support">
+            <p class="login-support__label">¿Olvidaste tu contraseña?</p>
+            <button type="button" class="link-button" id="forgotPasswordBtn">Recupérala aquí</button>
+          </div>
+          <p class="login-message login-error hidden" id="loginError" role="alert"></p>
+          <p class="login-message login-info hidden" id="connectionStatus" role="status" aria-live="polite"></p>
+          <p class="login-hint" id="loginHint">Recupera tu acceso con el correo institucional y tu ID asignado.</p>
+        </div>
+        <div id="loginReset" class="hidden" aria-hidden="true">
+          <form class="login-form" id="resetForm" autocomplete="off">
+            <p class="login-hint">Ingresa el correo institucional y tu ID de usuario tal como aparecen en tu hoja de asignación para generar una contraseña temporal de acceso inicial.</p>
+            <label>
+              <span>Correo institucional</span>
+              <input type="email" id="resetEmail" autocomplete="username" required />
+            </label>
+            <label>
+              <span>ID de usuario</span>
+              <input type="text" id="resetUserId" autocomplete="off" required />
+            </label>
+            <div class="login-actions">
+              <button type="submit" class="btn primary w100" id="resetSubmit">Crear contraseña temporal</button>
+              <button type="button" class="btn w100" id="resetCancel">Volver a iniciar sesión</button>
+            </div>
+          </form>
+          <p class="login-message login-info hidden" id="resetMessage" role="status" aria-live="polite"></p>
+          <p class="login-hint" id="resetHint">La contraseña temporal se muestra una sola vez. Anótala y cámbiala desde Configuración &gt; Seguridad después de entrar.</p>
+        </div>
+        <footer class="login-meta">
+          <span class="login-meta__version" data-version-format="Versión {version}"></span>
+          <span class="login-meta__rights">ReLead<sup>©</sup> Todos los Derechos Reservados</span>
+        </footer>
       </div>
     </div>
   </div>
@@ -5147,7 +5198,7 @@
     completedAt: 0,
     completedBy: ''
   };
-  const DEFAULT_LOGIN_HINT = '¿Olvidaste tu contraseña?';
+  const DEFAULT_LOGIN_HINT = 'Recupera tu acceso con el correo institucional y tu ID asignado.';
   const DEFAULT_RESET_HINT = 'La contraseña temporal se muestra una sola vez. Cámbiala desde Configuración después de entrar.';
   const DEFAULT_PROFILE = {
     userId: '',
@@ -8232,8 +8283,7 @@
 
   function renderDefaultLoginHint(target){
     if(!target) return;
-    target.innerHTML = '¿Es tu primer ingreso o olvidaste tu contraseña? <button type="button" class="link-button" id="forgotPasswordBtn">Solicita una contraseña temporal</button>.';
-    attachForgotPasswordHandler();
+    target.textContent = DEFAULT_LOGIN_HINT;
   }
 
   function updateLoginHint(message){
