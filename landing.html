@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReLead EDU — Plataforma de reactivación</title>
+  <link rel="icon" type="image/png" href="./icon-unidep180.png" />
+  <link rel="apple-touch-icon" href="./icon-unidep180.png?v=1" />
+  <link rel="shortcut icon" type="image/png" href="./icon-unidep180.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" />
+  <style>
+    :root {
+      --color-primary: #003a5f;
+      --color-secondary: #8a9ca3;
+      --bg: #0b1220;
+      --text: #e6ebf3;
+      --muted: #9fb0cc;
+      --accent: var(--color-primary);
+      --accent-soft: rgba(37, 99, 235, 0.18);
+      --radius: 24px;
+      --shadow: 0 28px 54px rgba(8, 15, 28, 0.35);
+      --space: 18px;
+      --space-lg: calc(var(--space) * 2.4);
+      --space-xl: calc(var(--space) * 3.4);
+      --font: "Manrope", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial,
+        "Apple Color Emoji", "Segoe UI Emoji";
+    }
+
+    html[data-theme="light"] {
+      --bg: #f6f8fb;
+      --text: #0f172a;
+      --muted: #5b6b86;
+      --shadow: 0 24px 56px rgba(15, 23, 42, 0.12);
+      --accent-soft: rgba(37, 99, 235, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: radial-gradient(900px 540px at 80% -10%, rgba(138, 156, 163, 0.18), transparent 62%),
+        radial-gradient(820px 480px at -10% 10%, rgba(0, 58, 95, 0.2), transparent 64%), var(--bg);
+      color: var(--text);
+      font-family: var(--font);
+      line-height: 1.6;
+      letter-spacing: 0.2px;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(18px);
+      background: color-mix(in srgb, rgba(11, 18, 32, 0.85) 72%, transparent);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="light"] .site-header {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(15, 23, 42, 0.06);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .site-header__inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space) clamp(var(--space), 6vw, var(--space-lg));
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: 0.4px;
+    }
+
+    .brand img {
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      background: rgba(11, 18, 32, 0.6);
+      padding: 6px;
+      box-shadow: var(--shadow);
+    }
+
+    html[data-theme="light"] .brand img {
+      background: #fff;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+    }
+
+    .header-login {
+      font-weight: 700;
+      letter-spacing: 0.35px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      background: transparent;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .header-login:hover,
+    .header-login:focus-visible {
+      background: rgba(37, 99, 235, 0.22);
+      transform: translateY(-1px);
+    }
+
+    html[data-theme="light"] .header-login {
+      border-color: rgba(15, 23, 42, 0.1);
+    }
+
+    .landing-main {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: clamp(var(--space-xl), 12vh, calc(var(--space-xl) * 1.2))
+        clamp(var(--space), 6vw, var(--space-lg));
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    .landing-hero {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space);
+      padding: clamp(var(--space-lg), 5vw, var(--space-xl));
+      border-radius: 32px;
+      background: linear-gradient(155deg, rgba(11, 18, 32, 0.9), rgba(37, 99, 235, 0.68));
+      color: #f8fafc;
+      box-shadow: var(--shadow);
+    }
+
+    html[data-theme="light"] .landing-hero {
+      background: linear-gradient(155deg, rgba(15, 23, 42, 0.92), rgba(59, 130, 246, 0.62));
+    }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      width: max-content;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.32);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    }
+
+    .landing-hero h1 {
+      margin: 0;
+      font-size: clamp(34px, 5vw, 54px);
+      line-height: 1.1;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: clamp(18px, 2.2vw, 22px);
+      color: rgba(248, 250, 252, 0.88);
+      max-width: 50ch;
+    }
+
+    .hero-note {
+      margin: 0;
+      font-size: 16px;
+      color: rgba(226, 232, 240, 0.82);
+      max-width: 60ch;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 22px;
+      border-radius: 16px;
+      border: 1px solid transparent;
+      background: rgba(255, 255, 255, 0.14);
+      color: inherit;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover,
+    .btn:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(2, 10, 28, 0.32);
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.88), rgba(14, 116, 144, 0.88));
+      border-color: rgba(255, 255, 255, 0.24);
+      color: #f8fafc;
+    }
+
+    .btn.outline {
+      background: transparent;
+      border: 1px solid rgba(248, 250, 252, 0.45);
+      color: #f8fafc;
+    }
+
+    .hero-metrics {
+      position: relative;
+      overflow: hidden;
+      margin-top: var(--space);
+    }
+
+    .hero-metrics__viewport {
+      overflow: hidden;
+      mask-image: linear-gradient(90deg, transparent 0%, rgba(0, 0, 0, 0.85) 12%, rgba(0, 0, 0, 0.85) 88%, transparent 100%);
+    }
+
+    .hero-metrics__track {
+      display: flex;
+      gap: var(--space);
+      width: max-content;
+      animation: heroCarousel 32s linear infinite;
+    }
+
+    .hero-metric {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 6px;
+      min-width: 200px;
+      padding: 18px 20px;
+      border-radius: calc(var(--radius) - 6px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.28), rgba(11, 18, 32, 0.6));
+      box-shadow: 0 18px 40px rgba(2, 10, 28, 0.45);
+      color: #f8fafc;
+    }
+
+    .hero-metric__value {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+    }
+
+    .hero-metric__label {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.2px;
+      color: color-mix(in srgb, currentColor 70%, rgba(255, 255, 255, 0.35) 30%);
+    }
+
+    .hero-metric__trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4ade80;
+    }
+
+    .landing-features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: calc(var(--space) * 1.5);
+    }
+
+    .feature-card {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: calc(var(--space) * 1.1);
+      border-radius: 22px;
+      background: rgba(15, 23, 42, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: var(--shadow);
+    }
+
+    .feature-card i {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: rgba(37, 99, 235, 0.22);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feature-card h3 {
+      margin: 0;
+      font-size: 18px;
+      letter-spacing: 0.2px;
+    }
+
+    .feature-card p {
+      margin: 0;
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    html[data-theme="light"] .feature-card {
+      background: rgba(255, 255, 255, 0.86);
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    .site-footer {
+      margin-top: auto;
+      padding: calc(var(--space) * 1.4) clamp(var(--space), 6vw, var(--space-lg)) calc(var(--space) * 2.2);
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: 0.3px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    html[data-theme="light"] .site-footer {
+      border-color: rgba(15, 23, 42, 0.08);
+    }
+
+    .site-footer__inner {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .site-footer__version {
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    @keyframes heroCarousel {
+      0% {
+        transform: translateX(0);
+      }
+      100% {
+        transform: translateX(-50%);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .hero-metrics__track {
+        animation: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      :root {
+        --radius: 20px;
+      }
+
+      .landing-main {
+        padding-top: clamp(calc(var(--space) * 2.4), 14vh, calc(var(--space) * 3));
+      }
+
+      .landing-hero {
+        text-align: center;
+        align-items: center;
+      }
+
+      .hero-subtitle,
+      .hero-note {
+        text-align: center;
+      }
+
+      .hero-metrics__viewport {
+        mask-image: none;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scrollbar-width: thin;
+      }
+
+      .hero-metric {
+        min-width: 180px;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .site-header__inner {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .hero-cta {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .btn {
+        width: 100%;
+      }
+
+      .landing-main {
+        padding-inline: clamp(var(--space), 8vw, var(--space-lg));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="#" aria-label="Inicio ReLead EDU">
+        <img src="./icon-unidep180.png" alt="Logotipo de ReLead EDU" width="46" height="46" />
+        <span>ReLead EDU</span>
+      </a>
+      <a class="header-login" href="./index.html">Ingresar al CRM</a>
+    </div>
+  </header>
+  <main class="landing-main">
+    <section class="landing-hero" aria-labelledby="heroTitle">
+      <span class="hero-kicker"><i class="bi bi-stars" aria-hidden="true"></i> Plataforma de reactivación</span>
+      <h1 id="heroTitle">Impulsa la retención con decisiones basadas en datos</h1>
+      <p class="hero-subtitle">
+        ReLead EDU centraliza seguimiento, priorización y comunicación para que cada plantel recupere leads dormidos en menos
+        tiempo.
+      </p>
+      <p class="hero-note">
+        Activa campañas automatizadas, enfoca a tus asesores en los leads con mayor probabilidad de respuesta y recupera
+        oportunidades en pausa sin fricción.
+      </p>
+      <div class="hero-cta">
+        <a class="btn primary" href="./index.html"><i class="bi bi-speedometer2"></i> Entrar al CRM</a>
+        <a class="btn outline" href="#solicitar-demo"><i class="bi bi-calendar3"></i> Solicitar una demo</a>
+      </div>
+      <div class="hero-metrics" aria-label="Resultados destacados">
+        <div class="hero-metrics__viewport" role="list">
+          <div class="hero-metrics__track">
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Leads reactivados</span>
+              <span class="hero-metric__value">+62%</span>
+              <span class="hero-metric__trend"><i class="bi bi-arrow-up-right"></i> Promedio 90 días</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Tiempo de respuesta</span>
+              <span class="hero-metric__value">-38%</span>
+              <span class="hero-metric__trend"><i class="bi bi-lightning-charge"></i> SLA de atención</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Productividad de asesores</span>
+              <span class="hero-metric__value">x1.8</span>
+              <span class="hero-metric__trend"><i class="bi bi-people"></i> Leads por jornada</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Integraciones activas</span>
+              <span class="hero-metric__value">12</span>
+              <span class="hero-metric__trend"><i class="bi bi-plug"></i> CRM y sistemas escolares</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Leads reactivados</span>
+              <span class="hero-metric__value">+62%</span>
+              <span class="hero-metric__trend"><i class="bi bi-arrow-up-right"></i> Promedio 90 días</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Tiempo de respuesta</span>
+              <span class="hero-metric__value">-38%</span>
+              <span class="hero-metric__trend"><i class="bi bi-lightning-charge"></i> SLA de atención</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Productividad de asesores</span>
+              <span class="hero-metric__value">x1.8</span>
+              <span class="hero-metric__trend"><i class="bi bi-people"></i> Leads por jornada</span>
+            </article>
+            <article class="hero-metric" role="listitem">
+              <span class="hero-metric__label">Integraciones activas</span>
+              <span class="hero-metric__value">12</span>
+              <span class="hero-metric__trend"><i class="bi bi-plug"></i> CRM y sistemas escolares</span>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section id="solicitar-demo" class="landing-features" aria-label="Motivos para elegir ReLead EDU">
+      <article class="feature-card">
+        <i class="bi bi-kanban" aria-hidden="true"></i>
+        <h3>Tableros pensados para asesores</h3>
+        <p>Organiza leads por etapa, urgencia y campañas activas para que cada jornada comience con prioridades claras.</p>
+      </article>
+      <article class="feature-card">
+        <i class="bi bi-robot" aria-hidden="true"></i>
+        <h3>Automatizaciones inteligentes</h3>
+        <p>Dispara recordatorios, envíos multicanal y asignaciones dinámicas desde un mismo flujo sin depender de TI.</p>
+      </article>
+      <article class="feature-card">
+        <i class="bi bi-shield-check" aria-hidden="true"></i>
+        <h3>Seguridad y cumplimiento</h3>
+        <p>Gestiona accesos por rol, auditorías completas y controles de datos para mantener la trazabilidad de cada contacto.</p>
+      </article>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <span class="site-footer__version">ReLead EDU</span>
+      <span>ReLead<sup>©</sup> Todos los Derechos Reservados</span>
+    </div>
+  </footer>
+</body>
+</html>
