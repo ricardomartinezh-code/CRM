@@ -204,12 +204,12 @@
     .login-panel{
       width:min(100%, 540px);
       margin-inline:auto;
-      padding:clamp(calc(var(--space) * 1.75), 4vw, calc(var(--space) * 3));
-      border-radius:38px;
-      background:linear-gradient(155deg, rgba(11,18,32,0.92), rgba(37,99,235,0.42));
-      border:1px solid rgba(255,255,255,0.18);
-      box-shadow:0 32px 70px rgba(8,15,28,0.5);
-      backdrop-filter:blur(20px);
+      padding:0;
+      border-radius:0;
+      background:none;
+      border:none;
+      box-shadow:none;
+      backdrop-filter:none;
       display:flex;
       flex-direction:column;
       align-items:stretch;
@@ -222,9 +222,9 @@
       box-shadow:0 20px 48px rgba(8,15,28,0.35);
     }
     html[data-theme="light"] .login-panel{
-      background:linear-gradient(155deg, rgba(248,250,252,0.92), rgba(148,163,184,0.38));
-      border-color:rgba(15,23,42,0.12);
-      box-shadow:0 28px 58px rgba(15,23,42,0.18);
+      background:none;
+      border:none;
+      box-shadow:none;
     }
     html[data-theme="light"] .login-panel .login-card{
       background:color-mix(in srgb, #ffffff 94%, rgba(37,99,235,0.08) 6%);
@@ -2920,9 +2920,6 @@
       <section id="view-leads" class="view-section hidden" data-mobile-title="Leads · Tablero">
       <header class="topbar">
         <div class="topbar-inner">
-          <button class="menu-btn menu-trigger" type="button" id="menuBtn" aria-label="Abrir menú principal" aria-expanded="false">
-            <i class="bi bi-list"></i>
-          </button>
           <div class="search" role="search">
             <svg class="icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
             <input id="q" type="search" placeholder="ID, nombre o teléfono… (Ctrl /)" aria-label="ID" />
@@ -3165,7 +3162,6 @@
           <div class="panel-section">
             <div class="messages-header">
               <h3><span aria-hidden="true">💬</span> Mensajes</h3>
-              <p class="muted">Bandeja unificada con los eventos recibidos de los webhooks de Meta para WhatsApp Business y Facebook Messenger.</p>
             </div>
           </div>
           <div class="panel-section messages-workspace">
@@ -3909,7 +3905,7 @@
                 </div>
               </div>
               <div class="pref-presets" id="prefPresetRecommendations" hidden>
-                <p class="pref-presets__title">Recomendaciones institucionales</p>
+                <p class="pref-presets__title">Recomendaciones operativas</p>
                 <div class="pref-presets__list" id="prefPresetList"></div>
               </div>
               <div class="row gap10 pref-actions">
@@ -4120,6 +4116,28 @@
     'Inscrito':['Inscrito confirmado']
   };
 
+  const normalizeColumnKey = key => {
+    return String(key || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9]/g, '')
+      .toLowerCase();
+  };
+  const buildAliasList = list => Array.from(new Set((list || []).map(normalizeColumnKey).filter(Boolean)));
+  const leadColumnAliases = {
+    id: buildAliasList(['idlead','leadid','folio','foliolead','identificador','identificadorlead','registro','idprospecto','clave']),
+    nombre: buildAliasList(['nombrecompleto','prospecto','alumno','contacto','fullname','fullnombre','nombrelead','nombreprospecto']),
+    matricula: buildAliasList(['matriculaalumno','idcliente','expediente','nocliente','nocuenta','numexpediente','numeroprospecto']),
+    correo: buildAliasList(['correo1','correo2','correoelectronico','correoinstitucional','email','emailprincipal','mail','contactoemail']),
+    campus: buildAliasList(['plantel','sede','campusinteres','campuslead','plantelasignado']),
+    modalidad: buildAliasList(['modalidadinteres','tipomodalidad','modalidadlead','modalidadprograma']),
+    programa: buildAliasList(['programainteres','carrera','programaacademico','plan','oferta','licenciatura','posgrado']),
+    etapa: buildAliasList(['estatus','status','fase','faseactual','etapalead','estatusgeneral']),
+    estado: buildAliasList(['subestado','detalleestado','estatusdetalle','estadodesegimiento','estadodellead']),
+    asesor: buildAliasList(['asesorasignado','asesorresponsable','agente','ejecutivo','orientador','asesorlead','responsable']),
+    comentario: buildAliasList(['notas','nota','observaciones','observacion','seguimiento','comentarios','comentariogeneral']),
+    asignacion: buildAliasList(['fechaasignacion','asignado','fechaasignado','asignacionlead','ultimoasignado'])
+  };
   const columns = ['id','nombre','matricula','correo','telefono','campus','modalidad','programa','etapa','estado','asesor','comentario','asignacion'];
 
   const CONTACT_SCRIPT_TYPES = ['call','whatsapp','email'];
@@ -5521,16 +5539,16 @@
   ];
   const INSTITUTIONAL_PRESETS = [
     {
-      id: 'institucional-diurno',
-      name: 'Institucional Diurno',
-      description: 'Tema claro, densidad cómoda, modo eco activo y contraste alto para pisos comerciales.',
-      values: { theme: 'light', density: 'comfortable', eco: true, highContrast: true }
+      id: 'operativo-intensivo',
+      name: 'Operativo intensivo',
+      description: 'Densidad compacta, tablero concentrado y visibilidad de ID para acelerar la gestión masiva.',
+      values: { density: 'compact', boardDensity: 'compact', showLeadId: true, eco: false, reducedMotion: false }
     },
     {
-      id: 'institucional-nocturno',
-      name: 'Institucional Nocturno',
-      description: 'Tema oscuro, densidad compacta y contraste normal para guardias vespertinas.',
-      values: { theme: 'dark', density: 'compact', eco: false, highContrast: false }
+      id: 'accesibilidad-reforzada',
+      name: 'Accesibilidad reforzada',
+      description: 'Texto amplio, contraste alto, animaciones reducidas y modo eco para jornadas prolongadas.',
+      values: { largeText: true, highContrast: true, reducedMotion: true, eco: true }
     }
   ];
   let permissionMultiSelectsInitialized = false;
@@ -9362,12 +9380,24 @@
     }
   }
 
+  function applyLeadColumnAliases(map){
+    Object.entries(leadColumnAliases).forEach(([target, aliases]) => {
+      if(Object.prototype.hasOwnProperty.call(map, target)) return;
+      for(const alias of aliases){
+        if(Object.prototype.hasOwnProperty.call(map, alias)){
+          map[target] = map[alias];
+          break;
+        }
+      }
+    });
+  }
   function normalizeLeadRecord(raw, sheetName){
     const map = {};
-    Object.keys(raw).forEach(k=>{
-      const norm = k.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,'').toLowerCase();
-      map[norm] = raw[k];
+    Object.keys(raw || {}).forEach(k=>{
+      const norm = normalizeColumnKey(k);
+      if(norm) map[norm] = raw[k];
     });
+    applyLeadColumnAliases(map);
     const etapaVal = etapaLabel(map.etapa || '');
     const estadoVal = map.estado || '';
     const comentarioVal = map.comentario || '';
