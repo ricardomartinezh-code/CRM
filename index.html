@@ -195,12 +195,6 @@
       background: radial-gradient(1200px 600px at 80% -10%, rgba(138,156,163,0.22), transparent 60%), radial-gradient(900px 500px at -10% 10%, rgba(0,58,95,0.25), transparent 60%), rgba(11,18,32,0.92);
       backdrop-filter: blur(8px);
     }
-    .landing-layout{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-      gap:calc(var(--space) * 2);
-      align-items:center;
-    }
     .login-panel{
       width:min(100%, 540px);
       margin-inline:auto;
@@ -231,56 +225,6 @@
       border-color:rgba(15,23,42,0.1);
       box-shadow:0 18px 46px rgba(15,23,42,0.14);
     }
-    .landing-hero{
-      display:flex;
-      flex-direction:column;
-      gap:var(--space);
-      padding:clamp(calc(var(--space) * 1.5), 4vw, calc(var(--space) * 3));
-      border-radius:32px;
-      color:#f8fafc;
-      background:linear-gradient(155deg, rgba(11,18,32,0.92), rgba(37,99,235,0.68));
-      box-shadow:0 32px 64px rgba(8,15,28,0.45);
-      backdrop-filter:blur(12px);
-    }
-    .hero-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      width:max-content;
-      padding:6px 12px;
-      font-size:12px;
-      font-weight:700;
-      letter-spacing:.4px;
-      text-transform:uppercase;
-      border-radius:999px;
-      background:rgba(37,99,235,0.32);
-      color:rgba(248,250,252,0.92);
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.18);
-    }
-    .landing-hero h1{
-      margin:0;
-      font-size:clamp(32px, 5vw, 48px);
-      line-height:1.1;
-      font-weight:800;
-    }
-    .hero-subtitle{
-      margin:0;
-      font-size:clamp(16px, 2.2vw, 20px);
-      color:rgba(248,250,252,0.88);
-      max-width:46ch;
-      text-wrap: balance;
-    }
-    .hero-note{
-      margin:0;
-      font-size:15px;
-      line-height:1.6;
-      max-width:48ch;
-      color:rgba(226,232,240,0.82);
-    }
-    html[data-theme="light"] .landing-hero{
-      background:linear-gradient(155deg, rgba(15,23,42,0.9), rgba(59,130,246,0.62));
-      box-shadow:0 28px 54px rgba(15,23,42,0.18);
-    }
     .btn.outline{
       background:transparent;
       border:1px solid rgba(255,255,255,0.5);
@@ -299,70 +243,6 @@
     html[data-theme="light"] .btn.outline:focus-visible{
       background:rgba(var(--panel-base-rgb),0.12);
     }
-    .hero-metrics{
-      position:relative;
-      overflow:hidden;
-      margin-top:var(--space);
-    }
-    .hero-metrics__viewport{
-      overflow:hidden;
-      mask-image:linear-gradient(90deg, transparent 0%, rgba(0,0,0,0.85) 12%, rgba(0,0,0,0.85) 88%, transparent 100%);
-    }
-    .hero-metrics__track{
-      display:flex;
-      gap:var(--space);
-      width:max-content;
-      animation:heroCarousel 32s linear infinite;
-    }
-    .hero-metric{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:6px;
-      min-width:200px;
-      padding:18px 20px;
-      border-radius:calc(var(--radius) - 4px);
-      border:1px solid rgba(255,255,255,0.14);
-      background:linear-gradient(135deg, rgba(var(--panel-base-rgb),0.28), rgba(11,18,32,0.6));
-      box-shadow:0 18px 40px rgba(2,10,28,0.45);
-      color:var(--panel-stage-text);
-    }
-    html[data-theme="light"] .hero-metric{
-      border-color:rgba(15,23,42,0.08);
-      background:linear-gradient(135deg, rgba(var(--panel-base-rgb),0.14), #fff);
-      color:#0f172a;
-      box-shadow:0 18px 42px rgba(var(--panel-base-rgb),0.24);
-    }
-    .hero-metric__value{
-      font-size:26px;
-      font-weight:800;
-      letter-spacing:-0.5px;
-    }
-    .hero-metric__label{
-      font-size:13px;
-      letter-spacing:.2px;
-      text-transform:uppercase;
-      color:color-mix(in srgb, currentColor 72%, rgba(255,255,255,0.45) 28%);
-    }
-    .hero-metric__trend{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      font-size:13px;
-      font-weight:600;
-      color:var(--ok);
-    }
-    html[data-theme="light"] .hero-metric__label{
-      color:color-mix(in srgb, currentColor 70%, rgba(15,23,42,0.3) 30%);
-    }
-    .hero-metric__trend .bi{ font-size:16px; }
-    @keyframes heroCarousel{
-      0%{ transform:translateX(0); }
-      100%{ transform:translateX(-50%); }
-    }
-    @media (prefers-reduced-motion: reduce){
-      .hero-metrics__track{ animation:none; }
-    }
     @media (max-width: 768px){
       :root{
         --font-size-base: 14px;
@@ -372,15 +252,6 @@
         --radius: 12px;
       }
       body{ line-height:1.55; }
-      .landing-layout{ gap:calc(var(--space) * 1.15); }
-      .landing-hero{ padding:calc(var(--space) * 1.5); border-radius:26px; }
-      .hero-note{ font-size:14px; }
-      .hero-metrics{ margin-inline:-4px; }
-      .hero-metrics__viewport{ mask-image:none; overflow-x:auto; scrollbar-width:thin; padding-inline:4px; }
-      .hero-metrics__viewport::-webkit-scrollbar{ height:6px; }
-      .hero-metrics__viewport::-webkit-scrollbar-thumb{ background:rgba(148,163,184,0.45); border-radius:999px; }
-      .hero-metrics__track{ gap:var(--space-sm); animation-duration:38s; }
-      .hero-metric{ min-width:180px; scroll-snap-align:start; }
       .login-screen{ padding-inline:max(var(--space), 6vw); }
       .login-card{ width:min(100%, 420px); margin-inline:auto; padding:calc(var(--space) * 1.35); }
       .login-actions{ gap:var(--space-sm); }
@@ -388,12 +259,6 @@
       .topbar-inner{ padding-inline:var(--space); }
     }
     @media (max-width: 540px){
-      .landing-hero{ padding:calc(var(--space) * 1.2); border-radius:22px; gap:var(--space-sm); }
-      .landing-hero h1{ font-size:clamp(26px, 8vw, 34px); }
-      .hero-subtitle{ font-size:15px; }
-      .hero-note{ font-size:13px; }
-      .hero-metrics__viewport{ scroll-snap-type:x mandatory; }
-      .hero-metrics__track{ width:max-content; }
       .login-screen{ padding-inline:var(--space); padding-block:calc(var(--space) * 2.4); }
       .login-card{ width:100%; padding:calc(var(--space) * 1.25); gap:var(--space-sm); border-radius:28px; }
       .login-intro{ font-size:13px; }
@@ -405,31 +270,12 @@
       .kpi-group{ padding:calc(var(--space) * 0.85); }
       .kpi-metric{ min-height:0; }
     }
-    @media (max-width: 900px){
-      .landing-layout{ grid-template-columns:1fr; }
-      .hero-cta .btn{ flex:1 1 140px; }
-    }
     @media (max-width: 720px){
       .login-screen{
         justify-content:flex-start;
         padding-block:clamp(calc(var(--space) * 2.25), 10vh, calc(var(--space) * 4));
         padding-inline:clamp(calc(var(--space) * 0.75), 6vw, calc(var(--space) * 2));
       }
-      .landing-layout{
-        gap:calc(var(--space) * 1.05);
-      }
-      .landing-hero{
-        text-align:center;
-        align-items:center;
-        padding:calc(var(--space) * 1.5);
-        border-radius:26px;
-      }
-      .hero-kicker{ margin-inline:auto; }
-      .hero-subtitle,
-      .hero-note{ text-align:center; }
-      .hero-metrics{ margin-inline:auto; max-width:100%; }
-      .hero-metric{ min-width:160px; padding:16px 18px; }
-      .hero-metrics__track{ animation-duration:24s; }
       .login-panel{
         order:-1;
         width:min(100%, 420px);
@@ -440,12 +286,6 @@
       .login-actions{ margin-top:var(--space); }
     }
     @media (max-width: 480px){
-      .landing-hero{
-        padding:calc(var(--space) * 1.25);
-        border-radius:22px;
-      }
-      .hero-metric{ min-width:150px; padding:14px 16px; }
-      .landing-layout{ gap:calc(var(--space) * 0.9); }
       .login-card{ padding:calc(var(--space) * 1.2); border-radius:26px; width:100%; }
       .login-title{ font-size:1.35rem; }
       .login-actions .btn.primary{
@@ -2151,8 +1991,6 @@
       .view-controls .filters label select{ padding:6px 8px; font-size:12px; }
     }
     @media (max-width: 420px){
-      .hero-metrics__viewport{ padding-inline:0; }
-      .hero-metric{ min-width:160px; }
       .board{ padding:var(--space-xs); }
       .column header{ padding:10px; }
     }
@@ -2557,60 +2395,7 @@
 </head>
 <body>
   <div class="login-screen" id="loginScreen" aria-hidden="false">
-    <div class="landing-layout">
-      <section class="landing-hero" aria-labelledby="heroTitle">
-        <span class="hero-kicker"><i class="bi bi-stars" aria-hidden="true"></i> Plataforma de reactivación</span>
-        <h1 id="heroTitle">Impulsa la retención con decisiones basadas en datos</h1>
-        <p class="hero-subtitle">ReLead EDU centraliza seguimiento, priorización y comunicación para que cada plantel recupere leads dormidos en menos tiempo.</p>
-        <p class="hero-note">Activa campañas automatizadas, enfoca a tus asesores en los leads con mayor probabilidad de respuesta y recupera oportunidades en pausa sin fricción.</p>
-        <div class="hero-metrics" aria-label="Resultados destacados">
-          <div class="hero-metrics__viewport" role="list">
-            <div class="hero-metrics__track">
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Leads reactivados</span>
-                <span class="hero-metric__value">+62%</span>
-                <span class="hero-metric__trend"><i class="bi bi-arrow-up-right"></i> Promedio 90 días</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Tiempo de respuesta</span>
-                <span class="hero-metric__value">-38%</span>
-                <span class="hero-metric__trend"><i class="bi bi-lightning-charge"></i> SLA de atención</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Productividad de asesores</span>
-                <span class="hero-metric__value">x1.8</span>
-                <span class="hero-metric__trend"><i class="bi bi-people"></i> Leads por jornada</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Integraciones activas</span>
-                <span class="hero-metric__value">12</span>
-                <span class="hero-metric__trend"><i class="bi bi-plug"></i> CRM y sistemas escolares</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Leads reactivados</span>
-                <span class="hero-metric__value">+62%</span>
-                <span class="hero-metric__trend"><i class="bi bi-arrow-up-right"></i> Promedio 90 días</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Tiempo de respuesta</span>
-                <span class="hero-metric__value">-38%</span>
-                <span class="hero-metric__trend"><i class="bi bi-lightning-charge"></i> SLA de atención</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Productividad de asesores</span>
-                <span class="hero-metric__value">x1.8</span>
-                <span class="hero-metric__trend"><i class="bi bi-people"></i> Leads por jornada</span>
-              </article>
-              <article class="hero-metric" role="listitem">
-                <span class="hero-metric__label">Integraciones activas</span>
-                <span class="hero-metric__value">12</span>
-                <span class="hero-metric__trend"><i class="bi bi-plug"></i> CRM y sistemas escolares</span>
-              </article>
-            </div>
-          </div>
-        </div>
-      </section>
-      <div class="login-panel">
+    <div class="login-panel">
         <div class="login-card" role="dialog" aria-labelledby="loginTitle">
           <div class="login-logo" aria-hidden="true">
             <img src="./icon-unidep180.png" alt="" width="132" height="132" />
