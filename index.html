@@ -1908,6 +1908,22 @@
       gap:var(--space-sm);
       align-items:center;
     }
+    .auto-reassign-pagination{
+      margin-top:var(--space-sm);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:center;
+      justify-content:space-between;
+      gap:var(--space-sm);
+      font-size:13px;
+      color:var(--muted);
+    }
+    .auto-reassign-pagination.hidden{ display:none; }
+    .auto-reassign-pagination__info{ flex:1 1 200px; }
+    .auto-reassign-pagination__controls{ display:flex; align-items:center; gap:var(--space-sm); }
+    .auto-reassign-pagination__page{ font-weight:600; }
+    .auto-reassign-pagination .btn{ display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:6px 12px; }
+    .auto-reassign-pagination .btn[disabled]{ opacity:.6; cursor:not-allowed; }
     html[data-theme="light"] .panel .contact-btn{
       border-color: color-mix(in srgb, var(--panel-tone-strong) 35%, #ffffff 65%);
       box-shadow: 0 12px 26px rgba(15,23,42,0.16);
@@ -2961,6 +2977,7 @@
           <div class="auto-reassign-card">
             <p class="auto-reassign-summary" id="autoReassignSummary">Analizando distribución de leads por asesor…</p>
             <ul class="auto-reassign-list" id="autoReassignList"></ul>
+            <div class="auto-reassign-pagination hidden" id="autoReassignPagination" role="group" aria-label="Paginación de sugerencias"></div>
           </div>
         </div>
         <div class="panel-section">
@@ -5377,6 +5394,7 @@
   };
   const DEFAULT_TAG_COLOR = '#2563eb';
   const AUTO_REASSIGN_DIFFERENCE_THRESHOLD = 1;
+  const AUTO_REASSIGN_PAGE_SIZE = 8;
   const CALENDAR_DEFAULT_DURATION = 30;
   function getCalendarForms(){
     return Array.from(document.querySelectorAll('[data-calendar-form]'))
@@ -5849,7 +5867,9 @@
     mobileColumns:{},
     columnLimits:{},
     columnLimitSignature:'',
-    viewMode:'board'
+    viewMode:'board',
+    autoReassignPage:0,
+    autoReassignSignature:''
   });
   let state = createInitialState();
   const boardMobileQuery = window.matchMedia('(max-width: 700px)');
@@ -9534,6 +9554,8 @@
       }
       leads = Array.isArray(loadedLeads) ? loadedLeads : [];
       autoReassignmentPlan = buildAutoReassignmentPlan(leads);
+      state.autoReassignPage = 0;
+      state.autoReassignSignature = '';
       applyAutoReassignmentAnnotations();
       syncQuickAccessWithLeads();
       state.columnLimits = {};
@@ -9542,6 +9564,8 @@
       if(err && err.code === 'UNAUTHORIZED'){
         leads = [];
         syncMessageInbox({ preserveActive: false, reset: true });
+        state.autoReassignPage = 0;
+        state.autoReassignSignature = '';
         return;
       }
       console.error('Error al cargar leads', err);
@@ -9549,6 +9573,8 @@
       syncQuickAccessWithLeads();
       state.columnLimits = {};
       state.columnLimitSignature = '';
+      state.autoReassignPage = 0;
+      state.autoReassignSignature = '';
     }
     syncMessageInbox();
   }
@@ -13314,36 +13340,83 @@
     return `${averageLabel} · ${suggestionLabel}${unassignedLabel}`;
   }
 
-  function renderAutoReassignmentPanel(_filteredRows){
+  function renderAutoReassignmentPanel(filteredRows){
     const section = el('#autoReassignSection');
     if(!section) return;
     const summaryEl = el('#autoReassignSummary');
     const listEl = el('#autoReassignList');
-    const suggestions = autoReassignmentPlan?.suggestions || [];
-    const pending = suggestions.slice();
-    if(!pending.length){
-      const hasOverload = (autoReassignmentPlan?.stats?.overloaded || []).length > 0;
-      if(summaryEl){
+    const paginationEl = el('#autoReassignPagination');
+    const suggestions = Array.isArray(autoReassignmentPlan?.suggestions) ? autoReassignmentPlan.suggestions : [];
+    let visibleSuggestions = suggestions;
+    let filteredOutByView = false;
+    if(Array.isArray(filteredRows) && filteredRows.length){
+      const allowedIds = new Set(filteredRows.map(row => String(row?.id || '')).filter(Boolean));
+      const subset = suggestions.filter(item => allowedIds.has(String(item?.leadId || '')));
+      if(subset.length){
+        visibleSuggestions = subset;
+      }else if(suggestions.length){
+        visibleSuggestions = [];
+        filteredOutByView = true;
+      }
+    }
+    const signature = JSON.stringify(visibleSuggestions.map(item => item?.leadId).filter(Boolean));
+    if(signature !== state.autoReassignSignature){
+      state.autoReassignSignature = signature;
+      state.autoReassignPage = 0;
+    }
+    const hasOverload = (autoReassignmentPlan?.stats?.overloaded || []).length > 0;
+    const totalSuggestions = suggestions.length;
+    if(summaryEl){
+      if(totalSuggestions){
+        let summaryText = formatAutoReassignSummary(autoReassignmentPlan?.stats, totalSuggestions);
+        if(filteredOutByView){
+          summaryText += ' · Ajusta los filtros para ver estas sugerencias.';
+        }
+        summaryEl.textContent = summaryText;
+      }else if(filteredOutByView){
+        summaryEl.textContent = 'No hay sugerencias que coincidan con los filtros activos.';
+      }else{
         summaryEl.textContent = hasOverload
-          ? formatAutoReassignSummary(autoReassignmentPlan.stats, 0)
+          ? formatAutoReassignSummary(autoReassignmentPlan?.stats, 0)
           : 'Las cargas actuales por asesor están equilibradas.';
       }
+    }
+    if(!visibleSuggestions.length){
       if(listEl){
-        listEl.innerHTML = hasOverload
-          ? '<li class="auto-reassign-item"><div><strong>Seguimiento equilibrado</strong><div class="auto-reassign-meta">Las sugerencias anteriores se han aplicado o descartado.</div></div></li>'
-          : '';
+        if(filteredOutByView){
+          listEl.innerHTML = '<li class="auto-reassign-item"><div><strong>Sin coincidencias</strong><div class="auto-reassign-meta">Ajusta los filtros actuales para ver las reasignaciones sugeridas.</div></div></li>';
+        }else{
+          listEl.innerHTML = hasOverload
+            ? '<li class="auto-reassign-item"><div><strong>Seguimiento equilibrado</strong><div class="auto-reassign-meta">Las sugerencias anteriores se han aplicado o descartado.</div></div></li>'
+            : '';
+        }
       }
-      section.classList.toggle('hidden', !hasOverload);
-      section.setAttribute('aria-hidden', hasOverload ? 'false' : 'true');
+      const shouldShow = filteredOutByView || hasOverload;
+      section.classList.toggle('hidden', !shouldShow);
+      section.setAttribute('aria-hidden', shouldShow ? 'false' : 'true');
+      if(paginationEl){
+        paginationEl.classList.add('hidden');
+        paginationEl.innerHTML = '';
+        paginationEl.removeAttribute('data-total-pages');
+        paginationEl.setAttribute('aria-hidden', 'true');
+      }
       return;
     }
     section.classList.remove('hidden');
     section.setAttribute('aria-hidden', 'false');
-    if(summaryEl){
-      summaryEl.textContent = formatAutoReassignSummary(autoReassignmentPlan?.stats, pending.length);
+    const totalPages = Math.max(1, Math.ceil(visibleSuggestions.length / AUTO_REASSIGN_PAGE_SIZE));
+    if(state.autoReassignPage >= totalPages){
+      state.autoReassignPage = totalPages - 1;
     }
+    if(state.autoReassignPage < 0){
+      state.autoReassignPage = 0;
+    }
+    const currentPage = state.autoReassignPage;
+    const start = currentPage * AUTO_REASSIGN_PAGE_SIZE;
+    const end = start + AUTO_REASSIGN_PAGE_SIZE;
+    const pageItems = visibleSuggestions.slice(start, end);
     if(listEl){
-      listEl.innerHTML = pending
+      listEl.innerHTML = pageItems
         .map(item => {
           const lead = item.lead;
           const stage = etapaGroup(lead && lead.etapa);
@@ -13355,6 +13428,27 @@
           return `<li class="auto-reassign-item" data-lead-id="${leadId}"><div><strong>${name}</strong><div class="auto-reassign-meta"><span><i class="bi bi-arrow-left-right"></i> ${from} → ${to}</span><span><i class="bi bi-kanban"></i> Etapa: ${stageLabel}</span></div></div><div class="auto-reassign-actions"><button class="btn outline" type="button" data-lead-open="${leadId}"><i class="bi bi-search"></i> Revisar lead</button></div></li>`;
         })
         .join('');
+    }
+    if(paginationEl){
+      const fromIndex = start + 1;
+      const toIndex = Math.min(end, visibleSuggestions.length);
+      const totalLabel = visibleSuggestions.length === 1 ? 'sugerencia' : 'sugerencias';
+      const infoText = `Mostrando ${fromIndex}–${toIndex} de ${visibleSuggestions.length} ${totalLabel}.`;
+      const pageLabel = `Página ${currentPage + 1} de ${totalPages}`;
+      paginationEl.innerHTML = `
+        <div class="auto-reassign-pagination__info" aria-live="polite">${infoText}</div>
+        <div class="auto-reassign-pagination__controls">
+          <button class="btn outline" type="button" data-auto-page="prev" ${currentPage === 0 ? 'disabled' : ''}>
+            <i class="bi bi-chevron-left" aria-hidden="true"></i><span>Anterior</span>
+          </button>
+          <span class="auto-reassign-pagination__page">${pageLabel}</span>
+          <button class="btn outline" type="button" data-auto-page="next" ${currentPage >= totalPages - 1 ? 'disabled' : ''}>
+            <span>Siguiente</span><i class="bi bi-chevron-right" aria-hidden="true"></i>
+          </button>
+        </div>`;
+      paginationEl.classList.remove('hidden');
+      paginationEl.setAttribute('aria-hidden', 'false');
+      paginationEl.setAttribute('data-total-pages', String(totalPages));
     }
   }
 
@@ -14777,10 +14871,41 @@
         if(!button) return;
         const leadId = button.getAttribute('data-lead-open');
         if(!leadId) return;
-        const targetLead = leads.find(item => String(item.id || '') === leadId);
+        let targetLead = leads.find(item => String(item.id || '') === leadId);
+        if(!targetLead){
+          const suggestion = (autoReassignmentPlan?.suggestions || []).find(item => String(item?.leadId || '') === leadId);
+          if(suggestion && suggestion.lead){
+            targetLead = suggestion.lead;
+          }
+        }
         if(targetLead){
           openDetails(targetLead);
         }
+      });
+    }
+    const autoPagerEl = el('#autoReassignPagination');
+    if(autoPagerEl){
+      autoPagerEl.addEventListener('click', event => {
+        const control = event.target.closest('[data-auto-page]');
+        if(!control) return;
+        event.preventDefault();
+        const totalPages = Number(autoPagerEl.getAttribute('data-total-pages')) || 0;
+        const action = control.dataset.autoPage;
+        if(action === 'prev'){
+          if(state.autoReassignPage <= 0) return;
+          state.autoReassignPage = Math.max(0, state.autoReassignPage - 1);
+        }else if(action === 'next'){
+          if(totalPages && state.autoReassignPage >= totalPages - 1) return;
+          state.autoReassignPage += 1;
+        }else if(action === 'page'){
+          const pageIndex = Number(control.dataset.pageIndex);
+          if(!Number.isFinite(pageIndex)) return;
+          const maxPage = totalPages ? Math.max(0, Math.min(pageIndex, totalPages - 1)) : Math.max(0, pageIndex);
+          state.autoReassignPage = maxPage;
+        }else{
+          return;
+        }
+        refresh();
       });
     }
     document.addEventListener('input', event => {
