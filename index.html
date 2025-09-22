@@ -2605,14 +2605,14 @@
       <nav class="nav" role="navigation">
         <div class="brand" data-expand-label="Expandir menú lateral">
           <img
-            src="./icon-unidep180.png"
+            src="./assets/Favicon.png?v=2"
             alt=""
             class="brand-logo"
             width="44"
             height="44"
             loading="lazy"
             id="sidebarBrandImg"
-            data-fallback-src="./icon-unidep180.png"
+            data-fallback-src="./assets/Favicon.png?v=2"
             data-favicon-src="./assets/Favicon.png?v=2"
             data-logo-alt="ReLead EDU"
           />
@@ -8590,7 +8590,7 @@
     const toggle = document.getElementById('menuToggle');
     const avatarImg = document.getElementById('sidebarAvatarImg');
     const avatarUrl = userProfile && userProfile.avatar ? String(userProfile.avatar).trim() : '';
-    const fallbackLogo = brandImg ? (brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || './assets/relead-logo.svg') : './assets/relead-logo.svg';
+    const fallbackLogo = brandImg ? (brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || './assets/Favicon.png?v=2') : './assets/Favicon.png?v=2';
     const currentName = currentUser && currentUser.name ? String(currentUser.name).trim() : '';
     const profileName = userProfile && userProfile.name ? String(userProfile.name).trim() : '';
     const userId = currentUser && currentUser.userId ? String(currentUser.userId).trim() : '';
