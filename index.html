@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="theme-color" content="#0b1220" />
   <title>ReLead EDU</title>
-  <link rel="icon" type="image/png" href="./assets/Favicon.png" />
-  <link rel="apple-touch-icon" href="./assets/Favicon.png" />
-  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png" />
+  <link rel="icon" type="image/png" href="./assets/Favicon.png?v=2" />
+  <link rel="apple-touch-icon" href="./assets/Favicon.png?v=2" />
+  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png?v=2" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -2613,7 +2613,7 @@
             loading="lazy"
             id="sidebarBrandImg"
             data-fallback-src="./icon-unidep180.png"
-            data-favicon-src="./assets/Favicon.png"
+            data-favicon-src="./assets/Favicon.png?v=2"
             data-logo-alt="ReLead EDU"
           />
           <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
@@ -8503,8 +8503,8 @@
   const brandContainer = document.querySelector('.brand');
 
   function getFaviconSource(){
-    if(!brandImg) return './assets/Favicon.png';
-    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || './assets/Favicon.png';
+    if(!brandImg) return './assets/Favicon.png?v=2';
+    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || './assets/Favicon.png?v=2';
   }
 
   function applyBrandLogoState(){
