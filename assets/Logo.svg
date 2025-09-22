@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200">
+  <defs>
+    <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#e0e0e0; stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#a0a0a0; stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#606060; stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <path d="M60 40 L100 40 Q120 40 120 60 L120 100 L100 100 L120 140 L100 160 L70 120 L60 120 Z"
+        fill="url(#metal)" />
+  <text x="150" y="110" font-family="Helvetica, Arial, sans-serif"
+        font-size="60" font-weight="bold" fill="url(#metal)">
+    ReLead
+  </text>
+  <text x="150" y="150" font-family="Helvetica, Arial, sans-serif"
+        font-size="30" font-weight="bold" fill="url(#metal)">
+    CRM
+  </text>
+</svg>
