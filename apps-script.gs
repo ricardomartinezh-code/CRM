@@ -4132,6 +4132,74 @@ function handleCreateUser_(e, body, requester){
   return jsonResponse({ ok:true, user: sanitized }, e);
 }
 
+function addDeveloperUser(){
+  // Edita los valores de este objeto y ejecuta la función para crear
+  // rápidamente un usuario con rol developer. Puedes volver a eliminarla
+  // cuando ya no la necesites.
+  const config = {
+    email: 'correo@example.com',
+    userId: 'id-unico',
+    name: 'Nombre del desarrollador',
+    password: 'ContraseñaTemporal123',
+    planteles: [], // Ejemplo: ['Plantel 1']
+    bases: [], // Ejemplo: ['Base A']
+    active: true,
+  };
+
+  return createDeveloperUser_(config);
+}
+
+function createDeveloperUser_(config){
+  const normalizedEmail = String(config?.email || '').trim().toLowerCase();
+  const normalizedUserId = String(config?.userId || '').trim();
+  const normalizedName = String(config?.name || '').trim();
+  const normalizedPassword = String(config?.password || '').trim();
+  const planteles = parseList_(config?.planteles);
+  const bases = parseList_(config?.bases);
+  const active = config?.active === undefined ? true : normalizeBoolean_(config?.active);
+  if(!normalizedEmail || !normalizedUserId || !normalizedName){
+    throw new Error('Correo, ID y nombre son obligatorios.');
+  }
+  if(!normalizedPassword){
+    throw new Error('La contraseña es obligatoria.');
+  }
+  const meta = readUsersWithMeta_();
+  if(meta.users.some(u => u.email === normalizedEmail)){
+    throw new Error('El correo ya está registrado.');
+  }
+  if(meta.users.some(u => u.userId === normalizedUserId)){
+    throw new Error('El ID ya está registrado.');
+  }
+  const salt = generateSalt_();
+  const hash = hashPassword_(normalizedPassword, salt);
+  const now = new Date();
+  const timestamp = formatDateTime_(now);
+  const sheet = meta.sheet;
+  const map = meta.map;
+  const totalCols = sheet.getLastColumn();
+  const rowValues = new Array(totalCols).fill('');
+  setRowValue_(rowValues, map, 'Email', normalizedEmail);
+  setRowValue_(rowValues, map, 'UserID', normalizedUserId);
+  setRowValue_(rowValues, map, 'Nombre', normalizedName);
+  setRowValue_(rowValues, map, 'Rol', 'developer');
+  setRowValue_(rowValues, map, 'Planteles', joinList_(planteles));
+  setRowValue_(rowValues, map, 'Bases', joinList_(bases));
+  setRowValue_(rowValues, map, 'Activo', active ? 'TRUE' : 'FALSE');
+  setRowValue_(rowValues, map, 'PasswordHash', hash);
+  setRowValue_(rowValues, map, 'Salt', salt);
+  setRowValue_(rowValues, map, 'CreadoEl', timestamp);
+  setRowValue_(rowValues, map, 'ActualizadoEl', timestamp);
+  const tokenVersion = generateTokenVersion_();
+  setRowValue_(rowValues, map, 'TokenVersion', tokenVersion);
+  const nextRow = sheet.getLastRow() + 1;
+  sheet.getRange(nextRow, 1, 1, totalCols).setValues([rowValues]);
+  const savedRow = sheet.getRange(nextRow, 1, 1, totalCols).getValues()[0];
+  const savedUser = mapUserRow_(savedRow, map);
+  savedUser.rowIndex = nextRow;
+  savedUser.tokenVersion = tokenVersion;
+  return sanitizeUserForClient_(savedUser);
+}
+
 function handleUpdateUser_(e, body, requester){
   const targetId = String(body?.userId || '').trim();
   if(!targetId){
