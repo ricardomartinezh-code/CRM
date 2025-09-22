@@ -3995,7 +3995,7 @@
   let autoReassignmentPlan = { stats: null, suggestions: [] };
   let detailLeadContext = null;
   const leadTagContext = { leadId: '', editingIndex: -1 };
-  const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--muted)' };
+  const TONE_COLORS = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', info:'var(--info)' };
   const etapasUI = ["Nuevo","Contactado","No Contactado","Inscrito","Descartado"];
   const estadosByEtapa = {
     'Nuevo':['Sin contactar'],
@@ -4018,6 +4018,7 @@
     nombre: buildAliasList(['nombrecompleto','prospecto','alumno','contacto','fullname','fullnombre','nombrelead','nombreprospecto']),
     matricula: buildAliasList(['matriculaalumno','idcliente','expediente','nocliente','nocuenta','numexpediente','numeroprospecto']),
     correo: buildAliasList(['correo1','correo2','correoelectronico','correoinstitucional','email','emailprincipal','mail','contactoemail']),
+    telefono: buildAliasList(['tel','telefono','telefonos','telefono1','telefono2','celular','movil','whatsapp','telefonocelular','telefonoprincipal','telefononormalizado']),
     campus: buildAliasList(['plantel','sede','campusinteres','campuslead','plantelasignado']),
     modalidad: buildAliasList(['modalidadinteres','tipomodalidad','modalidadlead','modalidadprograma']),
     programa: buildAliasList(['programainteres','carrera','programaacademico','plan','oferta','licenciatura','posgrado']),
