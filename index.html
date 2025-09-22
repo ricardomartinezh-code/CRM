@@ -2237,7 +2237,12 @@
     .permissions-card h4{ margin:0; font-size:16px; display:flex; align-items:center; gap:8px; }
     .permissions-card h4 i{ font-size:18px; }
     .permissions-card p{ margin:0; font-size:13px; color:var(--muted); }
+    .permission-matrix-wrapper{ width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 calc(var(--space-sm) * -1); padding:0 calc(var(--space-sm)); }
+    .permission-matrix-wrapper:focus-visible{ outline:2px solid var(--accent); outline-offset:4px; border-radius:12px; }
+    .permission-matrix-wrapper::-webkit-scrollbar{ height:8px; }
+    .permission-matrix-wrapper::-webkit-scrollbar-thumb{ background:rgba(var(--panel-base-rgb),0.35); border-radius:999px; }
     .permission-matrix{ width:100%; border-collapse:collapse; font-size:13px; }
+    .permission-matrix{ min-width:520px; }
     .permission-matrix thead th{ text-align:left; font-weight:700; padding:10px; border-bottom:1px solid rgba(255,255,255,0.12); }
     .permission-matrix tbody td{ padding:10px; border-bottom:1px solid rgba(255,255,255,0.08); vertical-align:top; }
     .permission-matrix tbody tr:last-child td{ border-bottom:none; }
@@ -6286,6 +6291,11 @@
       subtitle.textContent = 'Consulta el alcance de cada rol por tipo de acción.';
       matrixContainer.appendChild(subtitle);
       if(Array.isArray(PERMISSION_REFERENCE.roles) && PERMISSION_REFERENCE.roles.length){
+        const tableWrapper = document.createElement('div');
+        tableWrapper.className = 'permission-matrix-wrapper';
+        tableWrapper.tabIndex = 0;
+        tableWrapper.setAttribute('role', 'region');
+        tableWrapper.setAttribute('aria-label', 'Matriz de permisos, desplázate horizontalmente para ver todas las columnas');
         const table = document.createElement('table');
         table.className = 'permission-matrix';
         const thead = document.createElement('thead');
@@ -6304,7 +6314,8 @@
           tbody.appendChild(tr);
         });
         table.appendChild(tbody);
-        matrixContainer.appendChild(table);
+        tableWrapper.appendChild(table);
+        matrixContainer.appendChild(tableWrapper);
       }
     }
     const rulesContainer = el('#permissionRules');
