@@ -167,7 +167,7 @@ const TEAMS_SHEET_NAME = 'Equipos';
 const TEAM_HEADERS = ['TeamID','Nombre','Descripcion','Planteles','Bases','Miembros','Activo','CreadoEl','ActualizadoEl'];
 const TOKEN_SECRET_PROPERTY = 'AUTH_TOKEN_SECRET';
 const TOKEN_EXP_MINUTES = 12 * 60;
-const ADMIN_ROLES = new Set(['admin']);
+const ADMIN_ROLES = new Set(['admin','developer']);
 const SPREADSHEET_ID_PROPERTY = 'APP_SPREADSHEET_ID';
 const SPREADSHEET_ERROR_MESSAGE = 'No se encontró la hoja de cálculo principal. Configura el ID del libro en la propiedad de script "APP_SPREADSHEET_ID".';
 const AIRCALL_WEBHOOK_TOKEN_PROPERTY = 'AIRCALL_WEBHOOK_TOKEN';
@@ -3241,10 +3241,10 @@ function normalizeBoolean_(value){
 
 function normalizeRole_(role){
   const str = String(role || '').trim().toLowerCase();
-  const valid = ['admin','coordinador','asesor','viewer'];
+  const valid = ['developer','admin','coordinador','asesor'];
   if(!str) return 'asesor';
-  if(ADMIN_ROLES.has(str)) return 'admin';
   if(valid.indexOf(str) >= 0) return str;
+  if(ADMIN_ROLES.has(str)) return 'admin';
   return 'asesor';
 }
 
