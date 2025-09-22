@@ -3484,21 +3484,21 @@
                 <div class="integration-tabs__panels">
                   <div id="integration-panel-general" class="integration-tabpanel is-active" data-integration-panel="general" role="tabpanel" aria-labelledby="integration-tab-general">
                     <div class="integration-grid" id="integrationGridGeneral" role="list">
-                      <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title">
+                      <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title" data-integration="whatsapp-web">
                         <div class="integration-card__header">
                           <div>
                             <div class="integration-card__title" id="integration-whatsapp-title" data-integration-title><i class="bi bi-whatsapp" aria-hidden="true"></i> <span>WhatsApp Web personal</span></div>
-                            <div class="integration-card__status integration-status--beta"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
+                            <div class="integration-card__status integration-status--beta" id="whatsappIntegrationStatus"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
                           </div>
                           <span class="integration-tag">Sesión manual</span>
                         </div>
                         <div class="integration-card__body">
                           <p>Escanea el código QR desde tu teléfono para responder mensajes desde el panel de leads sin perder el historial institucional.</p>
                           <div class="integration-card__actions">
-                            <button type="button" class="btn primary"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
-                            <button type="button" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
+                            <button type="button" class="btn primary" id="whatsappIntegrationPair"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
+                            <button type="button" class="btn outline" id="whatsappIntegrationOpen"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
                           </div>
-                          <p class="integration-card__meta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
+                          <p class="integration-card__meta" id="whatsappIntegrationMeta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
                         </div>
                       </article>
                     </div>
