@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="theme-color" content="#0b1220" />
   <title>ReLead EDU</title>
-  <link rel="icon" type="image/png" href="./assets/Favicon.png" />
-  <link rel="apple-touch-icon" href="./assets/Favicon.png" />
-  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png" />
+  <link rel="icon" type="image/png" href="./assets/Favicon.png?v=3" />
+  <link rel="apple-touch-icon" href="./assets/Favicon.png?v=3" />
+  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -2605,15 +2605,15 @@
       <nav class="nav" role="navigation">
         <div class="brand" data-expand-label="Expandir menú lateral">
           <img
-            src="./icon-unidep180.png"
+            src="./assets/Logo.png"
             alt=""
             class="brand-logo"
             width="44"
             height="44"
             loading="lazy"
             id="sidebarBrandImg"
-            data-fallback-src="./icon-unidep180.png"
-            data-favicon-src="./assets/Favicon.png"
+            data-fallback-src="./assets/Logo.png"
+            data-favicon-src="./assets/Favicon.png?v=3"
             data-logo-alt="ReLead EDU"
           />
           <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
@@ -8501,10 +8501,31 @@
   const brandImg = document.getElementById('sidebarBrandImg');
   const brandNameEl = document.getElementById('sidebarBrandName');
   const brandContainer = document.querySelector('.brand');
+  const DEFAULT_FAVICON_URL = './assets/Favicon.png?v=3';
+  const FAVICON_LINK_SELECTORS = [
+    "link[rel='icon']",
+    "link[rel='shortcut icon']",
+    "link[rel='apple-touch-icon']",
+  ];
+
+  function updateDocumentFavicons(src){
+    const href = src || DEFAULT_FAVICON_URL;
+    FAVICON_LINK_SELECTORS.forEach(selector => {
+      const linkEl = document.head && document.head.querySelector(selector);
+      if(linkEl){
+        linkEl.href = href;
+      }
+    });
+  }
+
+  updateDocumentFavicons(DEFAULT_FAVICON_URL);
+  if(brandImg && !brandImg.dataset.faviconSrc){
+    brandImg.dataset.faviconSrc = DEFAULT_FAVICON_URL;
+  }
 
   function getFaviconSource(){
-    if(!brandImg) return './assets/Favicon.png';
-    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || './assets/Favicon.png';
+    if(!brandImg) return DEFAULT_FAVICON_URL;
+    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || DEFAULT_FAVICON_URL;
   }
 
   function applyBrandLogoState(){
@@ -8512,6 +8533,7 @@
     const appEl = document.getElementById('app');
     const isCollapsed = Boolean(appEl && appEl.classList.contains('collapsed'));
     const faviconSrc = getFaviconSource();
+    updateDocumentFavicons(faviconSrc);
     const fallbackSrc = brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || faviconSrc;
     const avatarSrc = brandImg.dataset.avatarSrc || '';
     let nextSrc = fallbackSrc || faviconSrc;
@@ -8599,6 +8621,7 @@
     const displayName = currentName || profileName || userId || 'Usuario';
 
     const faviconSrc = getFaviconSource();
+    updateDocumentFavicons(faviconSrc);
     const avatarDisplayUrl = avatarUrl || faviconSrc || '';
 
     if(toggle){
