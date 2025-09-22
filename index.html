@@ -3436,21 +3436,21 @@
           </div>
           <div class="panel-section integration-layout">
             <div class="integration-grid" role="list">
-              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title" data-integration="whatsapp-web">
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-whatsapp-title"><i class="bi bi-whatsapp" aria-hidden="true"></i> <span>WhatsApp Web personal</span></div>
-                    <div class="integration-card__status integration-status--beta"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
+                    <div class="integration-card__status integration-status--beta" id="whatsappIntegrationStatus"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
                   </div>
                   <span class="integration-tag">Sesión manual</span>
                 </div>
                 <div class="integration-card__body">
                   <p>Escanea el código QR desde tu teléfono para responder mensajes desde el panel de leads sin perder el historial institucional.</p>
                   <div class="integration-card__actions">
-                    <button type="button" class="btn primary"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
-                    <button type="button" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
+                    <button type="button" class="btn primary" id="whatsappIntegrationPair"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
+                    <button type="button" class="btn outline" id="whatsappIntegrationOpen"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
                   </div>
-                  <p class="integration-card__meta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
+                  <p class="integration-card__meta" id="whatsappIntegrationMeta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
                 </div>
               </article>
               <article class="integration-card" role="listitem" aria-labelledby="integration-aircall-title">
@@ -5132,7 +5132,8 @@
     whatsappLastTemplate: 'pulseWhatsappLastTemplate',
     emailTemplates: 'pulseEmailTemplates',
     emailLastTemplate: 'pulseEmailLastTemplate',
-    advisorWhatsapp: 'pulseAdvisorWhatsapp'
+    advisorWhatsapp: 'pulseAdvisorWhatsapp',
+    whatsappSession: 'pulseWhatsappSession'
   };
   const DEFAULT_PASSWORD_REQUEST = {
     status: 'idle',
@@ -9593,6 +9594,9 @@
   const WHATSAPP_TEMPLATE_LIMIT = 30;
   const EMAIL_TEMPLATE_LIMIT = 30;
   const CUSTOM_TEMPLATE_KEY = '__custom__';
+  const WHATSAPP_WEB_URL = 'https://web.whatsapp.com/';
+  const WHATSAPP_SESSION_DURATION_MS = 14 * 60 * 60 * 1000;
+  const DEFAULT_WHATSAPP_SESSION = { status: 'inactive', startedAt: 0, lastActiveAt: 0 };
   let quickAccessFavorites = loadQuickAccessList(STORAGE_KEYS.favorites);
   let quickAccessRecents = loadQuickAccessList(STORAGE_KEYS.recents);
   let quickAccessInitialized = false;
@@ -9602,6 +9606,7 @@
   let emailTemplates = loadEmailTemplates();
   let emailLastTemplateId = readStorageValue(STORAGE_KEYS.emailLastTemplate) || '';
   let advisorWhatsappNumber = readStorageValue(STORAGE_KEYS.advisorWhatsapp) || '';
+  let whatsappSessionState = loadWhatsappSessionState();
   let whatsappTemplateFormEditingId = '';
   let emailTemplateFormEditingId = '';
   const whatsappModalState = { lead: null, digits: '', defaultMessage: '', onSend: null, selectedId: '' };
@@ -9887,6 +9892,189 @@
   function saveEmailTemplates(list){
     emailTemplates = Array.isArray(list) ? list.slice(0, EMAIL_TEMPLATE_LIMIT) : [];
     writeStorageJSON(STORAGE_KEYS.emailTemplates, emailTemplates);
+  }
+
+  function loadWhatsappSessionState(){
+    const stored = readStorageJSON(STORAGE_KEYS.whatsappSession);
+    if(!stored || typeof stored !== 'object'){
+      return { ...DEFAULT_WHATSAPP_SESSION };
+    }
+    return {
+      status: typeof stored.status === 'string' ? stored.status : 'inactive',
+      startedAt: Number(stored.startedAt) || 0,
+      lastActiveAt: Number(stored.lastActiveAt) || 0
+    };
+  }
+
+  function persistWhatsappSessionState(updates){
+    const current = whatsappSessionState && typeof whatsappSessionState === 'object'
+      ? { ...whatsappSessionState }
+      : { ...DEFAULT_WHATSAPP_SESSION };
+    const next = { ...current, ...updates };
+    const status = typeof next.status === 'string' ? next.status : 'inactive';
+    if(!status || status === 'inactive'){
+      whatsappSessionState = { ...DEFAULT_WHATSAPP_SESSION };
+      removeStorageKey(STORAGE_KEYS.whatsappSession);
+      return whatsappSessionState;
+    }
+    let startedAt = Number(next.startedAt) || Date.now();
+    let lastActiveAt = Number(next.lastActiveAt) || startedAt;
+    if(lastActiveAt < startedAt){
+      lastActiveAt = startedAt;
+    }
+    whatsappSessionState = {
+      status,
+      startedAt,
+      lastActiveAt
+    };
+    writeStorageJSON(STORAGE_KEYS.whatsappSession, whatsappSessionState);
+    return whatsappSessionState;
+  }
+
+  function getWhatsappSessionEffectiveStatus(){
+    const state = whatsappSessionState && typeof whatsappSessionState === 'object'
+      ? whatsappSessionState
+      : DEFAULT_WHATSAPP_SESSION;
+    const status = typeof state.status === 'string' ? state.status : 'inactive';
+    const startedAt = Number(state.startedAt) || 0;
+    const lastActiveAt = Number(state.lastActiveAt) || startedAt;
+    const reference = lastActiveAt || startedAt;
+    if(!reference){
+      return 'inactive';
+    }
+    if(status === 'inactive'){
+      return 'inactive';
+    }
+    if(Date.now() - reference >= WHATSAPP_SESSION_DURATION_MS){
+      return 'expired';
+    }
+    if(status === 'pairing'){
+      return 'pairing';
+    }
+    if(status === 'expired'){
+      return 'expired';
+    }
+    return 'active';
+  }
+
+  function formatWhatsappSessionTimestamp(timestamp){
+    if(!timestamp) return '';
+    try{
+      if(CONTACT_TIMESTAMP_FORMAT){
+        return CONTACT_TIMESTAMP_FORMAT.format(new Date(timestamp));
+      }
+    }catch(err){
+      console.warn('No se pudo formatear la marca de tiempo de WhatsApp.', err);
+    }
+    try{
+      return new Date(timestamp).toLocaleString('es-MX');
+    }catch(err){
+      return '';
+    }
+  }
+
+  function updateWhatsappIntegrationCard(){
+    const statusContainer = el('#whatsappIntegrationStatus');
+    const metaContainer = el('#whatsappIntegrationMeta');
+    const card = document.querySelector('[data-integration="whatsapp-web"]');
+    const effectiveStatus = getWhatsappSessionEffectiveStatus();
+    const state = whatsappSessionState || DEFAULT_WHATSAPP_SESSION;
+    const startedAt = Number(state.startedAt) || 0;
+    const lastActiveAt = Number(state.lastActiveAt) || 0;
+    let statusText = 'Sin conexión activa';
+    let statusIcon = 'bi-dash-circle';
+    let statusClass = 'integration-status--beta';
+    let metaText = 'La sesión expira automáticamente al cerrar el navegador o después de 14 horas de inactividad.';
+    if(effectiveStatus === 'pairing'){
+      statusText = 'Esperando escaneo';
+      statusIcon = 'bi-qr-code';
+      metaText = 'Escanea el código QR en la ventana recién abierta para vincular tu sesión personal.';
+    }else if(effectiveStatus === 'active'){
+      statusText = 'Sesión conectada';
+      statusIcon = 'bi-check-circle';
+      statusClass = 'integration-status--connected';
+      const reference = lastActiveAt || startedAt;
+      if(reference){
+        const formatted = formatWhatsappSessionTimestamp(reference);
+        if(formatted){
+          metaText = `Última verificación: ${formatted}. La sesión caduca tras 14 horas de inactividad.`;
+        }else{
+          metaText = 'Sesión activa. La sesión caduca tras 14 horas de inactividad.';
+        }
+      }else{
+        metaText = 'Sesión activa. La sesión caduca tras 14 horas de inactividad.';
+      }
+    }else if(effectiveStatus === 'expired'){
+      statusText = 'Sesión expirada';
+      statusIcon = 'bi-exclamation-triangle';
+      metaText = 'La sesión anterior caducó. Inicia un nuevo emparejamiento para continuar.';
+    }
+    if(statusContainer){
+      statusContainer.classList.remove('integration-status--connected', 'integration-status--beta');
+      statusContainer.classList.add(statusClass);
+      const iconEl = statusContainer.querySelector('i');
+      if(iconEl){
+        iconEl.className = `bi ${statusIcon}`;
+        iconEl.setAttribute('aria-hidden', 'true');
+      }
+      const textEl = statusContainer.querySelector('span');
+      if(textEl){
+        textEl.textContent = statusText;
+      }
+    }
+    if(metaContainer){
+      metaContainer.textContent = metaText;
+    }
+    if(card){
+      card.setAttribute('data-session-status', effectiveStatus);
+    }
+  }
+
+  function openWhatsappWebWindow(){
+    try{
+      const popup = window.open(WHATSAPP_WEB_URL, '_blank', 'noopener');
+      if(!popup){
+        alert('No se pudo abrir WhatsApp Web. Desactiva el bloqueador de ventanas emergentes e inténtalo de nuevo.');
+        return false;
+      }
+      if(typeof popup.focus === 'function'){
+        popup.focus();
+      }
+      return true;
+    }catch(err){
+      console.error('No se pudo abrir WhatsApp Web.', err);
+      alert('No se pudo abrir WhatsApp Web en este navegador.');
+      return false;
+    }
+  }
+
+  function handleWhatsappIntegrationPair(){
+    const opened = openWhatsappWebWindow();
+    if(!opened) return;
+    const now = Date.now();
+    persistWhatsappSessionState({ status: 'pairing', startedAt: now, lastActiveAt: now });
+    updateWhatsappIntegrationCard();
+  }
+
+  function handleWhatsappIntegrationOpen(){
+    const opened = openWhatsappWebWindow();
+    if(!opened) return;
+    const now = Date.now();
+    const startedAt = Number(whatsappSessionState?.startedAt) || now;
+    persistWhatsappSessionState({ status: 'active', startedAt, lastActiveAt: now });
+    updateWhatsappIntegrationCard();
+  }
+
+  function initWhatsappIntegrationCard(){
+    const pairBtn = el('#whatsappIntegrationPair');
+    const openBtn = el('#whatsappIntegrationOpen');
+    if(pairBtn){
+      pairBtn.addEventListener('click', handleWhatsappIntegrationPair);
+    }
+    if(openBtn){
+      openBtn.addEventListener('click', handleWhatsappIntegrationOpen);
+    }
+    updateWhatsappIntegrationCard();
   }
 
   function resetWhatsappTemplateForm(){
@@ -14617,6 +14805,7 @@
     // Configuración y preferencias
     initSettings();
     initQuickAccessUI();
+    initWhatsappIntegrationCard();
 
     // Panel emergente
     const panelClose = el('#panelClose');
