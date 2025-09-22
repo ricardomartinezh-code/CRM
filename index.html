@@ -3169,10 +3169,10 @@
                   <label class="field-with-hint">
                     <span>Rol</span>
                     <select id="permRole">
+                      <option value="developer">Developer</option>
                       <option value="admin">Administrador</option>
                       <option value="coordinador">Coordinador</option>
                       <option value="asesor">Asesor</option>
-                      <option value="viewer">Consulta</option>
                     </select>
                     <span class="field-hint" id="permRoleHint"></span>
                     <div class="role-scope-suggestion" id="permRoleSuggestion" hidden>
@@ -3487,7 +3487,7 @@
                   <p class="integration-card__meta">Tu token se almacena cifrado y puedes revocarlo desde la consola de seguridad de Google Workspace.</p>
                 </div>
               </article>
-              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title" data-beta-feature>
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-neotel-title"><i class="bi bi-broadcast" aria-hidden="true"></i> <span>Neotel</span></div>
@@ -3504,7 +3504,7 @@
                   <p class="integration-card__meta">La integración está disponible sólo para equipos piloto. Recibirás instrucciones personalizadas al aprobarse tu solicitud.</p>
                 </div>
               </article>
-              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title" data-beta-feature>
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-siie-title"><i class="bi bi-mortarboard" aria-hidden="true"></i> <span>SIIE UNIDEP</span></div>
@@ -5115,10 +5115,10 @@
   };
 
   const KPI_ROLE_GROUPS = {
+    developer: Object.keys(KPI_GROUPS),
     admin: Object.keys(KPI_GROUPS),
     coordinador: Object.keys(KPI_GROUPS),
-    asesor: ['Base_Fria','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base'],
-    viewer: ['Base_Fria','Reactivacion','Conversion','Salud_Base']
+    asesor: ['Base_Fria','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base']
   };
 
   const STORAGE_KEYS = {
@@ -5198,57 +5198,57 @@
     pink: { primary: '#be185d', secondary: '#f472b6', panel: '190,24,93' }
   };
   const VIEW_PERMISSIONS = {
-    kpis: ['admin','coordinador','asesor','viewer'],
-    leads: ['admin','coordinador','asesor','viewer'],
-    mensajes: ['admin','coordinador','asesor','viewer'],
-    importar: ['admin','coordinador'],
-    exportar: ['admin','coordinador','viewer'],
-    sistema: ['admin','coordinador','viewer'],
-    permisos: ['admin'],
-    integraciones: ['admin','coordinador','asesor','viewer'],
-    configuracion: ['admin','coordinador','asesor','viewer'],
-    ayuda: ['admin','coordinador','asesor','viewer']
+    kpis: ['developer','admin','coordinador','asesor'],
+    leads: ['developer','admin','coordinador','asesor'],
+    mensajes: ['developer','admin','coordinador','asesor'],
+    importar: ['developer','admin'],
+    exportar: ['developer','admin','coordinador'],
+    sistema: ['developer','admin','coordinador'],
+    permisos: ['developer','admin'],
+    integraciones: ['developer','admin','coordinador','asesor'],
+    configuracion: ['developer','admin','coordinador','asesor'],
+    ayuda: ['developer','admin','coordinador','asesor']
   };
   const ACTION_PERMISSIONS = {
-    updateLead: ['admin','coordinador','asesor'],
-    importData: ['admin','coordinador'],
-    exportData: ['admin','coordinador','viewer'],
-    runDiagnostics: ['admin'],
-    manageDuplicates: ['admin'],
-    repairSheetStructure: ['admin'],
-    syncActivos: ['admin','coordinador'],
-    manageTeams: ['admin'],
-    reassignLeads: ['admin']
+    updateLead: ['developer','admin','coordinador','asesor'],
+    importData: ['developer','admin'],
+    exportData: ['developer','admin','coordinador'],
+    runDiagnostics: ['developer','admin'],
+    manageDuplicates: ['developer','admin'],
+    repairSheetStructure: ['developer','admin'],
+    syncActivos: ['developer','admin','coordinador'],
+    manageTeams: ['developer','admin'],
+    reassignLeads: ['developer','admin']
   };
   const ROLE_LABELS = {
+    developer: 'Developer',
     admin: 'Administrador',
     coordinador: 'Coordinador',
-    asesor: 'Asesor',
-    viewer: 'Consulta'
+    asesor: 'Asesor'
   };
-  const ROLE_ORDER = ['admin','coordinador','asesor','viewer'];
+  const ROLE_ORDER = ['developer','admin','coordinador','asesor'];
   const PERMISSION_REFERENCE = {
     roles: [
-      { action: 'Ver KPIs (kpi.view)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Propios', viewer: 'Global (sin PII)' },
-      { action: 'Ver leads (lead.read)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Propios', viewer: 'Agregado (sin PII)' },
-      { action: 'Tipificar leads (lead.typify)', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios', viewer: 'Ninguno' },
-      { action: 'Ver datos de contacto (contact.view)', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios', viewer: 'Ninguno' },
-      { action: 'Importar datos (data.import)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Cambios masivos (data.bulk_update)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Exportar datos (data.export)', admin: 'Global', coordinador: 'Equipo (acotado)', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Exportar reportes (report.export)', admin: 'Global', coordinador: 'Equipo (acotado)', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Generar diagnósticos (system.diagnostics)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Eliminar duplicados (lead.merge_duplicates)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Gestión de usuarios (user.manage)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Asignar roles (role.assign)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Asignar planteles/bases (scope.assign)', admin: 'Global', coordinador: 'Equipo', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Creación y asignación de equipos (team.manage)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' }
+      { action: 'Ver KPIs (kpi.view)', developer: 'Global + vistas beta', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Propios' },
+      { action: 'Ver leads (lead.read)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Propios' },
+      { action: 'Tipificar leads (lead.typify)', developer: 'Global', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios' },
+      { action: 'Ver datos de contacto (contact.view)', developer: 'Global', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios' },
+      { action: 'Importar datos (data.import)', developer: 'Global', admin: 'Global comercial', coordinador: 'No disponible', asesor: 'Ninguno' },
+      { action: 'Cambios masivos (data.bulk_update)', developer: 'Global', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Exportar datos (data.export)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Exportar reportes (report.export)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Generar diagnósticos (system.diagnostics)', developer: 'Global + herramientas beta', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Eliminar duplicados (lead.merge_duplicates)', developer: 'Global', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Gestión de usuarios (user.manage)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Asignar roles (role.assign)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Asignar planteles/bases (scope.assign)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Creación y asignación de equipos (team.manage)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' }
     ],
     rules: [
-      'Viewer no puede acceder a PII ni métodos de contacto.',
+      'Developer administra versiones beta, integraciones experimentales y el solucionador de problemas.',
+      'Admin controla activos comerciales, reasignaciones y usuarios sin habilitar funciones beta.',
+      'Coordinador opera únicamente sobre su equipo y activos asignados y no puede importar bases.',
       'Asesor solo ve y edita sus propios leads.',
-      'Coordinador puede operar únicamente sobre su equipo y planteles/bases asignadas.',
-      'Admin tiene control global de todas las acciones y recursos.',
       'Exportaciones deben ser auditadas (registro de usuario, filtros y fecha).',
       'Cambios masivos y eliminación de duplicados requieren confirmación adicional.',
       'La selección de “Todas” en Bases o “Todos” en Planteles equivale a acceso global sin restricciones.'
@@ -5270,10 +5270,10 @@
     }
   };
   const ROLE_SCOPE_HINTS = {
-    admin: 'Acceso global a todas las acciones, planteles y bases.',
-    coordinador: 'Opera sobre su equipo y los planteles/bases asignadas.',
-    asesor: 'Gestiona únicamente los leads y contactos asignados a su usuario.',
-    viewer: 'Consulta global sin exponer datos personales identificables.'
+    developer: 'Control total de la plataforma, incluyendo funciones e integraciones beta.',
+    admin: 'Acceso comercial global sin habilitar funciones beta.',
+    coordinador: 'Opera sobre su equipo y los activos (planteles/bases) asignados.',
+    asesor: 'Gestiona únicamente los leads y contactos asignados a su usuario.'
   };
   const PERMISSION_SCOPE_CONFIG = {
     planteles: {
@@ -5374,13 +5374,18 @@
     const defaultPlanteles = ensureValues(localPlanteles.slice(0, 3), plantelOptions.slice(0, 3));
     const defaultBases = ensureValues(localBases.slice(0, 3), baseOptions.slice(0, 3));
     return {
+      developer: {
+        description: 'Habilita control total, mantenimiento técnico y acceso a integraciones o funciones beta.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      },
       admin: {
-        description: 'Aplica acceso total para supervisar equipos, reportes y catálogos sin restricciones.',
+        description: 'Gestiona activos comerciales, bases y usuarios sin habilitar funciones ni integraciones beta.',
         planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
         bases: ensureValues([globalBase], baseOptions.slice(0, 1))
       },
       coordinador: {
-        description: 'Agrupa planteles y bases de su región para liderar la operación y monitorear a su equipo.',
+        description: 'Opera sobre los planteles y bases asignados para liderar a su equipo sin importar nuevas bases.',
         planteles: ensureValues(['HERMOSILLO', 'NOGALES', 'OBREGÓN'].filter(value => plantelOptions.includes(value)), defaultPlanteles),
         bases: ensureValues(['Planteles', 'Regresos', 'Rescatados'].filter(value => baseOptions.includes(value)), defaultBases)
       },
@@ -5388,11 +5393,6 @@
         description: 'Limita el alcance al plantel principal y a bases activas de seguimiento diario.',
         planteles: ensureValues(localPlanteles.slice(0, 1), defaultPlanteles.slice(0, 1)),
         bases: ensureValues(['Planteles', 'Reciclados'].filter(value => baseOptions.includes(value)), defaultBases.slice(0, 1))
-      },
-      viewer: {
-        description: 'Monitorea resultados institucionales sin exponer datos personales ni modificar información.',
-        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
-        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
       }
     };
   }
@@ -5415,6 +5415,7 @@
     systemThemeQuery.addListener(handleSystemThemeChange);
   }
   applyPreferences();
+  applyBetaFeatureVisibility();
 
   const ensureFormatModule = () => {
     if(window.ReLeadDataFormat && typeof window.ReLeadDataFormat.cleanValue === 'function'){
@@ -6191,17 +6192,17 @@
         const table = document.createElement('table');
         table.className = 'permission-matrix';
         const thead = document.createElement('thead');
-        thead.innerHTML = '<tr><th>Acción</th><th>Administrador</th><th>Coordinador</th><th>Asesor</th><th>Consulta</th></tr>';
+        thead.innerHTML = '<tr><th>Acción</th><th>Developer</th><th>Administrador</th><th>Coordinador</th><th>Asesor</th></tr>';
         table.appendChild(thead);
         const tbody = document.createElement('tbody');
         PERMISSION_REFERENCE.roles.forEach(row => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${escapeHtml(row.action)}</td>
+            <td>${escapeHtml(row.developer)}</td>
             <td>${escapeHtml(row.admin)}</td>
             <td>${escapeHtml(row.coordinador)}</td>
             <td>${escapeHtml(row.asesor)}</td>
-            <td>${escapeHtml(row.viewer)}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -8081,7 +8082,7 @@
   function canAccessView(view){
     if(!view) return true;
     const role = getUserRole();
-    if(role === 'admin') return true;
+    if(role === 'admin' || role === 'developer') return true;
     if(!role) return false;
     const allowed = VIEW_PERMISSIONS[view];
     if(!allowed || !allowed.length) return true;
@@ -8091,11 +8092,33 @@
   function canPerform(action){
     if(!action) return true;
     const role = getUserRole();
-    if(role === 'admin') return true;
+    if(role === 'admin' || role === 'developer') return true;
     if(!role) return false;
     const allowed = ACTION_PERMISSIONS[action];
     if(!allowed || !allowed.length) return true;
     return allowed.includes(role) || allowed.includes('*');
+  }
+
+  function canAccessBetaFeatures(){
+    return getUserRole() === 'developer';
+  }
+
+  function canRunProblemSolver(){
+    return getUserRole() === 'developer';
+  }
+
+  function applyBetaFeatureVisibility(){
+    const hasAccess = canAccessBetaFeatures();
+    const nodes = document.querySelectorAll('[data-beta-feature]');
+    nodes.forEach(node => {
+      if(!(node instanceof HTMLElement)) return;
+      node.classList.toggle('hidden', !hasAccess);
+      if(hasAccess){
+        node.removeAttribute('aria-hidden');
+      }else{
+        node.setAttribute('aria-hidden', 'true');
+      }
+    });
   }
 
   function getAllowedPlanteles(){
@@ -8674,6 +8697,7 @@
     if(typeof applyNavigationPermissions === 'function'){
       applyNavigationPermissions();
     }
+    applyBetaFeatureVisibility();
   }
 
   function hydrateProfileFromUser(){
@@ -11417,7 +11441,7 @@
       return;
     }
     const role = getUserRole();
-    const allowed = KPI_ROLE_GROUPS[role] || KPI_ROLE_GROUPS.viewer || Object.keys(KPI_GROUPS);
+    const allowed = KPI_ROLE_GROUPS[role] || Object.keys(KPI_GROUPS);
     if(!allowed.length){
       const empty = document.createElement('p');
       empty.className = 'kpi-empty';
@@ -13875,16 +13899,36 @@
       return;
     }
     const color = colorForTone(currentSolutionPlan.severity || 'info');
-    statusEl.textContent = currentSolutionPlan.summary;
+    const hasAuto = Array.isArray(currentSolutionPlan.autoActions) && currentSolutionPlan.autoActions.length;
+    const hasSteps = Array.isArray(currentSolutionPlan.steps) && currentSolutionPlan.steps.length;
+    const solverAllowed = canRunProblemSolver();
+    if(!solverAllowed && (hasAuto || hasSteps)){
+      statusEl.textContent = `${currentSolutionPlan.summary} · Solicita apoyo de Developer para ejecutar el solucionador.`;
+    }else{
+      statusEl.textContent = currentSolutionPlan.summary;
+    }
     statusEl.style.color = color;
-    autoBtn.disabled = solvingInProgress || !(currentSolutionPlan.autoActions || []).length;
-    stepsBtn.disabled = solvingInProgress || !(currentSolutionPlan.steps || []).length;
+    if(!solverAllowed){
+      autoBtn.disabled = true;
+      stepsBtn.disabled = true;
+      autoBtn.title = 'Disponible solo para Developer';
+      stepsBtn.title = 'Disponible solo para Developer';
+      return;
+    }
+    autoBtn.removeAttribute('title');
+    stepsBtn.removeAttribute('title');
+    autoBtn.disabled = solvingInProgress || !hasAuto;
+    stepsBtn.disabled = solvingInProgress || !hasSteps;
   }
 
   async function executeProblemSolver(options = {}){
     if(solvingInProgress) return;
     if(diagInProgress){
       appendSolverLog('Espera a que termine el diagnóstico antes de ejecutar el solucionador.', 'warn');
+      return;
+    }
+    if(!canRunProblemSolver()){
+      appendSolverLog('Solo un usuario con rol Developer puede ejecutar el solucionador de problemas.', 'warn');
       return;
     }
     const plan = currentSolutionPlan;
@@ -13936,6 +13980,10 @@
   }
 
   function displaySolutionSteps(){
+    if(!canRunProblemSolver()){
+      appendSolverLog('Solo un usuario con rol Developer puede consultar los pasos del solucionador.', 'warn');
+      return;
+    }
     const plan = currentSolutionPlan;
     if(!plan){
       appendSolverLog('No hay pasos disponibles. Ejecuta el diagnóstico.', 'info');
@@ -13956,6 +14004,7 @@
   }
 
   function triggerAutoSolverIfNeeded(){
+    if(!canRunProblemSolver()) return;
     const plan = currentSolutionPlan;
     if(solvingInProgress || !plan) return;
     const hasAuto = (plan.autoActions || []).some(action => action.auto !== false);
