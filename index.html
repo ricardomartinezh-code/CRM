@@ -5274,6 +5274,28 @@
     showLeadId: false,
     appliedPreset: ''
   };
+  const QUICK_PREFERENCE_MESSAGES = {
+    eco: {
+      true: { text: 'Activaste el modo eco.', tone: 'success' },
+      false: { text: 'Desactivaste el modo eco.', tone: 'info' }
+    },
+    reducedMotion: {
+      true: { text: 'Reduciste las animaciones de la interfaz.', tone: 'success' },
+      false: { text: 'Restauraste las animaciones completas.', tone: 'info' }
+    },
+    largeText: {
+      true: { text: 'Activaste el texto amplio para facilitar la lectura.', tone: 'success' },
+      false: { text: 'Volviste al tamaño de texto estándar.', tone: 'info' }
+    },
+    highContrast: {
+      true: { text: 'Activaste el contraste alto.', tone: 'success' },
+      false: { text: 'Regresaste al contraste estándar.', tone: 'info' }
+    },
+    showLeadId: {
+      true: { text: 'Se mostrarán los ID en las tarjetas del tablero.', tone: 'success' },
+      false: { text: 'Ocultaste los ID de las tarjetas del tablero.', tone: 'info' }
+    }
+  };
   const THEME_SURFACE_COLORS = {
     light: '#f6f8fb',
     dark: '#0b1220'
@@ -5309,7 +5331,7 @@
     administrador: ['admin','coordinador','developer'],
     desarrollador: ['developer'],
     integraciones: ['admin','coordinador','asesor','developer'],
-    configuracion: ['admin','coordinador','asesor','developer'],
+    configuracion: ['*'],
     ayuda: ['admin','coordinador','asesor','developer']
   };
   const ACTION_PERMISSIONS = {
@@ -11384,9 +11406,10 @@
     if(!touchesOnlyPreset && !('appliedPreset' in updates)){
       updates.appliedPreset = '';
     }
+    const previousPreferences = userPreferences;
     const nextPreferences = { ...userPreferences, ...updates };
-    const hasChanges = Object.keys(nextPreferences).some(key => nextPreferences[key] !== userPreferences[key]);
-    if(!hasChanges){
+    const changedKeys = Object.keys(nextPreferences).filter(key => nextPreferences[key] !== previousPreferences[key]);
+    if(!changedKeys.length){
       return;
     }
     userPreferences = nextPreferences;
@@ -11396,6 +11419,7 @@
     if(settingsReady){
       syncPreferencesForm();
       renderPreferencePresets();
+      announcePreferenceChanges(changedKeys, userPreferences);
     }
     if(typeof refresh === 'function'){
       try{
@@ -11438,38 +11462,68 @@
     }
     updateUserBadge();
   }
+  function resolveProfileText(key){
+    const fromProfile = userProfile && userProfile[key];
+    if(typeof fromProfile === 'string'){
+      const trimmed = fromProfile.trim();
+      if(trimmed) return trimmed;
+    }else if(typeof fromProfile === 'number'){
+      const numericText = String(fromProfile).trim();
+      if(numericText) return numericText;
+    }
+    const fromUser = currentUser && currentUser[key];
+    if(typeof fromUser === 'string'){
+      const trimmedUser = fromUser.trim();
+      if(trimmedUser) return trimmedUser;
+    }else if(typeof fromUser === 'number'){
+      const numericUser = String(fromUser).trim();
+      if(numericUser) return numericUser;
+    }
+    if(key === 'campus' && Array.isArray(currentUser?.planteles)){
+      const plantel = currentUser.planteles.find(value => value && String(value).trim());
+      if(plantel) return String(plantel).trim();
+    }
+    return '';
+  }
+
   function computeInitials(){
-    const name = (userProfile.name || '').trim();
+    const name = resolveProfileText('name');
     if(name){
       const parts = name.split(/\s+/).filter(Boolean).slice(0, 2);
       if(parts.length){
         return parts.map(p => p.charAt(0).toUpperCase()).join('');
       }
     }
-    const id = (userProfile.userId || '').trim();
+    const id = resolveProfileText('userId');
     if(id){
       return id.slice(0, 2).toUpperCase();
     }
     return 'U';
   }
   function syncProfileUI(){
+    const idValue = resolveProfileText('userId');
+    const nameValue = resolveProfileText('name');
+    const emailValue = resolveProfileText('email');
+    const roleValue = resolveProfileText('role');
+    const campusValue = resolveProfileText('campus');
     const idInput = el('#profileId');
-    if(idInput) idInput.value = userProfile.userId || '';
+    if(idInput) idInput.value = idValue;
     const nameInput = el('#profileName');
-    if(nameInput) nameInput.value = userProfile.name || '';
+    if(nameInput) nameInput.value = nameValue;
     const emailInput = el('#profileEmail');
-    if(emailInput) emailInput.value = userProfile.email || '';
+    if(emailInput) emailInput.value = emailValue;
     const roleInput = el('#profileRole');
-    if(roleInput) roleInput.value = userProfile.role || '';
+    if(roleInput) roleInput.value = roleValue;
     const campusInput = el('#profileCampus');
-    if(campusInput) campusInput.value = userProfile.campus || '';
+    if(campusInput) campusInput.value = campusValue;
     const avatarFrame = el('#profileAvatarFrame');
     const avatarImg = el('#profileAvatarImg');
     const avatarInitials = el('#profileAvatarInitials');
+    const avatarSource = userProfile.avatar || (currentUser && currentUser.avatar) || '';
     if(avatarFrame && avatarImg && avatarInitials){
-      if(userProfile.avatar){
+      if(avatarSource){
         avatarFrame.classList.add('has-image');
-        avatarImg.src = userProfile.avatar;
+        avatarImg.src = avatarSource;
         avatarInitials.textContent = '';
       }else{
         avatarFrame.classList.remove('has-image');
@@ -11478,15 +11532,15 @@
       }
     }
     const summaryId = el('#profileSummaryId');
-    if(summaryId) summaryId.textContent = userProfile.userId || 'Sin definir';
+    if(summaryId) summaryId.textContent = idValue || 'Sin definir';
     const summaryName = el('#profileSummaryName');
-    if(summaryName) summaryName.textContent = userProfile.name || 'Sin definir';
+    if(summaryName) summaryName.textContent = nameValue || 'Sin definir';
     const summaryEmail = el('#profileSummaryEmail');
-    if(summaryEmail) summaryEmail.textContent = userProfile.email || 'Sin definir';
+    if(summaryEmail) summaryEmail.textContent = emailValue || 'Sin definir';
     const summaryRole = el('#profileSummaryRole');
-    if(summaryRole) summaryRole.textContent = userProfile.role || 'Sin definir';
+    if(summaryRole) summaryRole.textContent = roleValue ? formatRoleLabel(roleValue) : 'Sin definir';
     const summaryCampus = el('#profileSummaryCampus');
-    if(summaryCampus) summaryCampus.textContent = userProfile.campus || 'Sin definir';
+    if(summaryCampus) summaryCampus.textContent = campusValue || 'Sin definir';
     updateProfileSyncAlert();
   }
 
@@ -11737,6 +11791,32 @@
     settingsStatusTimer = setTimeout(()=>{
       status.classList.add('fade');
     }, 4500);
+  }
+  function resolvePreferenceAnnouncement(key, preferences){
+    const config = QUICK_PREFERENCE_MESSAGES[key];
+    if(!config) return null;
+    const stateKey = String(Boolean(preferences && preferences[key]));
+    const entry = config[stateKey];
+    if(!entry || !entry.text) return null;
+    return { text: entry.text, tone: entry.tone || 'info' };
+  }
+  function announcePreferenceChanges(changedKeys, preferences){
+    if(!Array.isArray(changedKeys) || !changedKeys.length) return;
+    const announcements = changedKeys
+      .map(key => resolvePreferenceAnnouncement(key, preferences))
+      .filter(Boolean);
+    if(!announcements.length) return;
+    let tone = 'info';
+    const tonePriority = ['error','warning','success','info'];
+    tonePriority.some(candidate => {
+      if(announcements.some(item => item.tone === candidate)){
+        tone = candidate;
+        return true;
+      }
+      return false;
+    });
+    const message = announcements.map(item => item.text).join(' ');
+    showSettingsMessage(message, tone);
   }
   function handleAvatarUpload(file){
     if(!file) return;
