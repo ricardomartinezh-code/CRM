@@ -615,6 +615,17 @@
     .dup-card ul { margin:0; padding-left:18px; }
     .dup-card button { margin-top:auto; }
     #dupStatus { margin-top:6px; }
+    .dev-grid{ display:grid; gap:var(--space); grid-template-columns:repeat(auto-fit, minmax(320px,1fr)); }
+    .dev-panel{ background: var(--card-2); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding:var(--space); display:flex; flex-direction:column; gap:var(--space-sm); box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
+    html[data-theme="light"] .dev-panel{ border-color: rgba(15,23,42,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.6); }
+    .dev-panel__header{ display:flex; flex-wrap:wrap; align-items:flex-start; justify-content:space-between; gap:var(--space-sm); }
+    .dev-panel__title{ margin:0; font-size:17px; display:flex; align-items:center; gap:8px; }
+    .dev-panel__description{ margin:0; color: var(--muted); font-size:13px; }
+    .dev-panel__status{ margin:4px 0 0; font-size:13px; color: var(--muted); }
+    .dev-panel__log{ background: var(--bg-soft); border:1px solid rgba(255,255,255,0.08); border-radius: var(--radius); padding:12px; max-height:240px; overflow:auto; }
+    html[data-theme="light"] .dev-panel__log{ border-color: rgba(15,23,42,0.08); }
+    .dev-panel__log ul{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:6px; font-size:13px; }
+    .dev-actions{ display:flex; flex-wrap:wrap; gap:8px; }
 
     /* Theme toggle */
 
@@ -2655,7 +2666,7 @@
           <a href="#" class="nav-link" data-nav="leads"><i class="bi bi-people"></i><span>Leads</span></a>
           <a href="#" class="nav-link" data-nav="mensajes"><i class="bi bi-chat-dots"></i><span>Mensajes</span></a>
           <a href="#" class="nav-link" data-nav="administrador"><i class="bi bi-person-gear"></i><span>Administrador</span></a>
-          <a href="#" class="nav-link" data-nav="sistema"><i class="bi bi-cpu"></i><span>Sistema</span></a>
+          <a href="#" class="nav-link" data-nav="desarrollador"><i class="bi bi-terminal"></i><span>Desarrollador</span></a>
           <a href="#" class="nav-link" data-nav="integraciones"><i class="bi bi-plug"></i><span>Integraciones</span></a>
           <a href="#" class="nav-link" data-nav="configuracion"><i class="bi bi-gear"></i><span>Configuración</span></a>
         </div>
@@ -3406,6 +3417,57 @@
           </div>
         </div>
       </section>
+      <section id="view-desarrollador" class="view-section hidden" data-mobile-title="Desarrollador">
+        <div class="card" style="margin:18px">
+          <div class="panel-section">
+            <h3><span aria-hidden="true">🧑‍💻</span> Herramientas de desarrollador</h3>
+            <p class="muted small">Controla diagnósticos avanzados y automatiza soluciones para la plataforma.</p>
+          </div>
+          <div class="panel-section">
+            <div class="dev-grid">
+              <article class="dev-panel" aria-labelledby="dev-diagnostic-title">
+                <div class="dev-panel__header">
+                  <div>
+                    <h4 class="dev-panel__title" id="dev-diagnostic-title"><i class="bi bi-activity" aria-hidden="true"></i> Diagnóstico de integridad</h4>
+                    <p class="dev-panel__description">Ejecuta validaciones sobre hojas, servicios y conexiones principales.</p>
+                  </div>
+                  <button type="button" class="btn primary" id="diagBtn"><i class="bi bi-play-circle"></i> Ejecutar diagnóstico</button>
+                </div>
+                <p class="dev-panel__status">Los resultados más recientes aparecerán en el registro.</p>
+                <div class="dev-panel__log" role="status" aria-live="polite">
+                  <ul id="diagLog"></ul>
+                </div>
+              </article>
+              <article class="dev-panel" aria-labelledby="dev-duplicates-title">
+                <div class="dev-panel__header">
+                  <div>
+                    <h4 class="dev-panel__title" id="dev-duplicates-title"><i class="bi bi-layers" aria-hidden="true"></i> Duplicados</h4>
+                    <p class="dev-panel__description">Revisa coincidencias detectadas y ejecuta limpiezas dirigidas.</p>
+                  </div>
+                </div>
+                <p class="dev-panel__status" id="dupStatus">Ejecuta el diagnóstico para habilitar esta sección.</p>
+                <div class="dup-grid hidden" id="dupList" role="list"></div>
+              </article>
+              <article class="dev-panel" aria-labelledby="dev-solver-title">
+                <div class="dev-panel__header">
+                  <div>
+                    <h4 class="dev-panel__title" id="dev-solver-title"><i class="bi bi-magic" aria-hidden="true"></i> Solucionador automático</h4>
+                    <p class="dev-panel__description">Aplica acciones sugeridas según el último diagnóstico disponible.</p>
+                  </div>
+                  <div class="dev-actions">
+                    <button type="button" class="btn primary" id="solverAutoBtn"><i class="bi bi-lightning-charge"></i> Solución automática</button>
+                    <button type="button" class="btn outline" id="solverStepsBtn"><i class="bi bi-list-check"></i> Ver pasos</button>
+                  </div>
+                </div>
+                <p class="dev-panel__status" id="solverStatus">Ejecuta el diagnóstico para generar recomendaciones.</p>
+                <div class="dev-panel__log" role="log" aria-live="polite">
+                  <ul id="solverLog"></ul>
+                </div>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
       <section id="view-integraciones" class="view-section hidden" data-mobile-title="Integraciones">
         <div class="card" style="margin:18px">
           <div class="panel-section">
@@ -3782,10 +3844,10 @@
                 </ul>
               </div>
               <div>
-                <h4>Sistema</h4>
+                <h4>Desarrollador</h4>
                 <ul>
                   <li>Ejecuta diagnósticos completos y consulta resultados en tiempo real.</li>
-                  <li>Gestiona duplicados detectados en Google Sheets con mensajes de estado claros.</li>
+                  <li>Gestiona duplicados detectados y aplica soluciones automáticas desde un solo panel.</li>
                 </ul>
               </div>
               <div>
@@ -5239,9 +5301,8 @@
     leads: ['admin','coordinador','asesor','developer'],
     mensajes: ['admin','coordinador','asesor','developer'],
     administrador: ['admin','coordinador','developer'],
-    sistema: ['developer'],
-    permisos: ['admin','developer'],
-    integraciones: ['admin','coordinador','asesor','viewer','developer'],
+    desarrollador: ['developer'],
+    integraciones: ['admin','coordinador','asesor','developer'],
     configuracion: ['admin','coordinador','asesor','developer'],
     ayuda: ['admin','coordinador','asesor','developer']
   };
@@ -14275,7 +14336,7 @@
           }
         });
       }else{
-        addStep('Solicita a una persona administradora que ejecute la limpieza de duplicados desde Sistema > Duplicados.', 'warn');
+        addStep('Solicita a una persona administradora que ejecute la limpieza de duplicados desde Desarrollador > Duplicados.', 'warn');
       }
       addStep('Revisa en Google Sheets que los registros depurados sigan con datos completos.', 'info');
     }
