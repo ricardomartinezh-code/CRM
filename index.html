@@ -2636,10 +2636,8 @@
           <a href="#" class="nav-link active" data-nav="kpis" aria-current="page"><i class="bi bi-speedometer2"></i><span>KPI’s</span></a>
           <a href="#" class="nav-link" data-nav="leads"><i class="bi bi-people"></i><span>Leads</span></a>
           <a href="#" class="nav-link" data-nav="mensajes"><i class="bi bi-chat-dots"></i><span>Mensajes</span></a>
-          <a href="#" class="nav-link" data-nav="importar"><i class="bi bi-box-arrow-down"></i><span>Importar</span></a>
-          <a href="#" class="nav-link" data-nav="exportar"><i class="bi bi-box-arrow-up"></i><span>Exportar</span></a>
+          <a href="#" class="nav-link" data-nav="administrador"><i class="bi bi-person-gear"></i><span>Administrador</span></a>
           <a href="#" class="nav-link" data-nav="sistema"><i class="bi bi-cpu"></i><span>Sistema</span></a>
-          <a href="#" class="nav-link" data-nav="permisos"><i class="bi bi-shield-lock"></i><span>Permisos</span></a>
           <a href="#" class="nav-link" data-nav="integraciones"><i class="bi bi-plug"></i><span>Integraciones</span></a>
           <a href="#" class="nav-link" data-nav="configuracion"><i class="bi bi-gear"></i><span>Configuración</span></a>
         </div>
@@ -2987,447 +2985,409 @@
         </div>
       </section>
 
-      <section id="view-importar" class="view-section hidden">
-        <div class="card" style="margin:18px">
-          <div class="panel-section">
-            <h3>Datos</h3>
-            <div class="row gap10 panel-filters">
-              <label>
-                Base de destino
-                <select id="importBaseSelect"></select>
-              </label>
-              <input type="file" id="importFile" accept=".csv,.xlsx" class="file-input">
+      <section id="view-administrador" class="view-section hidden">
+        <div class="admin-panels">
+          <div class="card" style="margin:18px">
+            <div class="panel-section">
+              <h3><span aria-hidden="true">📥</span> Importar</h3>
+              <p class="muted small">Carga nuevos registros, actualiza activos y ejecuta cambios masivos.</p>
             </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn outline" id="btnVerify">Verificar</button>
-              <button class="btn outline" id="btnExecute" disabled>Ejecutar</button>
-            </div>
-            <div id="importPreview" class="preview-box hidden panel-preview"></div>
-            <div id="dupWrap" class="preview-box hidden panel-preview"></div>
-          </div>
-          <div class="panel-section">
-            <h3>Activos</h3>
-            <div class="row gap10 panel-filters">
-              <input type="file" id="activosFile" accept=".csv,.xlsx" class="file-input">
-            </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn outline" id="btnActivosVerify">Analizar</button>
-              <button class="btn outline" id="btnActivosExecute" disabled>Actualizar</button>
-            </div>
-            <div id="activosPreview" class="preview-box hidden panel-preview"></div>
-            <div id="activosDiff" class="preview-box hidden panel-preview"></div>
-          </div>
-          <div class="panel-section">
-            <h3>Cambios masivos</h3>
-            <div class="row gap10 panel-filters">
-              <input type="file" id="bulkFile" accept=".csv,.xlsx" class="file-input">
-            </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn outline" id="btnBulkVerify">Verificar</button>
-              <button class="btn outline" id="btnBulkExecute" disabled>Ejecutar</button>
-              <button class="btn outline" id="btnBulkTemplate">Plantilla</button>
-            </div>
-            <div id="bulkPreview" class="preview-box hidden panel-preview"></div>
-            <div id="bulkDupWrap" class="preview-box hidden panel-preview"></div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-exportar" class="view-section hidden">
-        <div class="card" style="margin:18px">
-          <div class="panel-section">
-            <h3>Datos</h3>
-            <div class="row gap10 panel-filters">
-              <select id="expDataBase"><option value="">Bases</option></select>
-              <select id="expDataAsesor"><option value="">Todos los asesores</option></select>
-              <select id="expDataEtapa"><option value="">Etapa</option></select>
-              <select id="expDataEstado"><option value="">Todos los estados</option></select>
-              <label class="date-filter" for="expDataStart">
-                <span>Desde</span>
-                <input type="date" id="expDataStart">
-              </label>
-              <label class="date-filter" for="expDataEnd">
-                <span>Hasta</span>
-                <input type="date" id="expDataEnd">
-              </label>
-            </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn primary" id="btnExportData">Ejecutar</button>
-            </div>
-          </div>
-          <div class="panel-section">
-            <h3>Reportes</h3>
-            <div class="row gap10 panel-filters">
-              <select id="expReportTipo">
-                <option value="">Tipo de reporte</option>
-                <option value="estado">Estado de la base</option>
-                <option value="detalle">Detalle asesor</option>
-                <option value="sistema">Sistema</option>
-                <option value="losg">Losg</option>
-              </select>
-              <select id="expReportBase"><option value="">Base</option></select>
-              <select id="expReportAsesor"><option value="">Todos los asesores</option></select>
-              <label class="date-filter" for="expReportStart">
-                <span>Desde</span>
-                <input type="date" id="expReportStart">
-              </label>
-              <label class="date-filter" for="expReportEnd">
-                <span>Hasta</span>
-                <input type="date" id="expReportEnd">
-              </label>
-            </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn primary" id="btnExportReport">Ejecutar</button>
-            </div>
-          </div>
-          <div class="panel-section">
-            <h3>Resoluciones</h3>
-            <div class="row gap10 panel-filters">
-              <select id="expResolCRM">
-                <option value="">CRM</option>
-                <option value="neotel">Neotel</option>
-                <option value="hubspot">HubSpot</option>
-              </select>
-              <select id="expResolAsesor"><option value="">Todos los asesores</option></select>
-              <select id="expResolBase"><option value="">Base</option></select>
-              <label class="date-filter" for="expResolStart">
-                <span>Desde</span>
-                <input type="date" id="expResolStart">
-              </label>
-              <label class="date-filter" for="expResolEnd">
-                <span>Hasta</span>
-                <input type="date" id="expResolEnd">
-              </label>
-            </div>
-            <div class="row gap10 panel-actions">
-              <button class="btn primary" id="btnExportResolution">Ejecutar</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-sistema" class="view-section hidden">
-        <div class="card" style="margin:18px">
-          <div class="panel-section">
-            <h3>Diagnóstico</h3>
-            <p>Ejecuta un chequeo completo para conocer el estado del sistema, la estructura de las hojas y los posibles riesgos.</p>
-            <div class="row gap10 panel-actions">
-              <button class="btn primary" id="diagBtn">Iniciar</button>
-            </div>
-            <div class="cmd-panel" role="log" aria-live="polite" aria-label="Resultados del diagnóstico">
-              <ul id="diagLog"></ul>
-            </div>
-          </div>
-          <div class="panel-section">
-            <h3>Duplicados</h3>
-            <div class="panel-status" id="dupStatus" role="status">Ejecuta el diagnóstico para habilitar esta sección.</div>
-            <div id="dupList" class="dup-grid hidden" aria-live="polite"></div>
-          </div>
-          <div class="panel-section">
-            <h3>Solucionar Problemas</h3>
-            <p class="muted small">Genera un plan después del diagnóstico para resolver incidencias automáticamente o seguir pasos guiados.</p>
-            <div class="panel-status" id="solverStatus" role="status">Ejecuta el diagnóstico para generar recomendaciones.</div>
-            <div class="row gap10 panel-actions">
-              <button class="btn primary" id="solverAutoBtn" disabled>Solución automática</button>
-              <button class="btn" id="solverStepsBtn" disabled>Ver pasos sugeridos</button>
-            </div>
-            <div class="cmd-panel" role="log" aria-live="polite" aria-label="Plan de solución">
-              <ul id="solverLog"></ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="view-permisos" class="view-section hidden">
-        <div class="card" style="margin:18px">
-          <div class="panel-section">
-            <h3><span aria-hidden="true">🛡️</span> Permisos</h3>
-            <div class="permissions-grid" id="permissionsGrid">
-              <div class="permissions-panel" aria-label="Usuarios registrados">
-                <div class="row gap10 panel-actions">
-                  <button type="button" class="btn outline" id="permReloadBtn"><i class="bi bi-arrow-repeat"></i> Actualizar</button>
-                  <button type="button" class="btn primary" id="permNewBtn"><i class="bi bi-plus-lg"></i> Nuevo usuario</button>
-                </div>
-                <p class="permissions-status small" id="permStatus" role="status" aria-live="polite">Carga los usuarios para comenzar.</p>
-                <div class="permissions-list" id="permList" role="listbox" aria-label="Usuarios"></div>
+            <div class="panel-section">
+              <h3>Datos</h3>
+              <div class="row gap10 panel-filters">
+                <label>
+                  Base de destino
+                  <select id="importBaseSelect"></select>
+                </label>
+                <input type="file" id="importFile" accept=".csv,.xlsx" class="file-input">
               </div>
-              <form class="permissions-form" id="permForm" autocomplete="off" novalidate>
-                <h4 class="perm-form-title" id="permFormTitle">Nuevo usuario</h4>
-                <div class="form-grid">
-                  <label>
-                    <span>Correo institucional</span>
-                    <input type="email" id="permEmail" autocomplete="email" required />
-                  </label>
-                  <label>
-                    <span>ID de usuario</span>
-                    <input type="text" id="permUserId" autocomplete="off" required />
-                  </label>
-                  <label>
-                    <span>Nombre completo</span>
-                    <input type="text" id="permName" autocomplete="name" required />
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Rol</span>
-                    <select id="permRole">
-                      <option value="developer">Developer</option>
-                      <option value="admin">Administrador</option>
-                      <option value="coordinador">Coordinador</option>
-                      <option value="asesor">Asesor</option>
-                    </select>
-                    <span class="field-hint" id="permRoleHint"></span>
-                    <div class="role-scope-suggestion" id="permRoleSuggestion" hidden>
-                      <p class="role-scope-suggestion__text" id="permRoleDescription"></p>
-                      <div class="role-scope-suggestion__chips" id="permRoleScopeChips" aria-live="polite"></div>
-                      <button type="button" class="btn micro" id="permApplyRolePreset"><i class="bi bi-magic"></i> Aplicar sugerencia</button>
-                    </div>
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Planteles autorizados</span>
-                    <div class="multi-select" id="permPlantelesSelect">
-                      <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="multi-select__button-text">Selecciona planteles</span>
-                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                      </button>
-                      <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
-                      <div class="multi-select__chips" aria-live="polite"></div>
-                    </div>
-                    <input type="hidden" id="permPlanteles" />
-                    <span class="field-hint">Seleccionar "Todos" otorga acceso global a todos los planteles.</span>
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Bases autorizadas</span>
-                    <div class="multi-select" id="permBasesSelect">
-                      <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="multi-select__button-text">Selecciona bases</span>
-                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                      </button>
-                      <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
-                      <div class="multi-select__chips" aria-live="polite"></div>
-                    </div>
-                    <input type="hidden" id="permBases" />
-                    <span class="field-hint">Seleccionar "Todas" otorga acceso global a todas las bases.</span>
-                  </label>
-                  <label>
-                    <span>Contraseña temporal</span>
-                    <input type="password" id="permPassword" autocomplete="new-password" />
-                  </label>
-                  <label class="permissions-switch">
-                    <input type="checkbox" id="permActive" checked />
-                    <span>Acceso activo</span>
-                  </label>
-                </div>
-                <p class="small muted" id="permPasswordHint">Se generará una contraseña temporal para compartir con la persona usuaria.</p>
-                <div class="permissions-meta small muted" id="permMeta"></div>
-                <div class="row gap10 panel-actions">
-                  <button type="submit" class="btn primary" id="permSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
-                  <button type="button" class="btn" id="permResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
-                  <button type="button" class="btn danger" id="permDeleteBtn"><i class="bi bi-person-dash"></i> Desactivar</button>
-                </div>
-              </form>
+              <div class="row gap10 panel-actions">
+                <button class="btn outline" id="btnVerify">Verificar</button>
+                <button class="btn outline" id="btnExecute" disabled>Ejecutar</button>
+              </div>
+              <div id="importPreview" class="preview-box hidden panel-preview"></div>
+              <div id="dupWrap" class="preview-box hidden panel-preview"></div>
+            </div>
+            <div class="panel-section">
+              <h3>Activos</h3>
+              <div class="row gap10 panel-filters">
+                <input type="file" id="activosFile" accept=".csv,.xlsx" class="file-input">
+              </div>
+              <div class="row gap10 panel-actions">
+                <button class="btn outline" id="btnActivosVerify">Analizar</button>
+                <button class="btn outline" id="btnActivosExecute" disabled>Actualizar</button>
+              </div>
+              <div id="activosPreview" class="preview-box hidden panel-preview"></div>
+              <div id="activosDiff" class="preview-box hidden panel-preview"></div>
+            </div>
+            <div class="panel-section">
+              <h3>Cambios masivos</h3>
+              <div class="row gap10 panel-filters">
+                <input type="file" id="bulkFile" accept=".csv,.xlsx" class="file-input">
+              </div>
+              <div class="row gap10 panel-actions">
+                <button class="btn outline" id="btnBulkVerify">Verificar</button>
+                <button class="btn outline" id="btnBulkExecute" disabled>Ejecutar</button>
+                <button class="btn outline" id="btnBulkTemplate">Plantilla</button>
+              </div>
+              <div id="bulkPreview" class="preview-box hidden panel-preview"></div>
+              <div id="bulkDupWrap" class="preview-box hidden panel-preview"></div>
             </div>
           </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">👥</span> Equipos</h3>
-            <div class="permissions-grid permissions-grid--teams">
-              <div class="permissions-panel">
-                <div class="row gap10 panel-actions">
-                  <button type="button" class="btn outline" id="teamReloadBtn"><i class="bi bi-arrow-repeat"></i> Actualizar</button>
-                  <button type="button" class="btn primary" id="teamNewBtn"><i class="bi bi-plus-lg"></i> Nuevo equipo</button>
-                </div>
-                <p class="permissions-status small" id="teamStatus" role="status" aria-live="polite">Carga los equipos para comenzar.</p>
-                <div class="permissions-list" id="teamList" role="listbox" aria-label="Equipos"></div>
+          <div class="card" style="margin:18px">
+            <div class="panel-section">
+              <h3><span aria-hidden="true">📤</span> Exportar</h3>
+              <p class="muted small">Genera extracciones de datos, reportes y resoluciones.</p>
+            </div>
+            <div class="panel-section">
+              <h3>Datos</h3>
+              <div class="row gap10 panel-filters">
+                <select id="expDataBase"><option value="">Bases</option></select>
+                <select id="expDataAsesor"><option value="">Todos los asesores</option></select>
+                <select id="expDataEtapa"><option value="">Etapa</option></select>
+                <select id="expDataEstado"><option value="">Todos los estados</option></select>
+                <label class="date-filter" for="expDataStart">
+                  <span>Desde</span>
+                  <input type="date" id="expDataStart">
+                </label>
+                <label class="date-filter" for="expDataEnd">
+                  <span>Hasta</span>
+                  <input type="date" id="expDataEnd">
+                </label>
               </div>
-              <form class="permissions-form" id="teamForm" autocomplete="off" novalidate>
-                <h4 class="perm-form-title" id="teamFormTitle">Nuevo equipo</h4>
-                <div class="scope-template-toolbar" id="teamTemplateToolbar" aria-label="Plantillas sugeridas"></div>
-                <div class="form-grid">
-                  <label>
-                    <span>ID del equipo</span>
-                    <input type="text" id="teamId" autocomplete="off" required />
-                  </label>
-                  <label>
-                    <span>Nombre del equipo</span>
-                    <input type="text" id="teamName" autocomplete="off" required />
-                  </label>
-                  <label>
-                    <span>Descripción</span>
-                    <textarea id="teamDescription" rows="3"></textarea>
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Planteles asignados</span>
-                    <div class="multi-select" id="teamPlantelesSelect">
-                      <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="multi-select__button-text">Selecciona planteles</span>
-                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                      </button>
-                      <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
-                      <div class="multi-select__chips" aria-live="polite"></div>
-                    </div>
-                    <input type="hidden" id="teamPlanteles" />
-                    <span class="field-hint">Determina a qué planteles puede acceder el equipo.</span>
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Bases asignadas</span>
-                    <div class="multi-select" id="teamBasesSelect">
-                      <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="multi-select__button-text">Selecciona bases</span>
-                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                      </button>
-                      <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
-                      <div class="multi-select__chips" aria-live="polite"></div>
-                    </div>
-                    <input type="hidden" id="teamBases" />
-                    <span class="field-hint">Controla las bases visibles para el equipo.</span>
-                  </label>
-                  <label class="field-with-hint">
-                    <span>Integrantes</span>
-                    <div class="multi-select" id="teamMembersSelect">
-                      <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
-                        <span class="multi-select__button-text">Selecciona integrantes</span>
-                        <i class="bi bi-chevron-down" aria-hidden="true"></i>
-                      </button>
-                      <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
-                      <div class="multi-select__chips" aria-live="polite"></div>
-                    </div>
-                    <input type="hidden" id="teamMembers" />
-                    <span class="field-hint">Asigna usuarios responsables del equipo.</span>
-                  </label>
-                  <label class="permissions-switch">
-                    <input type="checkbox" id="teamActive" checked />
-                    <span>Equipo activo</span>
-                  </label>
-                </div>
-                <div class="permissions-meta small muted" id="teamMeta"></div>
-                <div class="row gap10 panel-actions">
-                  <button type="submit" class="btn primary" id="teamSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
-                  <button type="button" class="btn" id="teamResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
-                  <button type="button" class="btn" id="teamCloneBtn"><i class="bi bi-copy"></i> Clonar configuración</button>
-                  <button type="button" class="btn danger" id="teamDeleteBtn"><i class="bi bi-x-circle"></i> Desactivar</button>
-                </div>
-              </form>
+              <div class="row gap10 panel-actions">
+                <button class="btn primary" id="btnExportData">Ejecutar</button>
+              </div>
+            </div>
+            <div class="panel-section">
+              <h3>Reportes</h3>
+              <div class="row gap10 panel-filters">
+                <select id="expReportTipo">
+                  <option value="">Tipo de reporte</option>
+                  <option value="estado">Estado de la base</option>
+                  <option value="detalle">Detalle asesor</option>
+                  <option value="sistema">Sistema</option>
+                  <option value="losg">Losg</option>
+                </select>
+                <select id="expReportBase"><option value="">Base</option></select>
+                <select id="expReportAsesor"><option value="">Todos los asesores</option></select>
+                <label class="date-filter" for="expReportStart">
+                  <span>Desde</span>
+                  <input type="date" id="expReportStart">
+                </label>
+                <label class="date-filter" for="expReportEnd">
+                  <span>Hasta</span>
+                  <input type="date" id="expReportEnd">
+                </label>
+              </div>
+              <div class="row gap10 panel-actions">
+                <button class="btn primary" id="btnExportReport">Ejecutar</button>
+              </div>
+            </div>
+            <div class="panel-section">
+              <h3>Resoluciones</h3>
+              <div class="row gap10 panel-filters">
+                <select id="expResolCRM">
+                  <option value="">CRM</option>
+                  <option value="neotel">Neotel</option>
+                  <option value="hubspot">HubSpot</option>
+                </select>
+                <select id="expResolAsesor"><option value="">Todos los asesores</option></select>
+                <select id="expResolBase"><option value="">Base</option></select>
+                <label class="date-filter" for="expResolStart">
+                  <span>Desde</span>
+                  <input type="date" id="expResolStart">
+                </label>
+                <label class="date-filter" for="expResolEnd">
+                  <span>Hasta</span>
+                  <input type="date" id="expResolEnd">
+                </label>
+              </div>
+              <div class="row gap10 panel-actions">
+                <button class="btn primary" id="btnExportResolution">Ejecutar</button>
+              </div>
             </div>
           </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">🔄</span> Asignación</h3>
-            <p class="muted small">Reasigna leads manualmente en la base activa seleccionando un caso individual, varios registros o un segmento completo.</p>
-            <div class="assignment-grid">
-              <div class="assignment-header">
-                <div class="segmented" role="radiogroup" aria-label="Modo de reasignación">
-                  <label class="segmented-option">
-                    <input type="radio" name="assignmentMode" value="single" checked>
-                    <span>Individual</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="assignmentMode" value="multiple">
-                    <span>Varios</span>
-                  </label>
-                  <label class="segmented-option">
-                    <input type="radio" name="assignmentMode" value="segment">
-                    <span>Segmento</span>
-                  </label>
+          <div class="card" style="margin:18px">
+            <div class="panel-section">
+              <h3><span aria-hidden="true">🛡️</span> Permisos</h3>
+              <div class="permissions-grid" id="permissionsGrid">
+                <div class="permissions-panel" aria-label="Usuarios registrados">
+                  <div class="row gap10 panel-actions">
+                    <button type="button" class="btn outline" id="permReloadBtn"><i class="bi bi-arrow-repeat"></i> Actualizar</button>
+                    <button type="button" class="btn primary" id="permNewBtn"><i class="bi bi-plus-lg"></i> Nuevo usuario</button>
+                  </div>
+                  <p class="permissions-status small" id="permStatus" role="status" aria-live="polite">Carga los usuarios para comenzar.</p>
+                  <div class="permissions-list" id="permList" role="listbox" aria-label="Usuarios"></div>
                 </div>
+                <form class="permissions-form" id="permForm" autocomplete="off" novalidate>
+                  <h4 class="perm-form-title" id="permFormTitle">Nuevo usuario</h4>
+                  <div class="form-grid">
+                    <label>
+                      <span>Correo institucional</span>
+                      <input type="email" id="permEmail" autocomplete="email" required />
+                    </label>
+                    <label>
+                      <span>ID de usuario</span>
+                      <input type="text" id="permUserId" autocomplete="off" required />
+                    </label>
+                    <label>
+                      <span>Nombre completo</span>
+                      <input type="text" id="permName" autocomplete="name" required />
+                    </label>
+                    <label class="field-with-hint">
+                      <span>Rol</span>
+                      <select id="permRole">
+                        <option value="admin">Administrador</option>
+                        <option value="coordinador">Coordinador</option>
+                        <option value="asesor">Asesor</option>
+                        <option value="viewer">Consulta</option>
+                      </select>
+                      <span class="field-hint" id="permRoleHint"></span>
+                      <div class="role-scope-suggestion" id="permRoleSuggestion" hidden>
+                        <p class="role-scope-suggestion__text" id="permRoleDescription"></p>
+                        <div class="role-scope-suggestion__chips" id="permRoleScopeChips" aria-live="polite"></div>
+                        <button type="button" class="btn micro" id="permApplyRolePreset"><i class="bi bi-magic"></i> Aplicar sugerencia</button>
+                      </div>
+                    </label>
+                    <label class="field-with-hint">
+                      <span>Planteles autorizados</span>
+                      <div class="multi-select" id="permPlantelesSelect">
+                        <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
+                          <span class="multi-select__button-text">Selecciona planteles</span>
+                          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
+                        <div class="multi-select__chips" aria-live="polite"></div>
+                      </div>
+                      <input type="hidden" id="permPlanteles" />
+                      <span class="field-hint">Seleccionar "Todos" otorga acceso global a todos los planteles.</span>
+                    </label>
+                    <label class="field-with-hint">
+                      <span>Bases autorizadas</span>
+                      <div class="multi-select" id="permBasesSelect">
+                        <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
+                          <span class="multi-select__button-text">Selecciona bases</span>
+                          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
+                        <div class="multi-select__chips" aria-live="polite"></div>
+                      </div>
+                      <input type="hidden" id="permBases" />
+                      <span class="field-hint">Seleccionar "Todas" otorga acceso global a todas las bases.</span>
+                    </label>
+                    <label>
+                      <span>Contraseña temporal</span>
+                      <input type="password" id="permPassword" autocomplete="new-password" />
+                    </label>
+                    <label class="permissions-switch">
+                      <input type="checkbox" id="permActive" checked />
+                      <span>Acceso activo</span>
+                    </label>
+                  </div>
+                  <p class="small muted" id="permPasswordHint">Se generará una contraseña temporal para compartir con la persona usuaria.</p>
+                  <div class="permissions-meta small muted" id="permMeta"></div>
+                  <div class="row gap10 panel-actions">
+                    <button type="submit" class="btn primary" id="permSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
+                    <button type="button" class="btn" id="permResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
+                    <button type="button" class="btn danger" id="permDeleteBtn"><i class="bi bi-person-dash"></i> Desactivar</button>
+                  </div>
+                </form>
               </div>
-              <div class="assignment-body">
-                <div class="assignment-mode" data-mode="single">
-                  <label class="field-with-hint">
-                    <span>Lead a reasignar</span>
-                    <input type="text" id="assignmentSingleInput" list="assignmentLeadOptions" placeholder="ID, matrícula, correo o nombre" autocomplete="off">
-                    <span class="field-hint">Empieza a escribir y selecciona una coincidencia del listado.</span>
-                    <datalist id="assignmentLeadOptions"></datalist>
-                  </label>
+            </div>
+            <div class="panel-section">
+              <h3><span aria-hidden="true">👥</span> Equipos</h3>
+              <div class="permissions-grid permissions-grid--teams">
+                <div class="permissions-panel">
+                  <div class="row gap10 panel-actions">
+                    <button type="button" class="btn outline" id="teamReloadBtn"><i class="bi bi-arrow-repeat"></i> Actualizar</button>
+                    <button type="button" class="btn primary" id="teamNewBtn"><i class="bi bi-plus-lg"></i> Nuevo equipo</button>
+                  </div>
+                  <p class="permissions-status small" id="teamStatus" role="status" aria-live="polite">Carga los equipos para comenzar.</p>
+                  <div class="permissions-list" id="teamList" role="listbox" aria-label="Equipos"></div>
                 </div>
-                <div class="assignment-mode hidden" data-mode="multiple">
-                  <label class="field-with-hint">
-                    <span>Leads seleccionados</span>
-                    <textarea id="assignmentBulkInput" rows="4" placeholder="Pega IDs o matrículas separados por comas, saltos de línea o espacios."></textarea>
-                    <span class="field-hint">Los duplicados se omiten automáticamente.</span>
-                  </label>
-                </div>
-                <div class="assignment-mode hidden" data-mode="segment">
-                  <div class="assignment-filters" role="group" aria-label="Filtros del segmento">
+                <form class="permissions-form" id="teamForm" autocomplete="off" novalidate>
+                  <h4 class="perm-form-title" id="teamFormTitle">Nuevo equipo</h4>
+                  <div class="form-grid">
                     <label>
-                      <span>Asesor actual</span>
-                      <select id="assignmentFilterAsesor">
-                        <option value="">Todos</option>
-                        <option value="__unassigned__">Solo sin asesor</option>
-                      </select>
+                      <span>Nombre del equipo</span>
+                      <input type="text" id="teamName" autocomplete="off" required />
                     </label>
-                    <label>
-                      <span>Etapa</span>
-                      <select id="assignmentFilterEtapa">
-                        <option value="">Todas</option>
-                      </select>
+                    <label class="field-with-hint">
+                      <span>Planteles</span>
+                      <div class="multi-select" id="teamPlantelesSelect">
+                        <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
+                          <span class="multi-select__button-text">Selecciona planteles</span>
+                          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
+                        <div class="multi-select__chips" aria-live="polite"></div>
+                      </div>
+                      <input type="hidden" id="teamPlanteles" />
+                      <span class="field-hint">Selecciona "Todos" para acceso global.</span>
                     </label>
-                    <label>
-                      <span>Estado</span>
-                      <select id="assignmentFilterEstado" disabled>
-                        <option value="">Todos</option>
-                      </select>
+                    <label class="field-with-hint">
+                      <span>Bases</span>
+                      <div class="multi-select" id="teamBasesSelect">
+                        <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
+                          <span class="multi-select__button-text">Selecciona bases</span>
+                          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
+                        <div class="multi-select__chips" aria-live="polite"></div>
+                      </div>
+                      <input type="hidden" id="teamBases" />
+                      <span class="field-hint">Selecciona "Todas" para acceso global.</span>
                     </label>
-                    <label>
-                      <span>Plantel</span>
-                      <select id="assignmentFilterCampus">
-                        <option value="">Todos</option>
-                      </select>
+                    <label class="field-with-hint">
+                      <span>Integrantes</span>
+                      <div class="multi-select" id="teamMembersSelect">
+                        <button type="button" class="multi-select__button" aria-haspopup="listbox" aria-expanded="false">
+                          <span class="multi-select__button-text">Selecciona integrantes</span>
+                          <i class="bi bi-chevron-down" aria-hidden="true"></i>
+                        </button>
+                        <div class="multi-select__menu" role="listbox" aria-multiselectable="true" tabindex="-1"></div>
+                        <div class="multi-select__chips" aria-live="polite"></div>
+                      </div>
+                      <input type="hidden" id="teamMembers" />
+                      <span class="field-hint">Asigna usuarios responsables del equipo.</span>
                     </label>
-                    <label>
-                      <span>Programa</span>
-                      <select id="assignmentFilterPrograma">
-                        <option value="">Todos</option>
-                      </select>
+                    <label class="permissions-switch">
+                      <input type="checkbox" id="teamActive" checked />
+                      <span>Equipo activo</span>
                     </label>
-                    <label>
-                      <span>Asignados desde</span>
-                      <input type="date" id="assignmentFilterStart">
+                  </div>
+                  <div class="permissions-meta small muted" id="teamMeta"></div>
+                  <div class="row gap10 panel-actions">
+                    <button type="submit" class="btn primary" id="teamSaveBtn"><i class="bi bi-floppy"></i> Guardar</button>
+                    <button type="button" class="btn" id="teamResetBtn"><i class="bi bi-arrow-counterclockwise"></i> Cancelar</button>
+                    <button type="button" class="btn" id="teamCloneBtn"><i class="bi bi-copy"></i> Clonar configuración</button>
+                    <button type="button" class="btn danger" id="teamDeleteBtn"><i class="bi bi-x-circle"></i> Desactivar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+            <div class="panel-section">
+              <h3><span aria-hidden="true">🔄</span> Asignación</h3>
+              <p class="muted small">Reasigna leads manualmente en la base activa seleccionando un caso individual, varios registros o un segmento completo.</p>
+              <div class="assignment-grid">
+                <div class="assignment-header">
+                  <div class="segmented" role="radiogroup" aria-label="Modo de reasignación">
+                    <label class="segmented-option">
+                      <input type="radio" name="assignmentMode" value="single" checked>
+                      <span>Individual</span>
                     </label>
-                    <label>
-                      <span>Asignados hasta</span>
-                      <input type="date" id="assignmentFilterEnd">
+                    <label class="segmented-option">
+                      <input type="radio" name="assignmentMode" value="multiple">
+                      <span>Varios</span>
                     </label>
-                    <label>
-                      <span>Límite</span>
-                      <input type="number" id="assignmentFilterLimit" min="1" max="500" placeholder="Ej. 50">
+                    <label class="segmented-option">
+                      <input type="radio" name="assignmentMode" value="segment">
+                      <span>Segmento</span>
                     </label>
                   </div>
                 </div>
-              </div>
-              <div class="assignment-targets">
-                <label class="field-with-hint">
-                  <span>Base de trabajo</span>
-                  <select id="assignmentBaseSelect"></select>
-                  <span class="field-hint">Solo se procesarán leads de la base seleccionada.</span>
-                </label>
-                <label class="field-with-hint">
-                  <span>Asesor destino</span>
-                  <input type="text" id="assignmentTargetInput" list="assignmentTargetOptions" placeholder="Nombre o ID" autocomplete="off">
-                  <span class="field-hint">Sugiere asesores activos, pero puedes capturar cualquier nombre válido.</span>
-                  <datalist id="assignmentTargetOptions"></datalist>
-                </label>
-              </div>
-              <div class="assignment-actions">
-                <div class="assignment-status" id="assignmentStatus" role="status" aria-live="polite">Selecciona el modo de reasignación y completa los datos.</div>
-                <div class="assignment-buttons">
-                  <button type="button" class="btn outline" id="assignmentPreviewBtn"><i class="bi bi-search"></i> Calcular selección</button>
-                  <button type="button" class="btn primary" id="assignmentExecuteBtn" disabled><i class="bi bi-arrow-repeat"></i> Reasignar leads</button>
+                <div class="assignment-body">
+                  <div class="assignment-mode" data-mode="single">
+                    <label class="field-with-hint">
+                      <span>Lead a reasignar</span>
+                      <input type="text" id="assignmentSingleInput" list="assignmentLeadOptions" placeholder="ID, matrícula, correo o nombre" autocomplete="off">
+                      <span class="field-hint">Empieza a escribir y selecciona una coincidencia del listado.</span>
+                      <datalist id="assignmentLeadOptions"></datalist>
+                    </label>
+                  </div>
+                  <div class="assignment-mode hidden" data-mode="multiple">
+                    <label class="field-with-hint">
+                      <span>Leads seleccionados</span>
+                      <textarea id="assignmentBulkInput" rows="4" placeholder="Pega IDs o matrículas separados por comas, saltos de línea o espacios."></textarea>
+                      <span class="field-hint">Los duplicados se omiten automáticamente.</span>
+                    </label>
+                  </div>
+                  <div class="assignment-mode hidden" data-mode="segment">
+                    <div class="assignment-filters" role="group" aria-label="Filtros del segmento">
+                      <label>
+                        <span>Asesor actual</span>
+                        <select id="assignmentFilterAsesor">
+                          <option value="">Todos</option>
+                          <option value="__unassigned__">Solo sin asesor</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Etapa</span>
+                        <select id="assignmentFilterEtapa">
+                          <option value="">Todas</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Estado</span>
+                        <select id="assignmentFilterEstado" disabled>
+                          <option value="">Todos</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Plantel</span>
+                        <select id="assignmentFilterCampus">
+                          <option value="">Todos</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Programa</span>
+                        <select id="assignmentFilterPrograma">
+                          <option value="">Todos</option>
+                        </select>
+                      </label>
+                      <label>
+                        <span>Asignados desde</span>
+                        <input type="date" id="assignmentFilterStart">
+                      </label>
+                      <label>
+                        <span>Asignados hasta</span>
+                        <input type="date" id="assignmentFilterEnd">
+                      </label>
+                      <label>
+                        <span>Límite</span>
+                        <input type="number" id="assignmentFilterLimit" min="1" max="500" placeholder="Ej. 50">
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="assignment-targets">
+                  <label class="field-with-hint">
+                    <span>Base de trabajo</span>
+                    <select id="assignmentBaseSelect"></select>
+                    <span class="field-hint">Solo se procesarán leads de la base seleccionada.</span>
+                  </label>
+                  <label class="field-with-hint">
+                    <span>Asesor destino</span>
+                    <input type="text" id="assignmentTargetInput" list="assignmentTargetOptions" placeholder="Nombre o ID" autocomplete="off">
+                    <span class="field-hint">Sugiere asesores activos, pero puedes capturar cualquier nombre válido.</span>
+                    <datalist id="assignmentTargetOptions"></datalist>
+                  </label>
+                </div>
+                <div class="assignment-actions">
+                  <div class="assignment-status" id="assignmentStatus" role="status" aria-live="polite">Selecciona el modo de reasignación y completa los datos.</div>
+                  <div class="assignment-buttons">
+                    <button type="button" class="btn outline" id="assignmentPreviewBtn"><i class="bi bi-search"></i> Calcular selección</button>
+                    <button type="button" class="btn primary" id="assignmentExecuteBtn" disabled><i class="bi bi-arrow-repeat"></i> Reasignar leads</button>
+                  </div>
+                </div>
+                <div class="assignment-summary" id="assignmentSummary" aria-live="polite"></div>
+                <div class="assignment-rules">
+                  <h4><i class="bi bi-list-check"></i> Reglas de asignación</h4>
+                  <ul id="assignmentRulesList" class="assignment-rules__list"></ul>
                 </div>
               </div>
-              <div class="assignment-summary" id="assignmentSummary" aria-live="polite"></div>
-              <div class="assignment-rules">
-                <h4><i class="bi bi-list-check"></i> Reglas de asignación</h4>
-                <ul id="assignmentRulesList" class="assignment-rules__list"></ul>
-              </div>
             </div>
-          </div>
-          <div class="panel-section">
-            <h3><span aria-hidden="true">📊</span> Referencia de permisos</h3>
-            <div class="permissions-reference">
-              <div class="permissions-card" id="permissionMatrix"></div>
-              <div class="permissions-card" id="permissionRules"></div>
+            <div class="panel-section">
+              <h3><span aria-hidden="true">📊</span> Referencia de permisos</h3>
+              <div class="permissions-reference">
+                <div class="permissions-card" id="permissionMatrix"></div>
+                <div class="permissions-card" id="permissionRules"></div>
+              </div>
             </div>
           </div>
         </div>
       </section>
-
       <section id="view-integraciones" class="view-section hidden" data-mobile-title="Integraciones">
         <div class="card" style="margin:18px">
           <div class="panel-section">
@@ -5199,30 +5159,28 @@
     pink: { primary: '#be185d', secondary: '#f472b6', panel: '190,24,93' }
   };
   const VIEW_PERMISSIONS = {
-    kpis: ['developer','admin','coordinador','asesor'],
-    leads: ['developer','admin','coordinador','asesor'],
-    mensajes: ['developer','admin','coordinador','asesor'],
-    importar: ['developer','admin'],
-    exportar: ['developer','admin','coordinador'],
-    sistema: ['developer','admin','coordinador'],
-    permisos: ['developer','admin'],
-    integraciones: ['developer','admin','coordinador','asesor'],
-    configuracion: ['developer','admin','coordinador','asesor'],
-    ayuda: ['developer','admin','coordinador','asesor']
+    kpis: ['admin','coordinador','asesor','developer'],
+    leads: ['admin','coordinador','asesor','developer'],
+    mensajes: ['admin','coordinador','asesor','developer'],
+    administrador: ['admin','coordinador','developer'],
+    sistema: ['admin','coordinador','viewer'],
+    integraciones: ['admin','coordinador','asesor','viewer'],
+    configuracion: ['admin','coordinador','asesor','viewer'],
+    ayuda: ['admin','coordinador','asesor','viewer']
   };
   const ACTION_PERMISSIONS = {
-    updateLead: ['developer','admin','coordinador','asesor'],
-    importData: ['developer','admin'],
-    exportData: ['developer','admin','coordinador'],
-    runDiagnostics: ['developer','admin'],
-    manageDuplicates: ['developer','admin'],
-    repairSheetStructure: ['developer','admin'],
-    syncActivos: ['developer','admin','coordinador'],
-    manageTeams: ['developer','admin'],
-    reassignLeads: ['developer','admin']
+    updateLead: ['admin','coordinador','asesor','developer'],
+    importData: ['admin','developer'],
+    exportData: ['admin','coordinador','developer'],
+    runDiagnostics: ['developer'],
+    manageDuplicates: ['admin','developer'],
+    repairSheetStructure: ['developer'],
+    syncActivos: ['admin','coordinador','developer'],
+    manageTeams: ['admin','developer'],
+    reassignLeads: ['admin','developer']
   };
   const ROLE_LABELS = {
-    developer: 'Developer',
+    developer: 'Desarrollador',
     admin: 'Administrador',
     coordinador: 'Coordinador',
     asesor: 'Asesor'
@@ -8887,7 +8845,7 @@
   }
 
   function handleViewShown(view){
-    if(view === 'permisos'){
+    if(view === 'administrador'){
       ensurePermissionsLoaded();
       ensureTeamsLoaded();
     }
