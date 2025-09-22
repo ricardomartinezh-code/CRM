@@ -9375,6 +9375,30 @@
       }
     });
   }
+
+  function extractLeadArray(payload){
+    if(Array.isArray(payload)){
+      return payload;
+    }
+    if(payload && typeof payload === 'object'){
+      const candidateKeys = ['leads','rows','records','data','items','values','entries','result'];
+      for(let i = 0; i < candidateKeys.length; i += 1){
+        const key = candidateKeys[i];
+        if(!Object.prototype.hasOwnProperty.call(payload, key)) continue;
+        const value = payload[key];
+        if(Array.isArray(value)){
+          return value;
+        }
+        if(value && typeof value === 'object'){
+          const nested = extractLeadArray(value);
+          if(Array.isArray(nested)){
+            return nested;
+          }
+        }
+      }
+    }
+    return null;
+  }
   function normalizeLeadRecord(raw, sheetName){
     const map = {};
     Object.keys(raw || {}).forEach(k=>{
@@ -9470,12 +9494,16 @@
       const res = await apiFetch(`${API_URL}?action=getLeads&sheet=${encodeURIComponent(sheetName)}`, { dedupeKey: `getLeads:${sheetName}` });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
-      if(Array.isArray(data)){
-        const mapped = data.map(raw => normalizeLeadRecord(raw, sheetName));
+      const rawLeads = extractLeadArray(data);
+      if(Array.isArray(rawLeads)){
+        const mapped = rawLeads.map(raw => normalizeLeadRecord(raw, sheetName));
         return filterLeadsByPlantel(mapped);
       }
       if(data && data.error){
         throw new Error(data.error);
+      }
+      if(data && typeof data.message === 'string' && data.ok === false){
+        throw new Error(data.message);
       }
     }catch(err){
       if(!(err && err.code === 'UNAUTHORIZED')){
