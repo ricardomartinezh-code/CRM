@@ -8747,23 +8747,41 @@
     links.forEach(link => {
       const view = link.dataset.nav;
       const allowed = canAccessView(view);
-      link.classList.toggle('hidden', !allowed);
-      if(link.tagName === 'BUTTON' || link.getAttribute('role') === 'tab'){
-        link.disabled = !allowed;
-      }
       const section = view ? document.getElementById(`view-${view}`) : null;
-      if(section && !allowed){
-        section.classList.add('hidden');
-        section.classList.remove('is-visible','is-exiting');
+      if(!allowed){
+        if(section){
+          section.classList.add('hidden');
+          section.classList.remove('is-visible','is-exiting');
+        }
+        if(link.tagName === 'BUTTON' || link.getAttribute('role') === 'tab'){
+          link.disabled = true;
+        }
+        if(link.parentElement){
+          link.parentElement.removeChild(link);
+        }else{
+          link.remove();
+        }
+        return;
       }
-      if(allowed && !fallbackLink){
+      link.classList.remove('hidden');
+      if(link.tagName === 'BUTTON' || link.getAttribute('role') === 'tab'){
+        link.disabled = false;
+      }
+      if(!fallbackLink){
         fallbackLink = link;
       }
     });
-    const activeLink = links.find(link => link.classList.contains('active') && !link.classList.contains('hidden'));
-    const targetLink = activeLink && canAccessView(activeLink.dataset.nav) ? activeLink : fallbackLink;
+    const availableLinks = getNavigationLinks();
+    const activeLink = availableLinks.find(link => link.classList.contains('active'));
+    const targetLink = activeLink && canAccessView(activeLink.dataset.nav) ? activeLink : (fallbackLink || availableLinks[0] || null);
     if(targetLink){
       activateView(targetLink.dataset.nav, targetLink);
+    }else{
+      const sections = els('.view-section');
+      sections.forEach(sec => {
+        sec.classList.add('hidden');
+        sec.classList.remove('is-visible','is-exiting');
+      });
     }
   }
 
