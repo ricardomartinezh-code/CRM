@@ -9537,6 +9537,33 @@
     return [];
   }
 
+  async function fetchSheetsInBatches(sheetNames, concurrency = 3){
+    const names = Array.isArray(sheetNames) ? sheetNames.filter(Boolean) : [];
+    if(!names.length) return [];
+    const limit = Math.min(Math.max(Number(concurrency) || 3, 1), 4);
+    const results = new Array(names.length);
+    let pointer = 0;
+    const workers = Array.from({ length: Math.min(limit, names.length) }, async () => {
+      while(true){
+        const currentIndex = pointer;
+        if(currentIndex >= names.length) break;
+        pointer += 1;
+        const sheetName = names[currentIndex];
+        try{
+          const list = await fetchLeadsForSheet(sheetName);
+          results[currentIndex] = Array.isArray(list) ? list : [];
+        }catch(err){
+          if(err && err.code === 'UNAUTHORIZED'){
+            throw err;
+          }
+          results[currentIndex] = [];
+        }
+      }
+    });
+    await Promise.all(workers);
+    return results;
+  }
+
   async function loadLeads(){
     if(!authToken){
       leads = [];
@@ -9550,16 +9577,13 @@
       let loadedLeads = [];
       if(state.sheet === ALL_SHEETS_VALUE){
         const sheetNames = sheets.filter(Boolean);
-        for(const sheetName of sheetNames){
-          try{
-            const list = await fetchLeadsForSheet(sheetName);
-            if(Array.isArray(list) && list.length){
-              loadedLeads.push(...list);
-            }
-          }catch(err){
-            if(err && err.code === 'UNAUTHORIZED') throw err;
+        const sheetResults = await fetchSheetsInBatches(sheetNames, 3);
+        loadedLeads = sheetResults.reduce((all, list) => {
+          if(Array.isArray(list) && list.length){
+            all.push(...list);
           }
-        }
+          return all;
+        }, []);
       }else{
         loadedLeads = await fetchLeadsForSheet(state.sheet);
       }
