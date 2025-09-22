@@ -8,9 +8,9 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="theme-color" content="#0b1220" />
   <title>ReLead EDU</title>
-  <link rel="icon" type="image/png" href="./assets/Favicon.png?v=2" />
-  <link rel="apple-touch-icon" href="./assets/Favicon.png?v=2" />
-  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png?v=2" />
+  <link rel="icon" type="image/png" href="./assets/Favicon.png?v=3" />
+  <link rel="apple-touch-icon" href="./assets/Favicon.png?v=3" />
+  <link rel="shortcut icon" type="image/png" href="./assets/Favicon.png?v=3" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
@@ -2605,15 +2605,15 @@
       <nav class="nav" role="navigation">
         <div class="brand" data-expand-label="Expandir menú lateral">
           <img
-            src="./assets/Favicon.png?v=2"
+            src="./assets/Logo.png"
             alt=""
             class="brand-logo"
             width="44"
             height="44"
             loading="lazy"
             id="sidebarBrandImg"
-            data-fallback-src="./assets/Favicon.png?v=2"
-            data-favicon-src="./assets/Favicon.png?v=2"
+            data-fallback-src="./assets/Logo.png"
+            data-favicon-src="./assets/Favicon.png?v=3"
             data-logo-alt="ReLead EDU"
           />
           <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
@@ -3396,21 +3396,21 @@
           </div>
           <div class="panel-section integration-layout">
             <div class="integration-grid" role="list">
-              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title" data-integration="whatsapp-web">
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-whatsapp-title"><i class="bi bi-whatsapp" aria-hidden="true"></i> <span>WhatsApp Web personal</span></div>
-                    <div class="integration-card__status integration-status--beta"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
+                    <div class="integration-card__status integration-status--beta" id="whatsappIntegrationStatus"><i class="bi bi-dash-circle" aria-hidden="true"></i> <span>Sin conexión activa</span></div>
                   </div>
                   <span class="integration-tag">Sesión manual</span>
                 </div>
                 <div class="integration-card__body">
                   <p>Escanea el código QR desde tu teléfono para responder mensajes desde el panel de leads sin perder el historial institucional.</p>
                   <div class="integration-card__actions">
-                    <button type="button" class="btn primary"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
-                    <button type="button" class="btn outline"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
+                    <button type="button" class="btn primary" id="whatsappIntegrationPair"><i class="bi bi-qr-code-scan"></i> Iniciar emparejamiento</button>
+                    <button type="button" class="btn outline" id="whatsappIntegrationOpen"><i class="bi bi-box-arrow-up-right"></i> Abrir WhatsApp Web</button>
                   </div>
-                  <p class="integration-card__meta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
+                  <p class="integration-card__meta" id="whatsappIntegrationMeta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
                 </div>
               </article>
               <article class="integration-card" role="listitem" aria-labelledby="integration-aircall-title">
@@ -3447,7 +3447,7 @@
                   <p class="integration-card__meta">Tu token se almacena cifrado y puedes revocarlo desde la consola de seguridad de Google Workspace.</p>
                 </div>
               </article>
-              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-neotel-title" data-beta-feature>
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-neotel-title"><i class="bi bi-broadcast" aria-hidden="true"></i> <span>Neotel</span></div>
@@ -3464,7 +3464,7 @@
                   <p class="integration-card__meta">La integración está disponible sólo para equipos piloto. Recibirás instrucciones personalizadas al aprobarse tu solicitud.</p>
                 </div>
               </article>
-              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title">
+              <article class="integration-card" role="listitem" aria-labelledby="integration-siie-title" data-beta-feature>
                 <div class="integration-card__header">
                   <div>
                     <div class="integration-card__title" id="integration-siie-title"><i class="bi bi-mortarboard" aria-hidden="true"></i> <span>SIIE UNIDEP</span></div>
@@ -5075,10 +5075,10 @@
   };
 
   const KPI_ROLE_GROUPS = {
+    developer: Object.keys(KPI_GROUPS),
     admin: Object.keys(KPI_GROUPS),
     coordinador: Object.keys(KPI_GROUPS),
-    asesor: ['Base_Fria','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base'],
-    viewer: ['Base_Fria','Reactivacion','Conversion','Salud_Base']
+    asesor: ['Base_Fria','Reactivacion','Conversion','Eficiencia_Operativa','Rendimiento_Asesores','Salud_Base']
   };
 
   const STORAGE_KEYS = {
@@ -5092,7 +5092,8 @@
     whatsappLastTemplate: 'pulseWhatsappLastTemplate',
     emailTemplates: 'pulseEmailTemplates',
     emailLastTemplate: 'pulseEmailLastTemplate',
-    advisorWhatsapp: 'pulseAdvisorWhatsapp'
+    advisorWhatsapp: 'pulseAdvisorWhatsapp',
+    whatsappSession: 'pulseWhatsappSession'
   };
   const DEFAULT_PASSWORD_REQUEST = {
     status: 'idle',
@@ -5158,55 +5159,55 @@
     pink: { primary: '#be185d', secondary: '#f472b6', panel: '190,24,93' }
   };
   const VIEW_PERMISSIONS = {
-    kpis: ['admin','coordinador','asesor','viewer'],
-    leads: ['admin','coordinador','asesor','viewer'],
-    mensajes: ['admin','coordinador','asesor','viewer'],
-    administrador: ['admin','coordinador'],
+    kpis: ['admin','coordinador','asesor','developer'],
+    leads: ['admin','coordinador','asesor','developer'],
+    mensajes: ['admin','coordinador','asesor','developer'],
+    administrador: ['admin','coordinador','developer'],
     sistema: ['admin','coordinador','viewer'],
     integraciones: ['admin','coordinador','asesor','viewer'],
     configuracion: ['admin','coordinador','asesor','viewer'],
     ayuda: ['admin','coordinador','asesor','viewer']
   };
   const ACTION_PERMISSIONS = {
-    updateLead: ['admin','coordinador','asesor'],
-    importData: ['admin'],
-    exportData: ['admin','coordinador','viewer'],
-    runDiagnostics: ['admin'],
-    manageDuplicates: ['admin'],
-    repairSheetStructure: ['admin'],
-    syncActivos: ['admin','coordinador'],
-    manageTeams: ['admin'],
-    reassignLeads: ['admin']
+    updateLead: ['admin','coordinador','asesor','developer'],
+    importData: ['admin','developer'],
+    exportData: ['admin','coordinador','developer'],
+    runDiagnostics: ['developer'],
+    manageDuplicates: ['admin','developer'],
+    repairSheetStructure: ['developer'],
+    syncActivos: ['admin','coordinador','developer'],
+    manageTeams: ['admin','developer'],
+    reassignLeads: ['admin','developer']
   };
   const ROLE_LABELS = {
+    developer: 'Desarrollador',
     admin: 'Administrador',
     coordinador: 'Coordinador',
-    asesor: 'Asesor',
-    viewer: 'Consulta'
+    asesor: 'Asesor'
   };
-  const ROLE_ORDER = ['admin','coordinador','asesor','viewer'];
+  const ROLE_ORDER = ['developer','admin','coordinador','asesor'];
   const PERMISSION_REFERENCE = {
     roles: [
-      { action: 'Ver KPIs (kpi.view)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Propios', viewer: 'Global (sin PII)' },
-      { action: 'Ver leads (lead.read)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Propios', viewer: 'Agregado (sin PII)' },
-      { action: 'Tipificar leads (lead.typify)', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios', viewer: 'Ninguno' },
-      { action: 'Ver datos de contacto (contact.view)', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios', viewer: 'Ninguno' },
-      { action: 'Importar datos (data.import)', admin: 'Global', coordinador: 'Equipo/Planteles asignados', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Cambios masivos (data.bulk_update)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Exportar datos (data.export)', admin: 'Global', coordinador: 'Equipo (acotado)', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Exportar reportes (report.export)', admin: 'Global', coordinador: 'Equipo (acotado)', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Generar diagnósticos (system.diagnostics)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Eliminar duplicados (lead.merge_duplicates)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Gestión de usuarios (user.manage)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Asignar roles (role.assign)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Asignar planteles/bases (scope.assign)', admin: 'Global', coordinador: 'Equipo', asesor: 'Ninguno', viewer: 'Ninguno' },
-      { action: 'Creación y asignación de equipos (team.manage)', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno', viewer: 'Ninguno' }
+      { action: 'Ver KPIs (kpi.view)', developer: 'Global + vistas beta', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Propios' },
+      { action: 'Ver leads (lead.read)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Propios' },
+      { action: 'Tipificar leads (lead.typify)', developer: 'Global', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios' },
+      { action: 'Ver datos de contacto (contact.view)', developer: 'Global', admin: 'Global', coordinador: 'Equipo', asesor: 'Propios' },
+      { action: 'Importar datos (data.import)', developer: 'Global', admin: 'Global comercial', coordinador: 'No disponible', asesor: 'Ninguno' },
+      { action: 'Cambios masivos (data.bulk_update)', developer: 'Global', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Exportar datos (data.export)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Exportar reportes (report.export)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Generar diagnósticos (system.diagnostics)', developer: 'Global + herramientas beta', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Eliminar duplicados (lead.merge_duplicates)', developer: 'Global', admin: 'Global', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Gestión de usuarios (user.manage)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Asignar roles (role.assign)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' },
+      { action: 'Asignar planteles/bases (scope.assign)', developer: 'Global', admin: 'Global comercial', coordinador: 'Activos asignados', asesor: 'Ninguno' },
+      { action: 'Creación y asignación de equipos (team.manage)', developer: 'Global', admin: 'Global comercial', coordinador: 'Ninguno', asesor: 'Ninguno' }
     ],
     rules: [
-      'Viewer no puede acceder a PII ni métodos de contacto.',
+      'Developer administra versiones beta, integraciones experimentales y el solucionador de problemas.',
+      'Admin controla activos comerciales, reasignaciones y usuarios sin habilitar funciones beta.',
+      'Coordinador opera únicamente sobre su equipo y activos asignados y no puede importar bases.',
       'Asesor solo ve y edita sus propios leads.',
-      'Coordinador puede operar únicamente sobre su equipo y planteles/bases asignadas.',
-      'Admin tiene control global de todas las acciones y recursos.',
       'Exportaciones deben ser auditadas (registro de usuario, filtros y fecha).',
       'Cambios masivos y eliminación de duplicados requieren confirmación adicional.',
       'La selección de “Todas” en Bases o “Todos” en Planteles equivale a acceso global sin restricciones.'
@@ -5228,10 +5229,10 @@
     }
   };
   const ROLE_SCOPE_HINTS = {
-    admin: 'Acceso global a todas las acciones, planteles y bases.',
-    coordinador: 'Opera sobre su equipo y los planteles/bases asignadas.',
-    asesor: 'Gestiona únicamente los leads y contactos asignados a su usuario.',
-    viewer: 'Consulta global sin exponer datos personales identificables.'
+    developer: 'Control total de la plataforma, incluyendo funciones e integraciones beta.',
+    admin: 'Acceso comercial global sin habilitar funciones beta.',
+    coordinador: 'Opera sobre su equipo y los activos (planteles/bases) asignados.',
+    asesor: 'Gestiona únicamente los leads y contactos asignados a su usuario.'
   };
   const PERMISSION_SCOPE_CONFIG = {
     planteles: {
@@ -5332,13 +5333,18 @@
     const defaultPlanteles = ensureValues(localPlanteles.slice(0, 3), plantelOptions.slice(0, 3));
     const defaultBases = ensureValues(localBases.slice(0, 3), baseOptions.slice(0, 3));
     return {
+      developer: {
+        description: 'Habilita control total, mantenimiento técnico y acceso a integraciones o funciones beta.',
+        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
+        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
+      },
       admin: {
-        description: 'Aplica acceso total para supervisar equipos, reportes y catálogos sin restricciones.',
+        description: 'Gestiona activos comerciales, bases y usuarios sin habilitar funciones ni integraciones beta.',
         planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
         bases: ensureValues([globalBase], baseOptions.slice(0, 1))
       },
       coordinador: {
-        description: 'Agrupa planteles y bases de su región para liderar la operación y monitorear a su equipo.',
+        description: 'Opera sobre los planteles y bases asignados para liderar a su equipo sin importar nuevas bases.',
         planteles: ensureValues(['HERMOSILLO', 'NOGALES', 'OBREGÓN'].filter(value => plantelOptions.includes(value)), defaultPlanteles),
         bases: ensureValues(['Planteles', 'Regresos', 'Rescatados'].filter(value => baseOptions.includes(value)), defaultBases)
       },
@@ -5346,11 +5352,6 @@
         description: 'Limita el alcance al plantel principal y a bases activas de seguimiento diario.',
         planteles: ensureValues(localPlanteles.slice(0, 1), defaultPlanteles.slice(0, 1)),
         bases: ensureValues(['Planteles', 'Reciclados'].filter(value => baseOptions.includes(value)), defaultBases.slice(0, 1))
-      },
-      viewer: {
-        description: 'Monitorea resultados institucionales sin exponer datos personales ni modificar información.',
-        planteles: ensureValues([globalPlantel], plantelOptions.slice(0, 1)),
-        bases: ensureValues([globalBase], baseOptions.slice(0, 1))
       }
     };
   }
@@ -5373,6 +5374,7 @@
     systemThemeQuery.addListener(handleSystemThemeChange);
   }
   applyPreferences();
+  applyBetaFeatureVisibility();
 
   const ensureFormatModule = () => {
     if(window.ReLeadDataFormat && typeof window.ReLeadDataFormat.cleanValue === 'function'){
@@ -6149,17 +6151,17 @@
         const table = document.createElement('table');
         table.className = 'permission-matrix';
         const thead = document.createElement('thead');
-        thead.innerHTML = '<tr><th>Acción</th><th>Administrador</th><th>Coordinador</th><th>Asesor</th><th>Consulta</th></tr>';
+        thead.innerHTML = '<tr><th>Acción</th><th>Developer</th><th>Administrador</th><th>Coordinador</th><th>Asesor</th></tr>';
         table.appendChild(thead);
         const tbody = document.createElement('tbody');
         PERMISSION_REFERENCE.roles.forEach(row => {
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${escapeHtml(row.action)}</td>
+            <td>${escapeHtml(row.developer)}</td>
             <td>${escapeHtml(row.admin)}</td>
             <td>${escapeHtml(row.coordinador)}</td>
             <td>${escapeHtml(row.asesor)}</td>
-            <td>${escapeHtml(row.viewer)}</td>
           `;
           tbody.appendChild(tr);
         });
@@ -8039,7 +8041,7 @@
   function canAccessView(view){
     if(!view) return true;
     const role = getUserRole();
-    if(role === 'admin') return true;
+    if(role === 'admin' || role === 'developer') return true;
     if(!role) return false;
     const allowed = VIEW_PERMISSIONS[view];
     if(!allowed || !allowed.length) return true;
@@ -8049,11 +8051,33 @@
   function canPerform(action){
     if(!action) return true;
     const role = getUserRole();
-    if(role === 'admin') return true;
+    if(role === 'admin' || role === 'developer') return true;
     if(!role) return false;
     const allowed = ACTION_PERMISSIONS[action];
     if(!allowed || !allowed.length) return true;
     return allowed.includes(role) || allowed.includes('*');
+  }
+
+  function canAccessBetaFeatures(){
+    return getUserRole() === 'developer';
+  }
+
+  function canRunProblemSolver(){
+    return getUserRole() === 'developer';
+  }
+
+  function applyBetaFeatureVisibility(){
+    const hasAccess = canAccessBetaFeatures();
+    const nodes = document.querySelectorAll('[data-beta-feature]');
+    nodes.forEach(node => {
+      if(!(node instanceof HTMLElement)) return;
+      node.classList.toggle('hidden', !hasAccess);
+      if(hasAccess){
+        node.removeAttribute('aria-hidden');
+      }else{
+        node.setAttribute('aria-hidden', 'true');
+      }
+    });
   }
 
   function getAllowedPlanteles(){
@@ -8459,10 +8483,31 @@
   const brandImg = document.getElementById('sidebarBrandImg');
   const brandNameEl = document.getElementById('sidebarBrandName');
   const brandContainer = document.querySelector('.brand');
+  const DEFAULT_FAVICON_URL = './assets/Favicon.png?v=3';
+  const FAVICON_LINK_SELECTORS = [
+    "link[rel='icon']",
+    "link[rel='shortcut icon']",
+    "link[rel='apple-touch-icon']",
+  ];
+
+  function updateDocumentFavicons(src){
+    const href = src || DEFAULT_FAVICON_URL;
+    FAVICON_LINK_SELECTORS.forEach(selector => {
+      const linkEl = document.head && document.head.querySelector(selector);
+      if(linkEl){
+        linkEl.href = href;
+      }
+    });
+  }
+
+  updateDocumentFavicons(DEFAULT_FAVICON_URL);
+  if(brandImg && !brandImg.dataset.faviconSrc){
+    brandImg.dataset.faviconSrc = DEFAULT_FAVICON_URL;
+  }
 
   function getFaviconSource(){
-    if(!brandImg) return './assets/Favicon.png?v=2';
-    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || './assets/Favicon.png?v=2';
+    if(!brandImg) return DEFAULT_FAVICON_URL;
+    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || DEFAULT_FAVICON_URL;
   }
 
   function applyBrandLogoState(){
@@ -8470,6 +8515,7 @@
     const appEl = document.getElementById('app');
     const isCollapsed = Boolean(appEl && appEl.classList.contains('collapsed'));
     const faviconSrc = getFaviconSource();
+    updateDocumentFavicons(faviconSrc);
     const fallbackSrc = brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || faviconSrc;
     const avatarSrc = brandImg.dataset.avatarSrc || '';
     let nextSrc = fallbackSrc || faviconSrc;
@@ -8557,6 +8603,7 @@
     const displayName = currentName || profileName || userId || 'Usuario';
 
     const faviconSrc = getFaviconSource();
+    updateDocumentFavicons(faviconSrc);
     const avatarDisplayUrl = avatarUrl || faviconSrc || '';
 
     if(toggle){
@@ -8632,6 +8679,7 @@
     if(typeof applyNavigationPermissions === 'function'){
       applyNavigationPermissions();
     }
+    applyBetaFeatureVisibility();
   }
 
   function hydrateProfileFromUser(){
@@ -9528,6 +9576,9 @@
   const WHATSAPP_TEMPLATE_LIMIT = 30;
   const EMAIL_TEMPLATE_LIMIT = 30;
   const CUSTOM_TEMPLATE_KEY = '__custom__';
+  const WHATSAPP_WEB_URL = 'https://web.whatsapp.com/';
+  const WHATSAPP_SESSION_DURATION_MS = 14 * 60 * 60 * 1000;
+  const DEFAULT_WHATSAPP_SESSION = { status: 'inactive', startedAt: 0, lastActiveAt: 0 };
   let quickAccessFavorites = loadQuickAccessList(STORAGE_KEYS.favorites);
   let quickAccessRecents = loadQuickAccessList(STORAGE_KEYS.recents);
   let quickAccessInitialized = false;
@@ -9537,6 +9588,7 @@
   let emailTemplates = loadEmailTemplates();
   let emailLastTemplateId = readStorageValue(STORAGE_KEYS.emailLastTemplate) || '';
   let advisorWhatsappNumber = readStorageValue(STORAGE_KEYS.advisorWhatsapp) || '';
+  let whatsappSessionState = loadWhatsappSessionState();
   let whatsappTemplateFormEditingId = '';
   let emailTemplateFormEditingId = '';
   const whatsappModalState = { lead: null, digits: '', defaultMessage: '', onSend: null, selectedId: '' };
@@ -9822,6 +9874,189 @@
   function saveEmailTemplates(list){
     emailTemplates = Array.isArray(list) ? list.slice(0, EMAIL_TEMPLATE_LIMIT) : [];
     writeStorageJSON(STORAGE_KEYS.emailTemplates, emailTemplates);
+  }
+
+  function loadWhatsappSessionState(){
+    const stored = readStorageJSON(STORAGE_KEYS.whatsappSession);
+    if(!stored || typeof stored !== 'object'){
+      return { ...DEFAULT_WHATSAPP_SESSION };
+    }
+    return {
+      status: typeof stored.status === 'string' ? stored.status : 'inactive',
+      startedAt: Number(stored.startedAt) || 0,
+      lastActiveAt: Number(stored.lastActiveAt) || 0
+    };
+  }
+
+  function persistWhatsappSessionState(updates){
+    const current = whatsappSessionState && typeof whatsappSessionState === 'object'
+      ? { ...whatsappSessionState }
+      : { ...DEFAULT_WHATSAPP_SESSION };
+    const next = { ...current, ...updates };
+    const status = typeof next.status === 'string' ? next.status : 'inactive';
+    if(!status || status === 'inactive'){
+      whatsappSessionState = { ...DEFAULT_WHATSAPP_SESSION };
+      removeStorageKey(STORAGE_KEYS.whatsappSession);
+      return whatsappSessionState;
+    }
+    let startedAt = Number(next.startedAt) || Date.now();
+    let lastActiveAt = Number(next.lastActiveAt) || startedAt;
+    if(lastActiveAt < startedAt){
+      lastActiveAt = startedAt;
+    }
+    whatsappSessionState = {
+      status,
+      startedAt,
+      lastActiveAt
+    };
+    writeStorageJSON(STORAGE_KEYS.whatsappSession, whatsappSessionState);
+    return whatsappSessionState;
+  }
+
+  function getWhatsappSessionEffectiveStatus(){
+    const state = whatsappSessionState && typeof whatsappSessionState === 'object'
+      ? whatsappSessionState
+      : DEFAULT_WHATSAPP_SESSION;
+    const status = typeof state.status === 'string' ? state.status : 'inactive';
+    const startedAt = Number(state.startedAt) || 0;
+    const lastActiveAt = Number(state.lastActiveAt) || startedAt;
+    const reference = lastActiveAt || startedAt;
+    if(!reference){
+      return 'inactive';
+    }
+    if(status === 'inactive'){
+      return 'inactive';
+    }
+    if(Date.now() - reference >= WHATSAPP_SESSION_DURATION_MS){
+      return 'expired';
+    }
+    if(status === 'pairing'){
+      return 'pairing';
+    }
+    if(status === 'expired'){
+      return 'expired';
+    }
+    return 'active';
+  }
+
+  function formatWhatsappSessionTimestamp(timestamp){
+    if(!timestamp) return '';
+    try{
+      if(CONTACT_TIMESTAMP_FORMAT){
+        return CONTACT_TIMESTAMP_FORMAT.format(new Date(timestamp));
+      }
+    }catch(err){
+      console.warn('No se pudo formatear la marca de tiempo de WhatsApp.', err);
+    }
+    try{
+      return new Date(timestamp).toLocaleString('es-MX');
+    }catch(err){
+      return '';
+    }
+  }
+
+  function updateWhatsappIntegrationCard(){
+    const statusContainer = el('#whatsappIntegrationStatus');
+    const metaContainer = el('#whatsappIntegrationMeta');
+    const card = document.querySelector('[data-integration="whatsapp-web"]');
+    const effectiveStatus = getWhatsappSessionEffectiveStatus();
+    const state = whatsappSessionState || DEFAULT_WHATSAPP_SESSION;
+    const startedAt = Number(state.startedAt) || 0;
+    const lastActiveAt = Number(state.lastActiveAt) || 0;
+    let statusText = 'Sin conexión activa';
+    let statusIcon = 'bi-dash-circle';
+    let statusClass = 'integration-status--beta';
+    let metaText = 'La sesión expira automáticamente al cerrar el navegador o después de 14 horas de inactividad.';
+    if(effectiveStatus === 'pairing'){
+      statusText = 'Esperando escaneo';
+      statusIcon = 'bi-qr-code';
+      metaText = 'Escanea el código QR en la ventana recién abierta para vincular tu sesión personal.';
+    }else if(effectiveStatus === 'active'){
+      statusText = 'Sesión conectada';
+      statusIcon = 'bi-check-circle';
+      statusClass = 'integration-status--connected';
+      const reference = lastActiveAt || startedAt;
+      if(reference){
+        const formatted = formatWhatsappSessionTimestamp(reference);
+        if(formatted){
+          metaText = `Última verificación: ${formatted}. La sesión caduca tras 14 horas de inactividad.`;
+        }else{
+          metaText = 'Sesión activa. La sesión caduca tras 14 horas de inactividad.';
+        }
+      }else{
+        metaText = 'Sesión activa. La sesión caduca tras 14 horas de inactividad.';
+      }
+    }else if(effectiveStatus === 'expired'){
+      statusText = 'Sesión expirada';
+      statusIcon = 'bi-exclamation-triangle';
+      metaText = 'La sesión anterior caducó. Inicia un nuevo emparejamiento para continuar.';
+    }
+    if(statusContainer){
+      statusContainer.classList.remove('integration-status--connected', 'integration-status--beta');
+      statusContainer.classList.add(statusClass);
+      const iconEl = statusContainer.querySelector('i');
+      if(iconEl){
+        iconEl.className = `bi ${statusIcon}`;
+        iconEl.setAttribute('aria-hidden', 'true');
+      }
+      const textEl = statusContainer.querySelector('span');
+      if(textEl){
+        textEl.textContent = statusText;
+      }
+    }
+    if(metaContainer){
+      metaContainer.textContent = metaText;
+    }
+    if(card){
+      card.setAttribute('data-session-status', effectiveStatus);
+    }
+  }
+
+  function openWhatsappWebWindow(){
+    try{
+      const popup = window.open(WHATSAPP_WEB_URL, '_blank', 'noopener');
+      if(!popup){
+        alert('No se pudo abrir WhatsApp Web. Desactiva el bloqueador de ventanas emergentes e inténtalo de nuevo.');
+        return false;
+      }
+      if(typeof popup.focus === 'function'){
+        popup.focus();
+      }
+      return true;
+    }catch(err){
+      console.error('No se pudo abrir WhatsApp Web.', err);
+      alert('No se pudo abrir WhatsApp Web en este navegador.');
+      return false;
+    }
+  }
+
+  function handleWhatsappIntegrationPair(){
+    const opened = openWhatsappWebWindow();
+    if(!opened) return;
+    const now = Date.now();
+    persistWhatsappSessionState({ status: 'pairing', startedAt: now, lastActiveAt: now });
+    updateWhatsappIntegrationCard();
+  }
+
+  function handleWhatsappIntegrationOpen(){
+    const opened = openWhatsappWebWindow();
+    if(!opened) return;
+    const now = Date.now();
+    const startedAt = Number(whatsappSessionState?.startedAt) || now;
+    persistWhatsappSessionState({ status: 'active', startedAt, lastActiveAt: now });
+    updateWhatsappIntegrationCard();
+  }
+
+  function initWhatsappIntegrationCard(){
+    const pairBtn = el('#whatsappIntegrationPair');
+    const openBtn = el('#whatsappIntegrationOpen');
+    if(pairBtn){
+      pairBtn.addEventListener('click', handleWhatsappIntegrationPair);
+    }
+    if(openBtn){
+      openBtn.addEventListener('click', handleWhatsappIntegrationOpen);
+    }
+    updateWhatsappIntegrationCard();
   }
 
   function resetWhatsappTemplateForm(){
@@ -11375,7 +11610,7 @@
       return;
     }
     const role = getUserRole();
-    const allowed = KPI_ROLE_GROUPS[role] || KPI_ROLE_GROUPS.viewer || Object.keys(KPI_GROUPS);
+    const allowed = KPI_ROLE_GROUPS[role] || Object.keys(KPI_GROUPS);
     if(!allowed.length){
       const empty = document.createElement('p');
       empty.className = 'kpi-empty';
@@ -13833,16 +14068,36 @@
       return;
     }
     const color = colorForTone(currentSolutionPlan.severity || 'info');
-    statusEl.textContent = currentSolutionPlan.summary;
+    const hasAuto = Array.isArray(currentSolutionPlan.autoActions) && currentSolutionPlan.autoActions.length;
+    const hasSteps = Array.isArray(currentSolutionPlan.steps) && currentSolutionPlan.steps.length;
+    const solverAllowed = canRunProblemSolver();
+    if(!solverAllowed && (hasAuto || hasSteps)){
+      statusEl.textContent = `${currentSolutionPlan.summary} · Solicita apoyo de Developer para ejecutar el solucionador.`;
+    }else{
+      statusEl.textContent = currentSolutionPlan.summary;
+    }
     statusEl.style.color = color;
-    autoBtn.disabled = solvingInProgress || !(currentSolutionPlan.autoActions || []).length;
-    stepsBtn.disabled = solvingInProgress || !(currentSolutionPlan.steps || []).length;
+    if(!solverAllowed){
+      autoBtn.disabled = true;
+      stepsBtn.disabled = true;
+      autoBtn.title = 'Disponible solo para Developer';
+      stepsBtn.title = 'Disponible solo para Developer';
+      return;
+    }
+    autoBtn.removeAttribute('title');
+    stepsBtn.removeAttribute('title');
+    autoBtn.disabled = solvingInProgress || !hasAuto;
+    stepsBtn.disabled = solvingInProgress || !hasSteps;
   }
 
   async function executeProblemSolver(options = {}){
     if(solvingInProgress) return;
     if(diagInProgress){
       appendSolverLog('Espera a que termine el diagnóstico antes de ejecutar el solucionador.', 'warn');
+      return;
+    }
+    if(!canRunProblemSolver()){
+      appendSolverLog('Solo un usuario con rol Developer puede ejecutar el solucionador de problemas.', 'warn');
       return;
     }
     const plan = currentSolutionPlan;
@@ -13894,6 +14149,10 @@
   }
 
   function displaySolutionSteps(){
+    if(!canRunProblemSolver()){
+      appendSolverLog('Solo un usuario con rol Developer puede consultar los pasos del solucionador.', 'warn');
+      return;
+    }
     const plan = currentSolutionPlan;
     if(!plan){
       appendSolverLog('No hay pasos disponibles. Ejecuta el diagnóstico.', 'info');
@@ -13914,6 +14173,7 @@
   }
 
   function triggerAutoSolverIfNeeded(){
+    if(!canRunProblemSolver()) return;
     const plan = currentSolutionPlan;
     if(solvingInProgress || !plan) return;
     const hasAuto = (plan.autoActions || []).some(action => action.auto !== false);
@@ -14552,6 +14812,7 @@
     // Configuración y preferencias
     initSettings();
     initQuickAccessUI();
+    initWhatsappIntegrationCard();
 
     // Panel emergente
     const panelClose = el('#panelClose');
