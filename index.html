@@ -9695,6 +9695,57 @@
 
   const el = sel => document.querySelector(sel);
   const els = sel => Array.from(document.querySelectorAll(sel));
+  function debounce(fn, delay){
+    if(typeof fn !== 'function'){
+      throw new TypeError('Se esperaba una función');
+    }
+    const wait = Number.isFinite(delay) && delay > 0 ? Number(delay) : 0;
+    let timerId = null;
+    let lastArgs;
+    let lastThis;
+    let pending = false;
+    const invoke = () => {
+      timerId = null;
+      if(!pending){
+        return undefined;
+      }
+      pending = false;
+      const args = lastArgs;
+      const context = lastThis;
+      lastArgs = undefined;
+      lastThis = undefined;
+      return fn.apply(context, args);
+    };
+    function debounced(...args){
+      lastArgs = args;
+      lastThis = this;
+      pending = true;
+      if(timerId){
+        clearTimeout(timerId);
+      }
+      timerId = setTimeout(invoke, wait);
+    }
+    debounced.cancel = () => {
+      if(timerId){
+        clearTimeout(timerId);
+        timerId = null;
+      }
+      pending = false;
+      lastArgs = undefined;
+      lastThis = undefined;
+    };
+    debounced.flush = () => {
+      if(timerId){
+        clearTimeout(timerId);
+        timerId = null;
+      }
+      if(!pending){
+        return undefined;
+      }
+      return invoke();
+    };
+    return debounced;
+  }
   function readStorageJSON(key){
     try{
       const raw = localStorage.getItem(key);
@@ -14780,7 +14831,29 @@
     hasBound = true;
     // Buscar (Ctrl+/)
     const q = el('#q');
-    q.addEventListener('input', ()=>{ state.query = q.value.trim(); state.page=0; refresh(); });
+    const updateQueryFilter = () => {
+      state.query = q.value.trim();
+      state.page = 0;
+      refresh();
+    };
+    const debouncedQueryUpdate = debounce(updateQueryFilter, 200);
+    q.addEventListener('input', () => debouncedQueryUpdate());
+    q.addEventListener('blur', () => {
+      if(typeof debouncedQueryUpdate.flush === 'function'){
+        debouncedQueryUpdate.flush();
+      }else{
+        updateQueryFilter();
+      }
+    });
+    q.addEventListener('keydown', e => {
+      if(e.key === 'Enter'){
+        if(typeof debouncedQueryUpdate.flush === 'function'){
+          debouncedQueryUpdate.flush();
+        }else{
+          updateQueryFilter();
+        }
+      }
+    });
     window.addEventListener('keydown', e=>{ if((e.ctrlKey||e.metaKey) && e.key === '/'){ e.preventDefault(); q.focus(); } })
 
     const appShell = el('#app');
