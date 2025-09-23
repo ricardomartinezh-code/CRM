@@ -29,6 +29,21 @@ Configura las siguientes propiedades en **Apps Script → Project Settings → S
 
 Sin `META_APP_SECRET` la firma se omitirá (no recomendado en producción). Sin `META_LEAD_ACCESS_TOKEN` no será posible descargar los campos del lead.
 
+### Configuración predefinida
+
+Este proyecto ya incluye valores predeterminados para la integración actual con WhatsApp Cloud API:
+
+| Propiedad | Valor |
+| --------- | ----- |
+| `META_WEBHOOK_URL` | `https://webhook-v88d.onrender.com/webhook` |
+| `META_WEBHOOK_VERIFY_TOKEN` | `ReLead_Verify_Token` |
+| `META_LEAD_ACCESS_TOKEN` | `EAAPzZCz9ZCiiIBPikjhHZA3PzUD9YWmteAcmgFVZCGsLZAyADZCwXHarhuCTmSBsTwPnVtNl6kVTLSge5WKgXxNZBZBg9fVKsaNWERhWFDF65xSZBXV8PmhJDtoSqdVsWtBh8OBvQsah8P4KYBD6IGZBTMBkeXC7LqQr1UjpHQB7xKfJVWe7yJzjOJ7cicN7o4AfhntwZDZD` |
+| `META_WHATSAPP_ACCESS_TOKEN` | `EAAPzZCz9ZCiiIBPikjhHZA3PzUD9YWmteAcmgFVZCGsLZAyADZCwXHarhuCTmSBsTwPnVtNl6kVTLSge5WKgXxNZBZBg9fVKsaNWERhWFDF65xSZBXV8PmhJDtoSqdVsWtBh8OBvQsah8P4KYBD6IGZBTMBkeXC7LqQr1UjpHQB7xKfJVWe7yJzjOJ7cicN7o4AfhntwZDZD` |
+| `META_WHATSAPP_BUSINESS_ACCOUNT_ID` | `24625801563741719` |
+| `META_WHATSAPP_PHONE_NUMBER_ID` | `839062255947764` |
+
+Si ya cuentas con valores propios en las propiedades de script, no se sobrescribirán.
+
 ## Flujo de Facebook Lead Ads
 
 1. Meta envía un evento `leadgen` con el `leadgen_id`.
