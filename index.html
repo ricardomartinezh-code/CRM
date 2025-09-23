@@ -2665,6 +2665,7 @@
             data-fallback-src="./assets/Logo.svg"
             data-favicon-src="./assets/Favicon.png?v=3"
             data-logo-alt="ReLead EDU"
+            data-brand-mode="favicon"
           />
           <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
         </div>
@@ -8693,6 +8694,7 @@
   if(brandImg && !brandImg.dataset.faviconSrc){
     brandImg.dataset.faviconSrc = DEFAULT_FAVICON_URL;
   }
+  applyBrandLogoState();
 
   function getFaviconSource(){
     if(!brandImg) return DEFAULT_FAVICON_URL;
@@ -8705,18 +8707,22 @@
     const isCollapsed = Boolean(appEl && appEl.classList.contains('collapsed'));
     const faviconSrc = getFaviconSource();
     updateDocumentFavicons(faviconSrc);
-    const fallbackSrc = brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || faviconSrc;
+    const fallbackSrc = brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || '';
     const avatarSrc = brandImg.dataset.avatarSrc || '';
-    let nextSrc = fallbackSrc || faviconSrc;
+    const brandMode = String(brandImg.dataset.brandMode || '').trim().toLowerCase();
+    const preferFavicon = brandMode === 'favicon' || !fallbackSrc;
+    let nextSrc = faviconSrc;
     let useAvatar = false;
-    if(isCollapsed){
-      nextSrc = faviconSrc;
-    }else if(avatarSrc){
+    if(!isCollapsed && avatarSrc){
       nextSrc = avatarSrc;
       useAvatar = true;
+    }else if(!preferFavicon && !isCollapsed && fallbackSrc){
+      nextSrc = fallbackSrc;
+    }else if(!faviconSrc && fallbackSrc){
+      nextSrc = fallbackSrc;
     }
     if(!nextSrc){
-      nextSrc = faviconSrc;
+      nextSrc = faviconSrc || fallbackSrc;
     }
     brandImg.src = nextSrc;
     const logoAlt = brandImg.dataset.logoAlt || brandImg.getAttribute('data-logo-alt') || '';
@@ -9560,9 +9566,8 @@
     const results = new Array(names.length);
     let pointer = 0;
     const workers = Array.from({ length: Math.min(limit, names.length) }, async () => {
-      while(true){
+      while(pointer < names.length){
         const currentIndex = pointer;
-        if(currentIndex >= names.length) break;
         pointer += 1;
         const sheetName = names[currentIndex];
         try{
