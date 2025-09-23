@@ -3241,9 +3241,33 @@ function normalizeBoolean_(value){
 
 function normalizeRole_(role){
   const str = String(role || '').trim().toLowerCase();
-  const valid = ['developer','admin','coordinador','asesor'];
   if(!str) return 'asesor';
-  if(valid.indexOf(str) >= 0) return str;
+  const direct = new Map([
+    ['developer', 'developer'],
+    ['admin', 'admin'],
+    ['coordinador', 'coordinador'],
+    ['asesor', 'asesor'],
+  ]);
+  if(direct.has(str)){
+    return direct.get(str);
+  }
+  const synonyms = new Map([
+    ['desarrollador', 'developer'],
+    ['desarrolladora', 'developer'],
+    ['dev', 'developer'],
+    ['administrador', 'admin'],
+    ['administradora', 'admin'],
+    ['coordinadora', 'coordinador'],
+    ['ejecutivo', 'asesor'],
+    ['ejecutiva', 'asesor'],
+    ['consultor', 'asesor'],
+    ['consultora', 'asesor'],
+    ['agente', 'asesor'],
+    ['asesora', 'asesor'],
+  ]);
+  if(synonyms.has(str)){
+    return synonyms.get(str);
+  }
   if(ADMIN_ROLES.has(str)) return 'admin';
   return 'asesor';
 }
