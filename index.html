@@ -8694,6 +8694,7 @@
   if(brandImg && !brandImg.dataset.faviconSrc){
     brandImg.dataset.faviconSrc = DEFAULT_FAVICON_URL;
   }
+  applyBrandLogoState();
 
   function getFaviconSource(){
     if(!brandImg) return DEFAULT_FAVICON_URL;

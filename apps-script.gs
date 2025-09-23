@@ -3240,24 +3240,46 @@ function normalizeBoolean_(value){
 }
 
 function normalizeRole_(role){
-  const str = String(role || '').trim().toLowerCase();
-  if(!str) return 'asesor';
+  const raw = String(role || '').trim();
+  if(!raw) return 'asesor';
+  const simplified = raw
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLowerCase();
+  if(!simplified) return 'asesor';
   const direct = new Map([
     ['developer', 'developer'],
     ['admin', 'admin'],
     ['coordinador', 'coordinador'],
     ['asesor', 'asesor'],
   ]);
-  if(direct.has(str)){
-    return direct.get(str);
+
+  if(direct.has(simplified)){
+    return direct.get(simplified);
   }
   const synonyms = new Map([
     ['desarrollador', 'developer'],
     ['desarrolladora', 'developer'],
+    ['desarrollador senior', 'developer'],
+    ['desarrollador junior', 'developer'],
+    ['desarrolladora senior', 'developer'],
+    ['desarrolladora junior', 'developer'],
     ['dev', 'developer'],
+    ['developer senior', 'developer'],
+    ['developer junior', 'developer'],
     ['administrador', 'admin'],
     ['administradora', 'admin'],
+    ['direccion', 'admin'],
+    ['director', 'admin'],
+    ['directora', 'admin'],
+    ['supervisor', 'admin'],
+    ['supervisora', 'admin'],
+    ['gerente', 'admin'],
+    ['gerenta', 'admin'],
     ['coordinadora', 'coordinador'],
+    ['coordinacion', 'coordinador'],
     ['ejecutivo', 'asesor'],
     ['ejecutiva', 'asesor'],
     ['consultor', 'asesor'],
@@ -3265,11 +3287,60 @@ function normalizeRole_(role){
     ['agente', 'asesor'],
     ['asesora', 'asesor'],
   ]);
-  if(synonyms.has(str)){
-    return synonyms.get(str);
+  if(synonyms.has(simplified)){
+    return synonyms.get(simplified);
   }
-  if(ADMIN_ROLES.has(str)) return 'admin';
+  const tokens = simplified
+    .split(/[\s\-_/|,.]+/)
+    .map(token => token.trim())
+    .filter(Boolean);
+  const hasToken = target => tokens.some(token => token === target || token.startsWith(target));
+  if(tokens.some(token => token === 'dev') || hasToken('devel') || simplified.includes('desarroll')){
+    return 'developer';
+  }
+  if(
+    hasToken('admin') ||
+    simplified.includes('administ') ||
+    simplified.includes('direccion') ||
+    simplified.includes('director') ||
+    simplified.includes('supervis') ||
+    simplified.includes('gerent')
+  ){
+    return 'admin';
+  }
+  if(hasToken('coord') || simplified.includes('coordin')){
+    return 'coordinador';
+  }
+  if(
+    hasToken('asesor') ||
+    simplified.includes('asesor') ||
+    simplified.includes('ejecutiv') ||
+    simplified.includes('consult') ||
+    simplified.includes('agente')
+  ){
+    return 'asesor';
+  }
+  const adminMatch = tokens.find(token => ADMIN_ROLES.has(token));
+  if(adminMatch){
+    return adminMatch;
+  }
   return 'asesor';
+}
+
+function rankRole_(role){
+  const normalized = normalizeRole_(role);
+  switch(normalized){
+    case 'developer':
+      return 3;
+    case 'admin':
+      return 2;
+    case 'coordinador':
+      return 1;
+    case 'asesor':
+      return 0;
+    default:
+      return -1;
+  }
 }
 
 function parseList_(value){
@@ -3850,7 +3921,30 @@ function userCanAccessSheet_(user, sheetName){
 function findUserByEmail_(email){
   const target = String(email || '').trim().toLowerCase();
   const meta = readUsersWithMeta_();
-  const match = target ? meta.users.find(u => u.email === target) || null : null;
+  if(!target){
+    return { sheet: meta.sheet, map: meta.map, user: null, users: meta.users };
+  }
+  const matches = meta.users.filter(u => u.email === target);
+  if(matches.length > 1){
+    const getTimestamp = value => {
+      if(!value) return 0;
+      const date = new Date(value);
+      const time = date && typeof date.getTime === 'function' ? date.getTime() : NaN;
+      return Number.isFinite(time) ? time : 0;
+    };
+    matches.sort((a, b) => {
+      const activeDiff = Number(b.active !== false) - Number(a.active !== false);
+      if(activeDiff) return activeDiff;
+      const passwordDiff = Number(Boolean(b.passwordHash)) - Number(Boolean(a.passwordHash));
+      if(passwordDiff) return passwordDiff;
+      const roleDiff = rankRole_(b.role) - rankRole_(a.role);
+      if(roleDiff) return roleDiff;
+      const updatedDiff = getTimestamp(b.updatedAt) - getTimestamp(a.updatedAt);
+      if(updatedDiff) return updatedDiff;
+      return (Number(b.rowIndex) || 0) - (Number(a.rowIndex) || 0);
+    });
+  }
+  const match = matches.length ? matches[0] : null;
   return { sheet: meta.sheet, map: meta.map, user: match, users: meta.users };
 }
 
