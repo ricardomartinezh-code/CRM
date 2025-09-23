@@ -230,13 +230,23 @@
     .login-brand__image{
       width:152px;
       max-width:62vw;
-      height:auto;
-      display:block;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:22px;
       border-radius:32px;
+      background:rgba(15,23,42,0.55);
       box-shadow:0 32px 64px rgba(6,12,24,0.55);
+      font-size:1.35rem;
+      font-weight:700;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+      color:var(--accent);
     }
     html[data-theme="light"] .login-brand__image{
+      background:rgba(255,255,255,0.92);
       box-shadow:0 28px 60px rgba(71,85,105,0.32);
+      color:var(--accent);
     }
     .login-title{
       margin:0;
@@ -393,11 +403,11 @@
     .sidebar { position: sticky; top:0; align-self:start; height:100dvh; padding:calc(var(--space) + 12px) var(--space) var(--space); background: var(--card); border-right:1px solid rgba(255,255,255,.12); box-shadow: 6px 0 24px rgba(2,10,28,0.32); display:flex; flex-direction:column; overflow-y:auto; overscroll-behavior:contain; }
     html[data-theme="light"] .sidebar{ background:#ffffff; border-color:rgba(15,23,42,0.08); box-shadow: 8px 0 30px rgba(15,23,42,0.08); }
     .brand { display:flex; align-items:center; gap:var(--space-sm); margin:6px 6px var(--space); padding:8px 12px; border-radius:16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
-    .brand-logo{ width:44px; height:44px; border-radius:14px; background:rgba(4,12,30,0.65); padding:6px; object-fit:cover; box-shadow: var(--shadow); display:block; }
-    .brand-logo--avatar{ background:none; border:none; padding:0; }
+    .brand-logo{ width:44px; height:44px; border-radius:14px; background:rgba(4,12,30,0.65); box-shadow: var(--shadow); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.05rem; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); }
+    .brand-logo--avatar{ background:rgba(4,12,30,0.4); }
     html[data-theme="light"] .brand{ background:rgba(15,23,42,0.06); border-color:rgba(15,23,42,0.08); box-shadow:none; }
-    html[data-theme="light"] .brand-logo{ background:#fff; border:1px solid rgba(15,23,42,0.08); box-shadow:0 12px 26px rgba(15,23,42,0.16); }
-    html[data-theme="light"] .brand-logo--avatar{ border:none; box-shadow:0 12px 26px rgba(15,23,42,0.16); }
+    html[data-theme="light"] .brand-logo{ background:#fff; border:1px solid rgba(15,23,42,0.08); box-shadow:0 12px 26px rgba(15,23,42,0.16); color:var(--accent); }
+    html[data-theme="light"] .brand-logo--avatar{ background:rgba(15,23,42,0.1); border:none; box-shadow:0 12px 26px rgba(15,23,42,0.16); }
     .brand-name{ font-size:1.1rem; font-weight:800; letter-spacing:.42px; color:var(--text); text-transform:none; }
     .app.collapsed .brand{ justify-content:center; padding:0; background:transparent; border:none; box-shadow:none; margin:6px auto var(--space); }
     .nav { display:flex; flex-direction:column; gap:var(--space-sm); margin-top:var(--space-sm); flex:1; }
@@ -413,9 +423,9 @@
     .app:not(.collapsed) .menu-toggle__bars,
     .app.show-sidebar .menu-toggle__bars{ display:none; }
     .menu-trigger[aria-expanded="true"] .bi-list{ display:none; }
-    .menu-toggle__icon img{ width:100%; height:100%; object-fit:cover; display:none; }
+    .menu-toggle__avatar{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:1.05rem; text-transform:uppercase; color:var(--accent); }
     .menu-toggle.has-avatar .menu-toggle__bars{ display:none; }
-    .menu-toggle.has-avatar .menu-toggle__icon img{ display:block; }
+    .menu-toggle.has-avatar .menu-toggle__avatar{ color:var(--accent); }
     .nav-header .menu-toggle{ display:none; }
     .nav-user{ display:inline-flex; align-items:center; justify-content:flex-start; gap:8px; padding:8px 12px; border-radius:12px; font-weight:700; font-size:15px; letter-spacing:.4px; color:var(--text); background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06); }
     html[data-theme="light"] .nav-user{ background:rgba(15,23,42,0.06); border-color:rgba(15,23,42,0.12); }
@@ -2093,9 +2103,9 @@
     .settings-profile{ display:flex; flex-wrap:wrap; gap:var(--space); align-items:flex-start; }
     .profile-avatar{ display:flex; flex-direction:column; gap:var(--space-sm); align-items:flex-start; }
     .avatar-frame{ width:var(--avatar-size); height:var(--avatar-size); border-radius:50%; border:2px dashed rgba(255,255,255,0.2); background:var(--card-2); color:var(--accent); display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; text-transform:uppercase; position:relative; overflow:hidden; box-shadow: inset 0 2px 6px rgba(2,12,29,0.35); }
-    .avatar-frame img{ width:100%; height:100%; object-fit:cover; display:none; }
+    .avatar-image{ width:100%; height:100%; display:none; align-items:center; justify-content:center; font-size:32px; font-weight:700; text-transform:uppercase; color:var(--accent); }
     .avatar-frame.has-image{ border-style:solid; border-color:rgba(255,255,255,0.3); }
-    .avatar-frame.has-image img{ display:block; }
+    .avatar-frame.has-image .avatar-image{ display:flex; }
     .avatar-frame.has-image span{ display:none; }
     .avatar-actions{ display:flex; flex-direction:column; gap:var(--space-sm); width:100%; }
     .avatar-actions .btn{ justify-content:center; }
@@ -2442,7 +2452,7 @@
     <div class="login-panel">
       <div class="login-card" role="dialog" aria-labelledby="loginTitle">
         <div class="login-brand" aria-hidden="true">
-          <img src="./assets/Logo.svg" alt="" class="login-brand__image" />
+          <span class="login-brand__image" role="presentation">ReLead EDU</span>
         </div>
         <h1 id="loginTitle" class="login-title">Ingresa sesión con tu cuenta</h1>
         <div id="loginSignIn" aria-hidden="false">
@@ -2654,25 +2664,20 @@
       <button class="sidebar-close" type="button" id="sidebarClose" aria-label="Cerrar menú lateral" title="Cerrar menú lateral">×</button>
       <nav class="nav" role="navigation">
         <div class="brand" data-expand-label="Expandir menú lateral">
-          <img
-            src="./assets/Logo.svg"
-            alt=""
+          <div
             class="brand-logo"
-            width="44"
-            height="44"
-            loading="lazy"
             id="sidebarBrandImg"
             data-fallback-src="./assets/Logo.svg"
             data-favicon-src="./assets/Favicon.png?v=3"
             data-logo-alt="ReLead EDU"
             data-brand-mode="favicon"
-          />
+          >RE</div>
           <span class="brand-name" id="sidebarBrandName">ReLead EDU</span>
         </div>
         <div class="nav-header">
           <button class="menu-toggle" type="button" id="menuToggle" aria-label="Alternar menú" aria-expanded="true" aria-controls="sidebar" title="Alternar menú">
             <span class="menu-toggle__icon" aria-hidden="true">
-              <img id="sidebarAvatarImg" alt="" />
+              <span class="menu-toggle__avatar" id="sidebarAvatarImg" aria-hidden="true">U</span>
               <span class="menu-toggle__bars">
                 <span></span>
                 <span></span>
@@ -3650,7 +3655,7 @@
             <div class="settings-profile">
               <div class="profile-avatar">
                 <div class="avatar-frame" id="profileAvatarFrame">
-                  <img id="profileAvatarImg" alt="Foto de perfil" />
+                  <div id="profileAvatarImg" class="avatar-image" role="img" aria-label="Foto de perfil"></div>
                   <span id="profileAvatarInitials">U</span>
                 </div>
                 <input type="file" accept="image/*" id="profileAvatarInput" class="hidden" />
@@ -8672,6 +8677,7 @@
 
   const brandImg = document.getElementById('sidebarBrandImg');
   const brandNameEl = document.getElementById('sidebarBrandName');
+  const defaultBrandName = brandNameEl ? String(brandNameEl.textContent || '').trim() || 'ReLead EDU' : 'ReLead EDU';
   const brandContainer = document.querySelector('.brand');
   const DEFAULT_FAVICON_URL = './assets/Favicon.png?v=3';
   const FAVICON_LINK_SELECTORS = [
@@ -8688,6 +8694,22 @@
         linkEl.href = href;
       }
     });
+  }
+
+  function buildInitialsFromText(text, fallback = 'U'){
+    const trimmed = String(text || '').trim();
+    if(!trimmed) return fallback;
+    const parts = trimmed.split(/\s+/).filter(Boolean).slice(0, 2);
+    if(!parts.length) return fallback;
+    const initials = parts.map(part => part.charAt(0).toUpperCase()).join('');
+    return initials || fallback;
+  }
+
+  function resolveUserDisplayName(){
+    const currentName = currentUser && currentUser.name ? String(currentUser.name).trim() : '';
+    const profileName = userProfile && userProfile.name ? String(userProfile.name).trim() : '';
+    const userId = currentUser && currentUser.userId ? String(currentUser.userId).trim() : '';
+    return currentName || profileName || userId || '';
   }
 
   updateDocumentFavicons(DEFAULT_FAVICON_URL);
@@ -8707,30 +8729,17 @@
     const isCollapsed = Boolean(appEl && appEl.classList.contains('collapsed'));
     const faviconSrc = getFaviconSource();
     updateDocumentFavicons(faviconSrc);
-    const fallbackSrc = brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || '';
-    const avatarSrc = brandImg.dataset.avatarSrc || '';
-    const brandMode = String(brandImg.dataset.brandMode || '').trim().toLowerCase();
-    const preferFavicon = brandMode === 'favicon' || !fallbackSrc;
-    let nextSrc = faviconSrc;
-    let useAvatar = false;
-    if(!isCollapsed && avatarSrc){
-      nextSrc = avatarSrc;
-      useAvatar = true;
-    }else if(!preferFavicon && !isCollapsed && fallbackSrc){
-      nextSrc = fallbackSrc;
-    }else if(!faviconSrc && fallbackSrc){
-      nextSrc = fallbackSrc;
-    }
-    if(!nextSrc){
-      nextSrc = faviconSrc || fallbackSrc;
-    }
-    brandImg.src = nextSrc;
-    const logoAlt = brandImg.dataset.logoAlt || brandImg.getAttribute('data-logo-alt') || '';
-    if(useAvatar){
-      const avatarAlt = brandImg.dataset.avatarAlt || '';
-      brandImg.alt = avatarAlt || logoAlt || '';
+    const userDisplayName = resolveUserDisplayName();
+    const brandInitials = buildInitialsFromText(defaultBrandName, 'RE');
+    const avatarInitials = buildInitialsFromText(userDisplayName, brandInitials);
+    const hasStoredAvatar = Boolean((userProfile && userProfile.avatar) || (currentUser && currentUser.avatar));
+    const useAvatar = !isCollapsed && hasStoredAvatar;
+    const nextLabel = useAvatar ? avatarInitials : brandInitials;
+    brandImg.textContent = nextLabel;
+    if(nextLabel){
+      brandImg.setAttribute('aria-label', `Identificador ${nextLabel}`);
     }else{
-      brandImg.alt = logoAlt || '';
+      brandImg.removeAttribute('aria-label');
     }
     brandImg.classList.toggle('brand-logo--avatar', useAvatar);
   }
@@ -8790,36 +8799,20 @@
     const avatarImg = document.getElementById('sidebarAvatarImg');
     const avatarUrl = userProfile && userProfile.avatar ? String(userProfile.avatar).trim() : '';
     const fallbackLogo = brandImg ? (brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || './assets/Favicon.png?v=2') : './assets/Favicon.png?v=2';
-    const currentName = currentUser && currentUser.name ? String(currentUser.name).trim() : '';
-    const profileName = userProfile && userProfile.name ? String(userProfile.name).trim() : '';
+    const displayName = resolveUserDisplayName() || 'Usuario';
     const userId = currentUser && currentUser.userId ? String(currentUser.userId).trim() : '';
     const role = currentUser && currentUser.role ? String(currentUser.role).trim().toLowerCase() : '';
     const roleLabel = ROLE_LABELS[role] || role;
-    const displayName = currentName || profileName || userId || 'Usuario';
+    const initials = buildInitialsFromText(displayName, 'U');
 
     const faviconSrc = getFaviconSource();
     updateDocumentFavicons(faviconSrc);
-    const avatarDisplayUrl = avatarUrl || faviconSrc || '';
 
     if(toggle){
-      toggle.classList.toggle('has-avatar', Boolean(avatarDisplayUrl));
+      toggle.classList.toggle('has-avatar', Boolean(displayName));
     }
     if(avatarImg){
-      if(avatarDisplayUrl){
-        avatarImg.src = avatarDisplayUrl;
-        if(avatarUrl){
-          const avatarAltText = displayName && displayName !== 'Usuario'
-            ? `Foto de perfil de ${displayName}`
-            : 'Foto de perfil del usuario';
-          avatarImg.alt = avatarAltText;
-        }else{
-          const defaultLogoAlt = brandImg && (brandImg.dataset.logoAlt || brandImg.getAttribute('data-logo-alt'));
-          avatarImg.alt = defaultLogoAlt || 'Icono de la aplicación';
-        }
-      }else{
-        avatarImg.removeAttribute('src');
-        avatarImg.alt = '';
-      }
+      avatarImg.textContent = initials;
     }
 
     if(brandNameEl){
@@ -8831,16 +8824,12 @@
       brandImg.dataset.fallbackSrc = fallbackSrc;
       if(avatarUrl){
         brandImg.dataset.avatarSrc = avatarUrl;
-        const avatarAltText = displayName && displayName !== 'Usuario'
-          ? `Avatar de ${displayName}`
-          : 'Avatar del usuario';
-        brandImg.dataset.avatarAlt = avatarAltText;
       }else{
-        brandImg.dataset.avatarSrc = '';
-        delete brandImg.dataset.avatarAlt;
+        delete brandImg.dataset.avatarSrc;
       }
+      brandImg.dataset.avatarInitials = initials;
       if(!brandImg.dataset.logoAlt){
-        const defaultLogoAlt = brandImg.getAttribute('data-logo-alt') || 'ReLead EDU';
+        const defaultLogoAlt = brandImg.getAttribute('data-logo-alt') || defaultBrandName;
         brandImg.dataset.logoAlt = defaultLogoAlt;
       }
       applyBrandLogoState();
@@ -11616,16 +11605,15 @@
     const avatarImg = el('#profileAvatarImg');
     const avatarInitials = el('#profileAvatarInitials');
     const avatarSource = userProfile.avatar || (currentUser && currentUser.avatar) || '';
-    if(avatarFrame && avatarImg && avatarInitials){
-      if(avatarSource){
-        avatarFrame.classList.add('has-image');
-        avatarImg.src = avatarSource;
-        avatarInitials.textContent = '';
-      }else{
-        avatarFrame.classList.remove('has-image');
-        avatarImg.removeAttribute('src');
-        avatarInitials.textContent = computeInitials();
-      }
+    const initialsValue = computeInitials();
+    if(avatarFrame){
+      avatarFrame.classList.toggle('has-image', Boolean(avatarSource));
+    }
+    if(avatarImg){
+      avatarImg.textContent = avatarSource ? initialsValue : '';
+    }
+    if(avatarInitials){
+      avatarInitials.textContent = initialsValue;
     }
     const summaryId = el('#profileSummaryId');
     if(summaryId) summaryId.textContent = idValue || 'Sin definir';
