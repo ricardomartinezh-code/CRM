@@ -3255,6 +3255,7 @@ function normalizeRole_(role){
     ['coordinador', 'coordinador'],
     ['asesor', 'asesor'],
   ]);
+
   if(direct.has(simplified)){
     return direct.get(simplified);
   }
