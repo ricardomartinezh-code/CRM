@@ -2667,7 +2667,7 @@
           <div
             class="brand-logo"
             id="sidebarBrandImg"
-            data-fallback-src="./assets/Logo.svg"
+            data-fallback-src="./assets/Favicon.png?v=3"
             data-favicon-src="./assets/Favicon.png?v=3"
             data-logo-alt="ReLead CRM"
             data-brand-mode="favicon"
@@ -8798,7 +8798,7 @@
     const toggle = document.getElementById('menuToggle');
     const avatarImg = document.getElementById('sidebarAvatarImg');
     const avatarUrl = userProfile && userProfile.avatar ? String(userProfile.avatar).trim() : '';
-    const fallbackLogo = brandImg ? (brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || './assets/Favicon.png?v=2') : './assets/Favicon.png?v=2';
+    const fallbackLogo = brandImg ? (brandImg.dataset.fallbackSrc || brandImg.getAttribute('data-fallback-src') || './assets/Favicon.png?v=3') : './assets/Favicon.png?v=3';
     const displayName = resolveUserDisplayName() || 'Usuario';
     const userId = currentUser && currentUser.userId ? String(currentUser.userId).trim() : '';
     const role = currentUser && currentUser.role ? String(currentUser.role).trim().toLowerCase() : '';
