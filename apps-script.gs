@@ -602,6 +602,73 @@ function getColumnIndex_(map, headerName){
   return undefined;
 }
 
+function ensureColumnInSheet_(sheet, headerName){
+  if(!sheet) return { added: false, column: '', sheet: '' };
+  const target = String(headerName || '').trim();
+  if(!target) return { added: false, column: '', sheet: sheet.getName() };
+  const { headers, map } = getColumnMap_(sheet);
+  if(getColumnIndex_(map, target) !== undefined){
+    return { added: false, column: target, sheet: sheet.getName() };
+  }
+  const updatedHeaders = headers.slice();
+  updatedHeaders.push(target);
+  const targetColumns = updatedHeaders.length;
+  const maxColumns = sheet.getMaxColumns();
+  if(targetColumns > maxColumns){
+    const insertPosition = Math.max(1, maxColumns);
+    sheet.insertColumnsAfter(insertPosition, targetColumns - maxColumns);
+  }
+  sheet.getRange(1, 1, 1, targetColumns).setValues([updatedHeaders]);
+  return { added: true, column: target, sheet: sheet.getName() };
+}
+
+function ensureMetadatosColumnForSheet(sheetName){
+  const targetSheet = String(sheetName || '').trim();
+  if(!targetSheet){
+    throw new Error('Proporciona el nombre de la hoja que quieres revisar.');
+  }
+  const ss = getSpreadsheet_();
+  if(!ss){
+    throw new Error('No se pudo abrir la hoja de cálculo configurada.');
+  }
+  const sheet = ss.getSheetByName(targetSheet);
+  if(!sheet){
+    throw new Error('La hoja "' + sheetName + '" no existe.');
+  }
+  const result = ensureColumnInSheet_(sheet, 'Metadatos');
+  if(result.added){
+    Logger.log('Se agregó la columna "Metadatos" en la hoja "' + result.sheet + '".');
+  }else{
+    Logger.log('La hoja "' + result.sheet + '" ya tiene la columna "Metadatos".');
+  }
+  return result;
+}
+
+function ensureMetadatosColumnForAllLeadSheets(){
+  const ss = getSpreadsheet_();
+  if(!ss){
+    throw new Error('No se pudo abrir la hoja de cálculo configurada.');
+  }
+  const leadSheets = ss.getSheets().filter(isLeadSheet_);
+  const updated = [];
+  for(let i = 0; i < leadSheets.length; i++){
+    const sheet = leadSheets[i];
+    const result = ensureColumnInSheet_(sheet, 'Metadatos');
+    if(result.added) updated.push(result.sheet);
+  }
+  if(updated.length){
+    Logger.log('Se agregó la columna "Metadatos" en: ' + updated.join(', '));
+  }else{
+    Logger.log('Todas las hojas revisadas ya tenían la columna "Metadatos".');
+  }
+  return {
+    ok: true,
+    processedSheets: leadSheets.map(sheet => sheet.getName()),
+    updatedSheets: updated,
+    addedCount: updated.length
+  };
+}
+
 function handleGetLeads_(e, user){
   e = e || { parameter: {} };
   const sheetName = e.parameter.sheet || 'Lead Recuperados';
