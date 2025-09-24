@@ -2474,7 +2474,7 @@
         <div class="login-brand" aria-hidden="true">
           <span class="login-brand__image" role="presentation">ReLead EDU</span>
         </div>
-        <h1 id="loginTitle" class="login-title">Ingresa sesión con tu cuenta</h1>
+        <h1 id="loginTitle" class="login-title">Inicia sesión con tu cuenta</h1>
         <div id="loginSignIn" aria-hidden="false">
           <form class="login-form" id="loginForm" autocomplete="off">
             <label>
@@ -4010,8 +4010,48 @@
   <script src="./js/utils/data-format.js"></script>
   <script>
   // —— Datos desde Google Sheets ——
+  function showFatalConfigError(message){
+    const text = String(message || 'Error de configuración.').trim();
+    console.error(text);
+    if(typeof setConnectionStatus === 'function'){
+      setConnectionStatus(text, 'error');
+      return;
+    }
+    const status = document.getElementById('connectionStatus');
+    if(status){
+      status.textContent = text;
+      status.classList.remove('hidden', 'login-info', 'login-success');
+      status.classList.add('login-error');
+      status.setAttribute('role', 'alert');
+      status.setAttribute('aria-live', 'assertive');
+    }
+  }
+
+  function resolveRequiredApiUrl(config){
+    const raw = typeof config.API_URL === 'string' ? config.API_URL.trim() : '';
+    if(!raw){
+      const message = 'Falta configurar ReLeadConfig.API_URL con la URL del Apps Script.';
+      showFatalConfigError(message);
+      throw new Error(message);
+    }
+    let parsed;
+    try{
+      parsed = new URL(raw);
+    }catch(_err){
+      const message = 'La URL de API configurada es inválida. Revisa ReLeadConfig.API_URL.';
+      showFatalConfigError(message);
+      throw new Error(message);
+    }
+    if(parsed.protocol !== 'https:'){
+      const message = 'La URL de API debe usar HTTPS en ReLeadConfig.API_URL.';
+      showFatalConfigError(message);
+      throw new Error(message);
+    }
+    return parsed.toString();
+  }
+
   const appConfig = window.ReLeadConfig || {};
-  const API_URL = appConfig.API_URL || 'https://script.google.com/macros/s/AKfycbzg0XHsW_fYiVhEcmp0WB3zmqQ9hV-usT0EDsnhwBlD8CSat3Gc_-lDOhMyGIUMjbcq/exec';
+  const API_URL = resolveRequiredApiUrl(appConfig);
   const REQUEST_TIMEOUT_MS = Number.isFinite(appConfig.REQUEST_TIMEOUT_MS) ? appConfig.REQUEST_TIMEOUT_MS : 45000;
   const SESSION_HEARTBEAT_INTERVAL_MS = Number.isFinite(appConfig.SESSION_HEARTBEAT_INTERVAL_MS)
     ? Math.max(60000, appConfig.SESSION_HEARTBEAT_INTERVAL_MS)
@@ -8634,45 +8674,84 @@
     }
   }
 
-  async function checkAppsScriptConnection(){
-    const button = document.getElementById('connectionCheckBtn');
+  const buildAppsScriptUrl = action => {
+    if(!action){
+      return API_URL;
+    }
+    const separator = API_URL.includes('?') ? '&' : '?';
+    return `${API_URL}${separator}action=${encodeURIComponent(action)}`;
+  };
+
+  function sanitizeResponseSnippet(text, maxLength = 160){
+    if(!text) return '';
+    const normalized = String(text).replace(/\s+/g, ' ').trim();
+    if(!normalized) return '';
+    if(normalized.length <= maxLength) return normalized;
+    return `${normalized.slice(0, maxLength)}…`;
+  }
+
+  async function probeAppsScriptConnection(options = {}){
+    const {
+      action = '',
+      method = 'GET',
+      authenticated = false,
+      body,
+      headers,
+      signal,
+      cache = 'no-store',
+      label = ''
+    } = options;
     const now = typeof performance !== 'undefined' && typeof performance.now === 'function'
       ? () => performance.now()
       : () => Date.now();
+    const url = buildAppsScriptUrl(action);
+    const requestInit = { method, cache, signal };
+    if(headers) requestInit.headers = headers;
+    if(body !== undefined) requestInit.body = body;
+    let response;
+    const startedAt = now();
+    if(authenticated){
+      response = await apiFetch(url, { method, body, headers, signal, cache, label });
+    }else{
+      response = await fetch(url, requestInit);
+    }
+    const elapsed = Math.max(0, Math.round(now() - startedAt));
+    let rawText = '';
+    let data = null;
+    try{
+      const clone = response.clone();
+      rawText = await clone.text();
+      if(rawText){
+        data = JSON.parse(rawText);
+      }
+    }catch(_err){
+      rawText = rawText || '';
+    }
+    const statusInfo = `${response.status} ${response.statusText || ''}`.trim();
+    return { response, data, rawText, statusInfo, elapsed };
+  }
+
+  async function checkAppsScriptConnection(){
+    const button = document.getElementById('connectionCheckBtn');
     setConnectionStatus('Verificando comunicación con Apps Script…', 'info');
     setButtonBusy(button, true, 'Verificando…');
-    const startedAt = now();
     try{
-      const response = await fetch(API_URL, { method: 'GET', cache: 'no-store' });
-      const elapsed = Math.max(0, Math.round(now() - startedAt));
-      let rawText = '';
-      let data = null;
-      try{
-        const clone = response.clone();
-        rawText = await clone.text();
-        if(rawText){
-          data = JSON.parse(rawText);
-        }
-      }catch(_err){
-        rawText = rawText || '';
-      }
-      const statusInfo = `${response.status} ${response.statusText || ''}`.trim();
-      const errorDetails = data?.error || data?.message || rawText || '';
-      if(!response.ok || data?.error){
-        const error = new Error(errorDetails || 'Respuesta inesperada del servicio.');
-        error.responseStatus = statusInfo;
-        error.responseBody = rawText;
+      const probe = await probeAppsScriptConnection();
+      if(!probe.response.ok || probe.data?.error){
+        const snippet = sanitizeResponseSnippet(probe.data?.error || probe.data?.message || probe.rawText);
+        const error = new Error(snippet || 'Respuesta inesperada del servicio.');
+        if(probe.statusInfo) error.responseStatus = probe.statusInfo;
+        if(snippet) error.responseSnippet = snippet;
         throw error;
       }
       const parts = [];
-      parts.push(`Servicio disponible${statusInfo ? ` (${statusInfo})` : ''}`);
-      parts.push(`Tiempo de respuesta: ${elapsed} ms`);
-      if(data?.message){
-        parts.push(data.message);
-      }else if(rawText){
-        const normalizedText = rawText.replace(/\s+/g, ' ').trim();
-        if(normalizedText){
-          const snippet = normalizedText.length > 160 ? `${normalizedText.slice(0, 160)}…` : normalizedText;
+      parts.push(`Servicio disponible${probe.statusInfo ? ` (${probe.statusInfo})` : ''}`);
+      parts.push(`Tiempo de respuesta: ${probe.elapsed} ms`);
+      if(probe.data?.message){
+        parts.push(probe.data.message);
+      }else{
+        const snippet = sanitizeResponseSnippet(probe.rawText);
+        if(snippet){
           parts.push(`Respuesta: ${snippet}`);
         }
       }
@@ -8688,12 +8767,16 @@
         }else if(normalized.includes('acción requerida') || normalized.includes('accion requerida')){
           message = 'La URL respondió pero requiere una acción específica. Asegúrate de que el Apps Script esté actualizado.';
         }
+        const snippet = typeof err.responseSnippet === 'string' ? err.responseSnippet : '';
+        if(snippet && !message.includes(snippet)){
+          message = `${message} Detalles: ${snippet}`;
+        }
       }
       setConnectionStatus(message, 'error');
       const context = { scope: 'connection-check' };
       if(err && typeof err === 'object' && err !== null){
         if(err.responseStatus) context.status = err.responseStatus;
-        if(err.responseBody) context.body = err.responseBody;
+        if(err.responseSnippet) context.bodySnippet = err.responseSnippet;
       }
       logNetworkError(err, context);
     }finally{
@@ -9496,14 +9579,20 @@
       if(!select) return;
       const previous = select.value;
       const isMainSelector = select.id === 'sheetSelect';
-      const optionParts = sheets.map(s => {
-        const label = sheetDisplayName(s) || s;
-        return `<option value="${s}">${label}</option>`;
-      });
+      const createOption = (value, label) => {
+        const option = document.createElement('option');
+        option.value = value;
+        option.textContent = label;
+        return option;
+      };
+      select.textContent = '';
       if(isMainSelector){
-        optionParts.unshift(`<option value="${ALL_SHEETS_VALUE}">Todos</option>`);
+        select.appendChild(createOption(ALL_SHEETS_VALUE, 'Todos'));
       }
-      select.innerHTML = optionParts.join('');
+      sheets.forEach(s => {
+        const label = sheetDisplayName(s) || s;
+        select.appendChild(createOption(s, label));
+      });
       let targetValue = '';
       if(isMainSelector){
         if(state.sheet === ALL_SHEETS_VALUE){
@@ -9558,7 +9647,10 @@
         setSheetStatus('No hay bases de leads disponibles. Verifica que el Apps Script tenga acceso al libro configurado.', 'info');
       }
     }catch(err){
-      if(err && err.code === 'UNAUTHORIZED') return;
+      if(err && err.code === 'UNAUTHORIZED'){
+        setSheetStatus('Tu sesión expiró. Inicia sesión nuevamente.', 'error');
+        return;
+      }
       console.error('Error al cargar hojas', err);
       sheets = [];
       state.sheet = '';
@@ -14684,7 +14776,8 @@
         id: 'verify-connection',
         label: 'Verificar conexión con Google Sheets',
         auto: true,
-        handler: async log => {          const maxAttempts = 3;
+        handler: async log => {
+          const maxAttempts = 3;
           for(let attempt = 1; attempt <= maxAttempts; attempt++){
             if(!navigator.onLine){
               log('Sin conexión local. Esperando reconexión antes de verificar el servicio…', 'warn');
@@ -14712,31 +14805,38 @@
               });
             }
             log(`Validando conectividad con Google Sheets (intento ${attempt}/${maxAttempts})…`, 'info');
-            let response;
             try{
-              response = await apiFetch(`${API_URL}?action=listSheets`);
+              const probe = await probeAppsScriptConnection({
+                action: 'listSheets',
+                authenticated: true,
+                label: 'diagnostics:connection-check'
+              });
+              if(probe.response.ok && !probe.data?.error){
+                log('Conexión con Google Sheets establecida correctamente.', 'ok');
+                return;
+              }
+              const snippet = sanitizeResponseSnippet(probe.data?.error || probe.data?.message || probe.rawText);
+              const label = probe.statusInfo || `HTTP ${probe.response.status}`;
+              const error = new Error(snippet ? `${label} · ${snippet}` : label);
+              error.responseStatus = label;
+              if(snippet) error.responseSnippet = snippet;
+              throw error;
             }catch(err){
               if(attempt === maxAttempts){
-                const error = err instanceof Error ? err : new Error(String(err));
-                throw error;
+                throw err instanceof Error ? err : new Error(String(err));
               }
-              log('El intento falló por un error de red. Reintentando…', 'warn');
-              await new Promise(resolve => setTimeout(resolve, attempt * 2000));
-              continue;
-            }
-            if(!response.ok){
-              const body = await response.text().catch(() => '');
-              const label = body ? `${response.status} ${body}` : `HTTP ${response.status}`;
-              if(attempt === maxAttempts){
-                throw new Error(label);
+              if(err && typeof err === 'object' && err !== null && err.responseStatus){
+                const snippet = typeof err.responseSnippet === 'string' && err.responseSnippet
+                  ? ` · ${sanitizeResponseSnippet(err.responseSnippet, 120)}`
+                  : '';
+                log(`Respuesta inesperada (${err.responseStatus}${snippet}). Reintentando…`, 'warn');
+              }else{
+                const detailText = err instanceof Error ? err.message : String(err || 'Error de red');
+                const detail = sanitizeResponseSnippet(detailText, 120) || 'Error de red';
+                log(`El intento falló por un error de red (${detail}). Reintentando…`, 'warn');
               }
-              log(`Respuesta inesperada (${label}). Reintentando…`, 'warn');
               await new Promise(resolve => setTimeout(resolve, attempt * 2000));
-              continue;
             }
-            await response.json().catch(() => null);
-            log('Conexión con Google Sheets establecida correctamente.', 'ok');
-            return;
           }
         }
       });
@@ -18275,6 +18375,54 @@
     }
     return text.toLowerCase();
   };
+  const parseDateToEpoch = value => {
+    if(value instanceof Date){
+      const time = value.valueOf();
+      return Number.isNaN(time) ? null : time;
+    }
+    if(typeof value === 'number' && Number.isFinite(value)){
+      return value;
+    }
+    const text = cleanValue(value);
+    if(!text){
+      return null;
+    }
+    const numeric = Number(text);
+    if(Number.isFinite(numeric)){
+      return numeric;
+    }
+    let normalized = text.replace(/\//g, '-').trim();
+    if(/^\d{4}-\d{2}-\d{2}$/.test(normalized)){
+      normalized = `${normalized}T00:00:00`;
+    }else if(/^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}/.test(normalized)){
+      normalized = normalized.replace(' ', 'T');
+    }
+    const parsed = new Date(normalized);
+    if(!Number.isNaN(parsed.valueOf())){
+      return parsed.valueOf();
+    }
+    const fallback = new Date(text);
+    if(!Number.isNaN(fallback.valueOf())){
+      return fallback.valueOf();
+    }
+    return null;
+  };
+  const getAssignmentEpoch = row => {
+    if(!row || typeof row !== 'object'){
+      return null;
+    }
+    if(Object.prototype.hasOwnProperty.call(row, '_assignmentEpoch')){
+      return row._assignmentEpoch;
+    }
+    const epoch = parseDateToEpoch(row.asignacion);
+    Object.defineProperty(row, '_assignmentEpoch', {
+      value: epoch,
+      writable: true,
+      configurable: true,
+      enumerable: false
+    });
+    return epoch;
+  };
   function handleDataExport(){
     if(!canPerform('exportData')){ alert('No tienes permisos para exportar información.'); return; }
     const params = {
@@ -18290,9 +18438,20 @@
     if(params.base) rows = rows.filter(r => r.base === params.base);
     if(params.etapa) rows = rows.filter(r => r.etapa === params.etapa || r.estado === params.etapa);
     if(params.estado) rows = rows.filter(r => r.estado === params.estado);
-    if(params.fi) rows = rows.filter(r => r.asignacion >= params.fi);
-    if(params.ff) rows = rows.filter(r => r.asignacion <= params.ff);
-    rows = rows.slice(0,150);
+    const startEpoch = parseDateToEpoch(params.fi);
+    const endEpoch = parseDateToEpoch(params.ff);
+    if(startEpoch !== null){
+      rows = rows.filter(r => {
+        const epoch = getAssignmentEpoch(r);
+        return epoch !== null && epoch >= startEpoch;
+      });
+    }
+    if(endEpoch !== null){
+      rows = rows.filter(r => {
+        const epoch = getAssignmentEpoch(r);
+        return epoch !== null && epoch <= endEpoch;
+      });
+    }
     exportData(rows,'datos.csv');
   }
   async function handleReportExport(){
@@ -18334,9 +18493,20 @@
     }
     if(params.asesor) rows = rows.filter(r => r.asesor === params.asesor);
     if(params.base) rows = rows.filter(r => r.base === params.base);
-    if(params.fi) rows = rows.filter(r => r.asignacion >= params.fi);
-    if(params.ff) rows = rows.filter(r => r.asignacion <= params.ff);
-    rows = rows.slice(0,150);
+    const startEpoch = parseDateToEpoch(params.fi);
+    const endEpoch = parseDateToEpoch(params.ff);
+    if(startEpoch !== null){
+      rows = rows.filter(r => {
+        const epoch = getAssignmentEpoch(r);
+        return epoch !== null && epoch >= startEpoch;
+      });
+    }
+    if(endEpoch !== null){
+      rows = rows.filter(r => {
+        const epoch = getAssignmentEpoch(r);
+        return epoch !== null && epoch <= endEpoch;
+      });
+    }
     exportResolutions(rows,'resoluciones.csv');
   }
   const expDataBtn=el('#btnExportData');
