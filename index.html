@@ -14664,6 +14664,18 @@
       addStep('Confirma que el Apps Script siga desplegado y que el libro de Google Sheets esté accesible y sin restricciones.', 'info');
     }
 
+    const webhookCheck = diagnostics.checks?.webhook;
+    if(webhookCheck){
+      if(!webhookCheck.serviceOk){
+        pushIssue(webhookCheck.serviceMessage || 'No se pudo verificar la comunicación entre el webhook y Apps Script.', 'bad');
+        addStep(webhookCheck.serviceMessage || 'Revisa el token de verificación y el secreto configurados para el webhook en Apps Script.', 'bad');
+      }
+      if(!webhookCheck.htmlOk){
+        pushIssue(webhookCheck.htmlMessage || 'El HTML no recibió una URL válida del webhook.', 'warn');
+        addStep(webhookCheck.htmlMessage || 'Actualiza la URL del webhook y vuelve a desplegar la interfaz HTML.', 'warn');
+      }
+    }
+
     const readCheck = diagnostics.checks?.read;
     if(readCheck && !readCheck.ok){
       pushIssue('La prueba de lectura falló en Google Sheets.', 'bad');
@@ -16020,6 +16032,19 @@
         }
       }else{
         addLine(`Google Sheets (${sheetLabel}): ${data.connection ? 'OK' : 'Fallo'}`, data.connection ? 'ok' : 'bad');
+      }
+
+      const webhookCheck = data.checks?.webhook;
+      if(webhookCheck){
+        const webhookLine = addLine(`Webhook: ${webhookCheck.ok ? 'OK' : 'Revisar'}`, webhookCheck.ok ? 'ok' : 'warn');
+        const webhookDetails = [];
+        if(webhookCheck.serviceMessage){
+          webhookDetails.push({ text: webhookCheck.serviceMessage, tone: webhookCheck.serviceOk ? 'info' : 'bad' });
+        }
+        if(webhookCheck.htmlMessage){
+          webhookDetails.push({ text: webhookCheck.htmlMessage, tone: webhookCheck.htmlOk ? 'info' : 'warn' });
+        }
+        addSublist(webhookLine, webhookDetails);
       }
 
       const readCheck = data.checks?.read;
