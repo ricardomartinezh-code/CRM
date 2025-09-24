@@ -2404,27 +2404,21 @@ function computeDiagnosticsReport_(requestedSheet){
   result.checks.connection.ok = true;
   result.checks.connection.message = 'Hoja "' + result.sheet + '" disponible para análisis.';
 
-  try{
-    const rows = Math.max(1, Math.min(targetSheet.getLastRow(), 5));
-    const cols = Math.max(1, Math.min(targetSheet.getLastColumn(), 5));
-    targetSheet.getRange(1, 1, rows, cols).getValues();
-    result.read = true;
-    result.checks.read.ok = true;
-    result.checks.read.message = 'Lectura realizada correctamente.';
-  }catch(err){
-    result.errors.push('Error de lectura en ' + result.sheet + ': ' + err.message);
-    result.checks.read.message = err.message;
+  const webhookCheck = verifyWebhookCommunication_();
+  result.checks.webhook = webhookCheck;
+  if(!webhookCheck.ok && webhookCheck.message){
+    result.warnings.push(webhookCheck.message);
   }
 
-  try{
-    const cell = targetSheet.getRange(1, 1);
-    cell.setValue(cell.getValue());
-    result.write = true;
-    result.checks.write.ok = true;
-    result.checks.write.message = 'Escritura verificada correctamente.';
-  }catch(err){
-    result.errors.push('Error de escritura en ' + result.sheet + ': ' + err.message);
-    result.checks.write.message = err.message;
+  const ioCheck = verifyWebhookSheetOperations_(targetSheet, result.sheet);
+  result.read = ioCheck.read.ok;
+  result.write = ioCheck.write.ok;
+  result.checks.read = ioCheck.read;
+  result.checks.write = ioCheck.write;
+  if(Array.isArray(ioCheck.errors) && ioCheck.errors.length){
+    ioCheck.errors.forEach(errorMessage => {
+      if(errorMessage) result.errors.push(errorMessage);
+    });
   }
 
   const trackers = {
@@ -2456,6 +2450,124 @@ function computeDiagnosticsReport_(requestedSheet){
     result.system.status = 'Operativo';
   }
 
+  return result;
+}
+
+function verifyWebhookCommunication_(){
+  const result = {
+    ok: false,
+    message: '',
+    serviceOk: false,
+    serviceMessage: '',
+    htmlOk: false,
+    htmlMessage: ''
+  };
+  let webhookUrl = '';
+  try{
+    const props = PropertiesService.getScriptProperties();
+    if(!props){
+      result.serviceMessage = 'No se pudieron leer las propiedades del proyecto para validar el webhook.';
+    }else{
+      const verifyToken = String(props.getProperty(META_WEBHOOK_VERIFY_TOKEN_PROPERTY) || '').trim();
+      const appSecret = String(props.getProperty(META_APP_SECRET_PROPERTY) || '').trim();
+      webhookUrl = String(props.getProperty(META_WEBHOOK_URL_PROPERTY) || '').trim();
+      const missing = [];
+      if(!verifyToken) missing.push('token de verificación');
+      if(!appSecret) missing.push('secreto de la app');
+      if(!missing.length){
+        result.serviceOk = true;
+        result.serviceMessage = 'Token y secreto del webhook configurados en Apps Script.';
+      }else{
+        const missingLabel = missing.length > 1 ? 'los siguientes datos del webhook: ' + missing.join(', ') : 'el ' + missing[0] + ' del webhook';
+        result.serviceMessage = 'Falta configurar ' + missingLabel + '.';
+      }
+    }
+  }catch(err){
+    result.serviceMessage = 'Error al validar la configuración del webhook: ' + err.message;
+  }
+  if(!result.serviceMessage){
+    result.serviceMessage = result.serviceOk
+      ? 'Webhook configurado correctamente en Apps Script.'
+      : 'Configura las credenciales del webhook en Apps Script.';
+  }
+  try{
+    if(webhookUrl){
+      result.htmlOk = true;
+      result.htmlMessage = 'URL del webhook configurada para el HTML.';
+      if(typeof ScriptApp !== 'undefined' && typeof ScriptApp.getService === 'function'){
+        const service = ScriptApp.getService();
+        if(service && typeof service.getUrl === 'function'){
+          const deploymentUrl = String(service.getUrl() || '').trim();
+          if(deploymentUrl && webhookUrl.indexOf(deploymentUrl) !== 0){
+            result.htmlOk = false;
+            result.htmlMessage = 'La URL configurada para el webhook no coincide con el despliegue actual del Apps Script.';
+          }else if(deploymentUrl){
+            result.htmlMessage = 'La URL del webhook apunta al despliegue actual.';
+          }
+        }
+      }
+    }else{
+      result.htmlMessage = 'Configura la propiedad META_WEBHOOK_URL para compartirla con el HTML.';
+    }
+  }catch(err){
+    result.htmlOk = false;
+    result.htmlMessage = 'Error al validar la URL del webhook: ' + err.message;
+  }
+  result.ok = result.serviceOk && result.htmlOk;
+  if(result.ok){
+    result.message = 'Comunicación del webhook verificada correctamente.';
+  }else{
+    const pieces = [];
+    if(!result.serviceOk && result.serviceMessage) pieces.push(result.serviceMessage);
+    if(!result.htmlOk && result.htmlMessage) pieces.push(result.htmlMessage);
+    result.message = pieces.join(' ');
+  }
+  return result;
+}
+
+function verifyWebhookSheetOperations_(sheet, sheetName){
+  const result = {
+    ok: false,
+    read: { ok: false, message: '' },
+    write: { ok: false, message: '' },
+    errors: []
+  };
+  const name = String(sheetName || (sheet && sheet.getName && sheet.getName()) || '').trim() || 'hoja';
+  if(!sheet){
+    result.read.message = 'Hoja no disponible para validar lectura.';
+    result.write.message = 'Hoja no disponible para validar escritura.';
+    result.errors.push('No se encontró la hoja "' + name + '" para verificar el webhook.');
+    return result;
+  }
+  try{
+    const rows = Math.max(1, Math.min(sheet.getLastRow(), 5));
+    const cols = Math.max(1, Math.min(sheet.getLastColumn(), 5));
+    if(rows > 0 && cols > 0){
+      const values = sheet.getRange(1, 1, rows, cols).getValues();
+      if(values && values.length){
+        result.read.message = 'Lectura realizada correctamente.';
+      }else{
+        result.read.message = 'Lectura realizada correctamente (rango sin datos).';
+      }
+    }else{
+      result.read.message = 'La hoja está vacía, lectura de control completada.';
+    }
+    result.read.ok = true;
+  }catch(err){
+    result.read.message = err.message;
+    result.errors.push('Error de lectura en ' + name + ': ' + err.message);
+  }
+  try{
+    const cell = sheet.getRange(1, 1);
+    const currentValue = cell.getValue();
+    cell.setValue(currentValue);
+    result.write.ok = true;
+    result.write.message = 'Escritura verificada correctamente.';
+  }catch(err){
+    result.write.message = err.message;
+    result.errors.push('Error de escritura en ' + name + ': ' + err.message);
+  }
+  result.ok = result.read.ok && result.write.ok;
   return result;
 }
 
