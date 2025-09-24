@@ -5388,6 +5388,79 @@
     teal: { primary: '#0f766e', secondary: '#14b8a6', panel: '15,118,110' },
     pink: { primary: '#be185d', secondary: '#f472b6', panel: '190,24,93' }
   };
+  const CANONICAL_ROLES = new Map([
+    ['developer', 'developer'],
+    ['admin', 'admin'],
+    ['coordinador', 'coordinador'],
+    ['asesor', 'asesor'],
+  ]);
+  const ROLE_SYNONYMS = new Map([
+    ['desarrollador', 'developer'],
+    ['desarrolladora', 'developer'],
+    ['desarrollador senior', 'developer'],
+    ['desarrollador junior', 'developer'],
+    ['desarrolladora senior', 'developer'],
+    ['desarrolladora junior', 'developer'],
+    ['dev', 'developer'],
+    ['developer senior', 'developer'],
+    ['developer junior', 'developer'],
+    ['administrador', 'admin'],
+    ['administradora', 'admin'],
+    ['direccion', 'admin'],
+    ['director', 'admin'],
+    ['directora', 'admin'],
+    ['supervisor', 'admin'],
+    ['supervisora', 'admin'],
+    ['gerente', 'admin'],
+    ['gerenta', 'admin'],
+    ['coordinadora', 'coordinador'],
+    ['coordinacion', 'coordinador'],
+    ['ejecutivo', 'asesor'],
+    ['ejecutiva', 'asesor'],
+    ['consultor', 'asesor'],
+    ['consultora', 'asesor'],
+    ['agente', 'asesor'],
+    ['orientador', 'asesor'],
+    ['orientadora', 'asesor'],
+  ]);
+  const ROLE_SEPARATOR_PATTERN = /^[0-9]+[\s\-:]+/;
+
+  function normalizeRoleValue(role){
+    const raw = typeof role === 'string' || typeof role === 'number'
+      ? String(role).trim()
+      : '';
+    if(!raw){
+      return '';
+    }
+    const simplify = value => value
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/[^a-zA-Z0-9\s]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase();
+    const tryResolve = value => {
+      if(!value) return '';
+      if(CANONICAL_ROLES.has(value)){
+        return CANONICAL_ROLES.get(value);
+      }
+      if(ROLE_SYNONYMS.has(value)){
+        return ROLE_SYNONYMS.get(value);
+      }
+      return '';
+    };
+    const simplified = simplify(raw);
+    let resolved = tryResolve(simplified);
+    if(resolved) return resolved;
+    const withoutPrefix = tryResolve(simplified.replace(ROLE_SEPARATOR_PATTERN, ''));
+    if(withoutPrefix) return withoutPrefix;
+    for(const part of simplified.split(' ')){
+      const partResolved = tryResolve(part);
+      if(partResolved) return partResolved;
+    }
+    return simplified;
+  }
+
   const VIEW_PERMISSIONS = {
     kpis: ['admin','coordinador','asesor','developer'],
     leads: ['admin','coordinador','asesor','developer'],
@@ -6005,8 +6078,14 @@
   }
 
   function formatRoleLabel(role){
-    const key = String(role || '').trim().toLowerCase();
-    return ROLE_LABELS[key] || (key ? key.charAt(0).toUpperCase() + key.slice(1) : 'Sin rol');
+    const key = normalizeRoleValue(role);
+    if(ROLE_LABELS[key]){
+      return ROLE_LABELS[key];
+    }
+    if(!key){
+      return 'Sin rol';
+    }
+    return key.charAt(0).toUpperCase() + key.slice(1);
   }
 
   function parseListInput(value){
@@ -8269,7 +8348,7 @@
 
   function getUserRole(){
     if(currentUser && currentUser.role){
-      return String(currentUser.role).trim().toLowerCase();
+      return normalizeRoleValue(currentUser.role);
     }
     return '';
   }
