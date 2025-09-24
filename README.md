@@ -27,3 +27,14 @@ Some configuration cannot be automated from this repository:
 - Creating the Google Cloud service account and downloading its JSON credentials must be done manually in the Google Cloud Console.
 - Upload the downloaded JSON as the `GCP_SA_KEY` secret in the GitHub repository settings.
 - Configure the required branch protections directly in the repository settings.
+
+## Webhook relay server
+
+The repository now bundles a lightweight Express server that serves the static CRM front-end and exposes a `/webhook` endpoint. Incoming requests are forwarded to the Apps Script deployment (default URL taken from `config/app-config.js`) so Meta can target the Render deployment directly. To run it locally:
+
+```bash
+npm install
+npm start
+```
+
+Set the `APPS_SCRIPT_URL` environment variable if you need to override the Apps Script Web App endpoint.

@@ -8,6 +8,9 @@ function bootstrapMetaIntegration_(){
 
 function doGet(e){
   bootstrapMetaIntegration_();
+  if(isMetaWebhookVerificationRequest_(e)){
+    return handleMetaWebhookVerification_(e);
+  }
   const action = String(e?.parameter?.action || '').trim();
   if(!action){
     return jsonResponse({ ok: true, message: 'Servicio disponible' }, e);
@@ -82,6 +85,9 @@ function doPost(e){
   let action = String(body.action || '').trim();
   if(!action){
     action = String(e?.parameter?.action || '').trim();
+  }
+  if(!action && isMetaWebhookPayload_(e, body)){
+    action = 'metaWebhook';
   }
   if(action === 'login'){
     return handleLogin_(e, body);
@@ -169,6 +175,35 @@ function jsonResponse(obj, e){
   const out = cb ? `${cb}(${JSON.stringify(obj)})` : JSON.stringify(obj);
   return ContentService.createTextOutput(out)
     .setMimeType(cb ? ContentService.MimeType.JAVASCRIPT : ContentService.MimeType.JSON);
+}
+
+function isMetaWebhookVerificationRequest_(e){
+  const params = e && e.parameter ? e.parameter : {};
+  if(!params) return false;
+  const challengeKeys = ['hub.challenge','hub_challenge','challenge'];
+  const hasChallenge = challengeKeys.some(key => params[key] !== undefined);
+  if(!hasChallenge) return false;
+  const mode = String(params['hub.mode'] || params['hub_mode'] || params.mode || '').trim().toLowerCase();
+  return mode === 'subscribe' || !mode;
+}
+
+function isMetaWebhookPayload_(e, body){
+  if(body && typeof body === 'object'){
+    const objectType = String(body.object || '').trim().toLowerCase();
+    if(objectType === 'whatsapp_business_account' || objectType === 'page'){
+      return true;
+    }
+    if(Array.isArray(body.entry)){
+      const hasChanges = body.entry.some(entry => entry && typeof entry === 'object' && Array.isArray(entry.changes));
+      if(hasChanges) return true;
+    }
+  }
+  const headers = e && e.headers ? e.headers : {};
+  const headerKeys = Object.keys(headers).map(key => String(key || '').toLowerCase());
+  if(headerKeys.some(key => key === 'x-hub-signature-256' || key === 'x-hub-signature')){
+    return true;
+  }
+  return false;
 }
 
 const USERS_SHEET_NAME = 'Usuarios';
@@ -1608,7 +1643,7 @@ function normalizeWhatsappChange_(entry, change){
   const configuredDefaultSheet = String(props.getProperty(META_WHATSAPP_DEFAULT_SHEET_PROPERTY) || '').trim();
   const preferredSheet = configuredDefaultSheet || '5-WhatsApp';
   const requestedSheet = String(value.sheet || value.base || '').trim();
-  const sheet = String(preferredSheet || requestedSheet || '').trim();
+  const sheet = String(requestedSheet || preferredSheet || '').trim();
   const metadata = value && typeof value.metadata === 'object' ? value.metadata : {};
   const contacts = Array.isArray(value.contacts) ? value.contacts : [];
   const contactNames = new Map();
