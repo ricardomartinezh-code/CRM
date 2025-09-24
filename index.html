@@ -3553,6 +3553,11 @@
                 <div class="integration-tabs__panels">
                   <div id="integration-panel-general" class="integration-tabpanel is-active" data-integration-panel="general" role="tabpanel" aria-labelledby="integration-tab-general">
                     <div class="integration-grid" id="integrationGridGeneral" role="list">
+                    </div>
+                    <p class="integration-empty hidden" id="integrationGeneralEmpty">No hay integraciones disponibles en esta categoría.</p>
+                  </div>
+                  <div id="integration-panel-developer" class="integration-tabpanel" data-integration-panel="developer" role="tabpanel" aria-labelledby="integration-tab-developer" hidden>
+                    <div class="integration-grid" id="integrationGridDeveloper" role="list">
                       <article class="integration-card" role="listitem" aria-labelledby="integration-whatsapp-title" data-integration="whatsapp-web">
                         <div class="integration-card__header">
                           <div>
@@ -3570,11 +3575,6 @@
                           <p class="integration-card__meta" id="whatsappIntegrationMeta">La sesión expira automáticamente al cerrar el navegador o después de 14&nbsp;horas de inactividad.</p>
                         </div>
                       </article>
-                    </div>
-                    <p class="integration-empty hidden" id="integrationGeneralEmpty">No hay integraciones disponibles en esta categoría.</p>
-                  </div>
-                  <div id="integration-panel-developer" class="integration-tabpanel" data-integration-panel="developer" role="tabpanel" aria-labelledby="integration-tab-developer" hidden>
-                    <div class="integration-grid" id="integrationGridDeveloper" role="list">
                       <article class="integration-card" role="listitem" aria-labelledby="integration-aircall-title" data-integration-id="aircall">
                         <div class="integration-card__header">
                           <div>
@@ -5467,7 +5467,7 @@
     mensajes: ['admin','coordinador','asesor','developer'],
     administrador: ['admin','coordinador','developer'],
     desarrollador: ['developer'],
-    integraciones: ['admin','coordinador','asesor','developer'],
+    integraciones: ['developer'],
     configuracion: ['*'],
     ayuda: ['admin','coordinador','asesor','developer']
   };
