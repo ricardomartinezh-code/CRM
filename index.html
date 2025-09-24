@@ -2125,6 +2125,22 @@
     .profile-sync-alert[data-state="stale"] strong{ color:var(--bad); }
     .profile-sync-alert[data-state="unknown"]{ border-color:rgba(245,158,11,0.45); background:rgba(245,158,11,0.12); color:var(--warn); }
     .profile-sync-alert button{ align-self:flex-start; }
+    .view-status{
+      margin: var(--space-sm) 0 0;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid transparent;
+      font-size: 13px;
+      line-height: 1.45;
+      letter-spacing: .2px;
+    }
+    .view-status.hidden{ display:none !important; }
+    .view-status--error{ border-color: rgba(239,68,68,0.38); background: rgba(239,68,68,0.12); color: var(--bad); }
+    .view-status--info{ border-color: rgba(96,165,250,0.35); background: rgba(96,165,250,0.12); color: var(--info); }
+    .view-status--success{ border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.12); color: var(--ok); }
+    html[data-theme="light"] .view-status--error{ border-color: rgba(239,68,68,0.45); background: rgba(239,68,68,0.12); color: #b91c1c; }
+    html[data-theme="light"] .view-status--info{ border-color: rgba(59,130,246,0.35); background: rgba(59,130,246,0.12); color: #1d4ed8; }
+    html[data-theme="light"] .view-status--success{ border-color: rgba(34,197,94,0.35); background: rgba(34,197,94,0.12); color: #15803d; }
     .summary-label{ font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted); }
     .summary-value{ font-size:14px; font-weight:600; color:var(--text); word-break:break-word; }
     .security-form{ gap:var(--space-sm); align-items:flex-end; }
@@ -2830,6 +2846,7 @@
             </div>
             <div class="daily-shortcuts" id="dailyShortcuts" aria-label="Listas diarias sugeridas"></div>
           </div>
+          <p class="view-status hidden" id="sheetStatus" role="status" aria-live="polite"></p>
         </div>
         <div class="panel-section hidden" id="autoReassignSection" aria-live="polite" aria-label="Reasignación automática">
           <h3>Reasignación automática</h3>
@@ -8362,6 +8379,7 @@
     messageInboxState.search = '';
     messageInboxState.activeId = '';
     syncMessageInbox({ preserveActive: false, reset: true });
+    setSheetStatus('');
   }
 
   function setLoginError(message){
@@ -8487,6 +8505,30 @@
       status.textContent = text;
       status.classList.add('login-message', toneClass);
       status.classList.remove('hidden');
+      status.setAttribute('role', tone === 'error' ? 'alert' : 'status');
+      status.setAttribute('aria-live', tone === 'error' ? 'assertive' : 'polite');
+    }else{
+      status.textContent = '';
+      status.classList.add('hidden');
+      status.removeAttribute('role');
+      status.setAttribute('aria-live', 'polite');
+    }
+  }
+
+  function setSheetStatus(message, tone){
+    const status = document.getElementById('sheetStatus');
+    if(!status) return;
+    status.classList.remove('view-status--error','view-status--info','view-status--success');
+    const text = message ? String(message).trim() : '';
+    if(text){
+      const toneClass = tone === 'success'
+        ? 'view-status--success'
+        : tone === 'info'
+          ? 'view-status--info'
+          : 'view-status--error';
+      status.textContent = text;
+      status.classList.remove('hidden');
+      status.classList.add(toneClass);
       status.setAttribute('role', tone === 'error' ? 'alert' : 'status');
       status.setAttribute('aria-live', tone === 'error' ? 'assertive' : 'polite');
     }else{
@@ -9407,6 +9449,7 @@
   async function loadSheets(){
     if(!authToken) return;
     try{
+      setSheetStatus('');
       const res = await apiFetch(`${API_URL}?action=listSheets`, { dedupeKey: 'listSheets' });
       if(!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -9432,11 +9475,20 @@
       if(!hasValidSelection){
         state.sheet = sheets[0] || '';
       }
+      if(!sheets.length){
+        setSheetStatus('No hay bases de leads disponibles. Verifica que el Apps Script tenga acceso al libro configurado.', 'info');
+      }
     }catch(err){
       if(err && err.code === 'UNAUTHORIZED') return;
       console.error('Error al cargar hojas', err);
       sheets = [];
       state.sheet = '';
+      let message = resolveErrorMessage(err, 'No se pudieron cargar las bases.');
+      const explicit = typeof err?.message === 'string' ? err.message.trim() : '';
+      if(explicit && explicit.toLowerCase().includes('hoja de cálculo principal')){
+        message = `${explicit} Pide a un administrador que configure la propiedad de script "APP_SPREADSHEET_ID" en Apps Script con el ID del libro de Google Sheets.`;
+      }
+      setSheetStatus(message, 'error');
     }
   }
 
