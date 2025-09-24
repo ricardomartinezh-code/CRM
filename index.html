@@ -8686,8 +8686,25 @@
     "link[rel='apple-touch-icon']",
   ];
 
+  // Allows only http(s) URLs and data:image URIs as favicon sources
+  function sanitizeFaviconUrl(url) {
+    if (typeof url !== 'string' || !url) return DEFAULT_FAVICON_URL;
+    url = url.trim();
+    try {
+      // Allow data:image/*, http(s) and relative URLs; block javascript: and others
+      if (/^data:image\//i.test(url)) return url;
+      // Skip dangerous schemes (like javascript:)
+      const urlObj = new URL(url, window.location.origin);
+      if (urlObj.protocol === 'http:' || urlObj.protocol === 'https:') return urlObj.href;
+    } catch(e) {
+      // Could not parse as a valid URL, possibly a relative path
+      if (url.startsWith('/') || url.startsWith('./') || url.startsWith('../')) return url;
+    }
+    return DEFAULT_FAVICON_URL;
+  }
+
   function updateDocumentFavicons(src){
-    const href = src || DEFAULT_FAVICON_URL;
+    const href = sanitizeFaviconUrl(src || DEFAULT_FAVICON_URL);
     FAVICON_LINK_SELECTORS.forEach(selector => {
       const linkEl = document.head && document.head.querySelector(selector);
       if(linkEl){
@@ -8720,7 +8737,8 @@
 
   function getFaviconSource(){
     if(!brandImg) return DEFAULT_FAVICON_URL;
-    return brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || DEFAULT_FAVICON_URL;
+    const src = brandImg.dataset.faviconSrc || brandImg.getAttribute('data-favicon-src') || DEFAULT_FAVICON_URL;
+    return sanitizeFaviconUrl(src);
   }
 
   function applyBrandLogoState(){
