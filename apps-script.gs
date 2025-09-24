@@ -1,4 +1,13 @@
+function bootstrapMetaIntegration_(){
+  try{
+    ensureMetaIntegrationDefaults_();
+  }catch(err){
+    Logger.log('No se pudieron establecer los valores predeterminados de Meta: ' + err);
+  }
+}
+
 function doGet(e){
+  bootstrapMetaIntegration_();
   const action = String(e?.parameter?.action || '').trim();
   if(!action){
     return jsonResponse({ ok: true, message: 'Servicio disponible' }, e);
@@ -68,6 +77,7 @@ function doGet(e){
 }
 
 function doPost(e){
+  bootstrapMetaIntegration_();
   const body = parseJsonBody_(e);
   let action = String(body.action || '').trim();
   if(!action){
