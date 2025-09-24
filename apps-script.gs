@@ -226,9 +226,11 @@ const META_WEBHOOK_URL_PROPERTY = 'META_WEBHOOK_URL';
 const META_WHATSAPP_ACCESS_TOKEN_PROPERTY = 'META_WHATSAPP_ACCESS_TOKEN';
 const META_WHATSAPP_BUSINESS_ACCOUNT_ID_PROPERTY = 'META_WHATSAPP_BUSINESS_ACCOUNT_ID';
 const META_WHATSAPP_PHONE_NUMBER_ID_PROPERTY = 'META_WHATSAPP_PHONE_NUMBER_ID';
+const DEFAULT_AUTH_TOKEN_SECRET = '3ceb0c522cc64166930f36b77d09693a9eb9a425327b421db83ba20229e8e7f6';
 const DEFAULT_META_INTEGRATION_CONFIG = Object.freeze({
   webhookUrl: 'https://webhook-v88d.onrender.com/webhook',
   verifyToken: 'ReLead_Verify_Token',
+  appSecret: '9ab04bb016e846e381b97cffd1410f27',
   accessToken:
     'EAAPzZCz9ZCiiIBPikjhHZA3PzUD9YWmteAcmgFVZCGsLZAyADZCwXHarhuCTmSBsTwPnVtNl6kVTLSge5WKgXxNZBZBg9fVKsaNWERhWFDF65xSZBXV8PmhJDtoSqdVsWtBh8OBvQsah8P4KYBD6IGZBTMBkeXC7LqQr1UjpHQB7xKfJVWe7yJzjOJ7cicN7o4AfhntwZDZD',
   wabaId: '24625801563741719',
@@ -258,6 +260,7 @@ function ensureMetaIntegrationDefaults_(){
     }
   };
   ensure(META_WEBHOOK_VERIFY_TOKEN_PROPERTY, defaults.verifyToken);
+  ensure(META_APP_SECRET_PROPERTY, defaults.appSecret);
   ensure(META_WEBHOOK_URL_PROPERTY, defaults.webhookUrl);
   ensure(META_LEAD_ACCESS_TOKEN_PROPERTY, defaults.accessToken);
   ensure(META_WHATSAPP_ACCESS_TOKEN_PROPERTY, defaults.accessToken);
@@ -3485,7 +3488,7 @@ function getTokenSecret_(){
   const props = PropertiesService.getScriptProperties();
   let secret = props.getProperty(TOKEN_SECRET_PROPERTY);
   if(!secret){
-    secret = generateSecret_();
+    secret = DEFAULT_AUTH_TOKEN_SECRET;
     props.setProperty(TOKEN_SECRET_PROPERTY, secret);
   }
   return secret;
