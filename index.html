@@ -1238,6 +1238,10 @@
     .template-modal__section{ display:flex; flex-direction:column; gap:var(--space-sm); }
     .template-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:8px; }
     .template-list__item{ display:flex; align-items:flex-start; gap:10px; justify-content:space-between; width:100%; border-radius:12px; border:1px solid rgba(255,255,255,0.1); padding:10px 12px; background:var(--card-2); color:var(--text); text-align:left; cursor:pointer; transition: transform .18s ease, box-shadow .18s ease; }
+    .whatsapp-web-modal{ width:min(1024px, 100%); height:min(88vh, 840px); }
+    .whatsapp-web-modal .modal-body{ padding:0; flex:1; display:flex; gap:0; }
+    .whatsapp-web-frame{ flex:1; width:100%; height:100%; border:0; background:#0b1220; border-radius:0; }
+    html[data-theme="light"] .whatsapp-web-frame{ background:#ffffff; }
     .template-list__item:hover, .template-list__item:focus-visible{ transform:translateY(-1px); box-shadow:0 12px 28px rgba(5,12,28,0.32); outline:none; }
     .template-list__meta{ font-size:12px; opacity:0.7; margin-top:4px; }
     .template-list__empty{ font-size:12px; color:var(--muted); padding:10px 12px; border-radius:12px; border:1px dashed rgba(255,255,255,0.18); background:rgba(148,163,184,0.08); text-align:center; }
@@ -2655,6 +2659,26 @@
             <button type="button" class="btn danger" id="emailTemplateDelete">Eliminar</button>
           </div>
         </form>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="whatsappWebModal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-card whatsapp-web-modal" role="document">
+      <button type="button" class="modal-close" id="whatsappWebClose" aria-label="Cerrar WhatsApp Web">
+        <i class="bi bi-x-lg" aria-hidden="true"></i>
+      </button>
+      <div class="modal-header">
+        <h2>WhatsApp Web</h2>
+        <p>Escanea el código QR o continúa con tu sesión activa sin salir de ReLead.</p>
+      </div>
+      <div class="modal-body">
+        <iframe
+          id="whatsappWebFrame"
+          class="whatsapp-web-frame"
+          title="WhatsApp Web"
+          src="about:blank"
+          allow="clipboard-read; clipboard-write"
+        ></iframe>
       </div>
     </div>
   </div>
@@ -10163,6 +10187,7 @@
   const whatsappModalState = { lead: null, digits: '', defaultMessage: '', onSend: null, selectedId: '' };
   const emailModalState = { lead: null, email: '', defaultSubject: '', defaultBody: '', mailtoFallback: '', onSend: null, selectedId: '' };
   let whatsappModalReady = false;
+  let whatsappWebModalReady = false;
   let emailModalReady = false;
 
   function normalizeLeadId(value){
@@ -10581,7 +10606,55 @@
     }
   }
 
-  function openWhatsappWebWindow(){
+  function initWhatsappWebModal(){
+    if(whatsappWebModalReady) return;
+    const overlay = el('#whatsappWebModal');
+    if(!overlay) return;
+    overlay.addEventListener('click', event => {
+      if(event.target === overlay){
+        hideWhatsappWebModal();
+      }
+    });
+    const closeBtn = el('#whatsappWebClose');
+    if(closeBtn) closeBtn.addEventListener('click', hideWhatsappWebModal);
+    const handleEscape = event => {
+      if(event.key !== 'Escape') return;
+      if(!overlay.classList.contains('active')) return;
+      event.preventDefault();
+      hideWhatsappWebModal();
+    };
+    document.addEventListener('keydown', handleEscape);
+    whatsappWebModalReady = true;
+  }
+
+  function hideWhatsappWebModal(){
+    const overlay = el('#whatsappWebModal');
+    if(overlay){
+      overlay.classList.remove('active');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+    document.body.classList.remove('modal-open');
+    const frame = el('#whatsappWebFrame');
+    if(frame){
+      frame.src = 'about:blank';
+    }
+  }
+
+  function showWhatsappWebModal(){
+    initWhatsappWebModal();
+    const overlay = el('#whatsappWebModal');
+    const frame = el('#whatsappWebFrame');
+    if(!overlay || !frame){
+      return false;
+    }
+    frame.src = WHATSAPP_WEB_URL;
+    overlay.classList.add('active');
+    overlay.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    return true;
+  }
+
+  function openWhatsappWebPopup(){
     try{
       const popup = window.open(WHATSAPP_WEB_URL, '_blank', 'noopener,noreferrer');
       if(popup){
@@ -10624,8 +10697,15 @@
     }
   }
 
+  function openWhatsappWebExperience(){
+    if(showWhatsappWebModal()){
+      return true;
+    }
+    return openWhatsappWebPopup();
+  }
+
   function handleWhatsappIntegrationPair(){
-    const opened = openWhatsappWebWindow();
+    const opened = openWhatsappWebExperience();
     if(!opened) return;
     const now = Date.now();
     persistWhatsappSessionState({ status: 'pairing', startedAt: now, lastActiveAt: now });
@@ -10633,7 +10713,7 @@
   }
 
   function handleWhatsappIntegrationOpen(){
-    const opened = openWhatsappWebWindow();
+    const opened = openWhatsappWebExperience();
     if(!opened) return;
     const now = Date.now();
     const startedAt = Number(whatsappSessionState?.startedAt) || now;

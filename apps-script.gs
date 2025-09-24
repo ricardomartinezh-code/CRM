@@ -197,7 +197,8 @@ const DEFAULT_META_INTEGRATION_CONFIG = Object.freeze({
   accessToken:
     'EAAPzZCz9ZCiiIBPikjhHZA3PzUD9YWmteAcmgFVZCGsLZAyADZCwXHarhuCTmSBsTwPnVtNl6kVTLSge5WKgXxNZBZBg9fVKsaNWERhWFDF65xSZBXV8PmhJDtoSqdVsWtBh8OBvQsah8P4KYBD6IGZBTMBkeXC7LqQr1UjpHQB7xKfJVWe7yJzjOJ7cicN7o4AfhntwZDZD',
   wabaId: '24625801563741719',
-  phoneNumberId: '839062255947764'
+  phoneNumberId: '839062255947764',
+  defaultWhatsappSheet: '5-WhatsApp'
 });
 const META_LEAD_SHEET_PROPERTY_PREFIX = 'META_LEAD_SHEET_';
 
@@ -227,6 +228,7 @@ function ensureMetaIntegrationDefaults_(){
   ensure(META_WHATSAPP_ACCESS_TOKEN_PROPERTY, defaults.accessToken);
   ensure(META_WHATSAPP_BUSINESS_ACCOUNT_ID_PROPERTY, defaults.wabaId);
   ensure(META_WHATSAPP_PHONE_NUMBER_ID_PROPERTY, defaults.phoneNumberId);
+  ensure(META_WHATSAPP_DEFAULT_SHEET_PROPERTY, defaults.defaultWhatsappSheet);
 }
 
 let ACTIVE_USER = null;
@@ -1603,8 +1605,10 @@ function applyLeadCreateFromIntegration_(normalized){
 function normalizeWhatsappChange_(entry, change){
   const value = change && typeof change.value === 'object' ? change.value : {};
   const props = PropertiesService.getScriptProperties();
-  const defaultSheet = String(props.getProperty(META_WHATSAPP_DEFAULT_SHEET_PROPERTY) || '').trim();
-  const sheet = String(value.sheet || value.base || defaultSheet || '').trim();
+  const configuredDefaultSheet = String(props.getProperty(META_WHATSAPP_DEFAULT_SHEET_PROPERTY) || '').trim();
+  const preferredSheet = configuredDefaultSheet || '5-WhatsApp';
+  const requestedSheet = String(value.sheet || value.base || '').trim();
+  const sheet = String(preferredSheet || requestedSheet || '').trim();
   const metadata = value && typeof value.metadata === 'object' ? value.metadata : {};
   const contacts = Array.isArray(value.contacts) ? value.contacts : [];
   const contactNames = new Map();
