@@ -61,6 +61,16 @@ module.exports = {
         node: true,
       },
     },
+    {
+      files: ['server.js'],
+      env: {
+        node: true,
+      },
+      globals: {
+        fetch: 'readonly',
+        AbortController: 'readonly',
+      },
+    },
   ],
   settings: {
     'html/html-extensions': ['.html'],
