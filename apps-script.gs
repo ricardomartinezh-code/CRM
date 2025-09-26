@@ -2501,11 +2501,28 @@ function verifyWebhookCommunication_(){
         const service = ScriptApp.getService();
         if(service && typeof service.getUrl === 'function'){
           const deploymentUrl = String(service.getUrl() || '').trim();
-          if(deploymentUrl && webhookUrl.indexOf(deploymentUrl) !== 0){
-            result.htmlOk = false;
-            result.htmlMessage = 'La URL configurada para el webhook no coincide con el despliegue actual del Apps Script.';
-          }else if(deploymentUrl){
-            result.htmlMessage = 'La URL del webhook apunta al despliegue actual.';
+          if(deploymentUrl){
+            const matchesDeployment = webhookUrl.indexOf(deploymentUrl) === 0;
+            let usesRenderProxy = false;
+            if(!matchesDeployment){
+              try{
+                const webhookHost = new URL(webhookUrl).hostname;
+                if(webhookHost && webhookHost.toLowerCase().endsWith('.onrender.com')){
+                  usesRenderProxy = true;
+                }
+              }catch(_err){
+                usesRenderProxy = false;
+              }
+            }
+            if(matchesDeployment){
+              result.htmlMessage = 'La URL del webhook apunta al despliegue actual.';
+            }else if(usesRenderProxy){
+              result.htmlOk = true;
+              result.htmlMessage = 'La URL del webhook usa la pasarela de Render configurada.';
+            }else{
+              result.htmlOk = false;
+              result.htmlMessage = 'La URL configurada para el webhook no coincide con el despliegue actual del Apps Script.';
+            }
           }
         }
       }
