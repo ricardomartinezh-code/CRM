@@ -1334,6 +1334,11 @@
       border-color: color-mix(in srgb, var(--panel-tone-strong) 25%, #e2e8f0 75%);
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.75);
     }
+    .panel-quick__form{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
     .panel-quick__header h4{
       margin:0;
       font-size:16px;
@@ -1797,6 +1802,7 @@
     .auto-reassign-pagination__info{ flex:1 1 200px; }
     .auto-reassign-pagination__controls{ display:flex; align-items:center; gap:var(--space-sm); }
     .auto-reassign-pagination__page{ font-weight:600; }
+    .auto-reassign-wrapper{ margin-top:12px; }
     .auto-reassign-pagination .btn{ display:inline-flex; align-items:center; gap:6px; font-size:13px; padding:6px 12px; }
     .auto-reassign-pagination .btn[disabled]{ opacity:.6; cursor:not-allowed; }
     html[data-theme="light"] .panel .contact-btn{
@@ -1828,16 +1834,39 @@
     html[data-theme="light"] .panel-favorite[aria-pressed="true"]{ background:#fef3c7; color:#b45309; }
     .quick-access{
       margin-top:12px;
-      padding:16px;
       border-radius:16px;
       border:1px solid color-mix(in srgb, var(--panel-tone-strong) 35%, rgba(15,23,42,0.55) 65%);
       background:color-mix(in srgb, var(--panel-tone-soft) 75%, rgba(15,23,42,0.4) 25%);
+      display:block;
+      overflow:hidden;
+    }
+    .quick-access__summary{
+      margin:0;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:14px 16px;
+      font-size:14px;
+      font-weight:700;
+      letter-spacing:.3px;
+      text-transform:uppercase;
+      color:var(--panel-tone-text);
+      cursor:pointer;
+      list-style:none;
+    }
+    .quick-access__summary::-webkit-details-marker{ display:none; }
+    .quick-access__summary i{ font-size:16px; opacity:0.85; }
+    .quick-access__body{
       display:flex;
       flex-direction:column;
       gap:14px;
+      padding:0 16px 16px;
     }
-    .quick-access__header h4{ margin:0; font-size:16px; font-weight:700; }
-    .quick-access__header p{ margin:4px 0 0; font-size:13px; color:var(--panel-tone-text); opacity:0.7; }
+    .quick-access__description{
+      margin:0;
+      font-size:13px;
+      color:color-mix(in srgb, var(--panel-tone-text) 70%, rgba(226,232,240,0.9) 30%);
+    }
     .quick-access__group{ display:flex; flex-direction:column; gap:8px; }
     .quick-access__label{ font-size:13px; letter-spacing:.3px; text-transform:uppercase; color:var(--panel-tone-text); opacity:0.8; }
     .quick-access__list{ display:flex; flex-wrap:wrap; gap:8px; }
@@ -1866,6 +1895,8 @@
     .quick-access__item-meta{ font-size:12px; opacity:0.75; display:flex; gap:4px; flex-wrap:wrap; }
     .quick-access__empty{ margin:0; font-size:12px; color:var(--panel-tone-text); opacity:0.6; }
     html[data-theme="light"] .quick-access{ background:color-mix(in srgb, #ffffff 85%, var(--panel-tone-soft) 15%); border-color:color-mix(in srgb, var(--panel-tone-strong) 28%, #cbd5f5 72%); }
+    html[data-theme="light"] .quick-access__summary{ color:color-mix(in srgb, var(--panel-tone-strong) 45%, #1f2937 55%); }
+    html[data-theme="light"] .quick-access__description{ color:color-mix(in srgb, var(--panel-tone-strong) 35%, #1e293b 65%); }
     html[data-theme="light"] .quick-access__item{ background:#ffffff; border-color:color-mix(in srgb, var(--panel-tone-strong) 22%, #dbeafe 78%); }
     html[data-theme="light"] .quick-access__item:hover, html[data-theme="light"] .quick-access__item:focus-visible{ box-shadow:0 12px 26px rgba(15,23,42,0.18); }
 
@@ -2848,14 +2879,6 @@
           </div>
           <p class="view-status hidden" id="sheetStatus" role="status" aria-live="polite"></p>
         </div>
-        <div class="panel-section hidden" id="autoReassignSection" aria-live="polite" aria-label="Reasignación automática">
-          <h3>Reasignación automática</h3>
-          <div class="auto-reassign-card">
-            <p class="auto-reassign-summary" id="autoReassignSummary">Analizando distribución de leads por asesor…</p>
-            <ul class="auto-reassign-list" id="autoReassignList"></ul>
-            <div class="auto-reassign-pagination hidden" id="autoReassignPagination" role="group" aria-label="Paginación de sugerencias"></div>
-          </div>
-        </div>
         <div class="panel-section">
           <div class="row between align-center" style="gap:var(--space-sm)">
             <h3>Leads</h3>
@@ -2959,58 +2982,55 @@
             </form>
             <p class="panel-tags__feedback hidden" id="leadTagFeedback"></p>
           </section>
-          <div class="panel-hint hidden" id="autoReassignDetail" role="status" aria-live="polite">
-            <strong id="autoReassignDetailTitle"></strong>
-            <p id="autoReassignDetailMessage"></p>
-            <div class="panel-hint__actions">
-              <button class="btn primary" type="button" id="autoReassignApply"><i class="bi bi-arrow-left-right"></i> Reasignar ahora</button>
-              <button class="btn" type="button" id="autoReassignKeep">Mantener asignación</button>
-            </div>
-          </div>
           <section class="panel-quick" aria-labelledby="panelQuickTitle">
-            <div class="panel-quick__header">
+            <header class="panel-quick__header">
               <h4 id="panelQuickTitle">Actualiza y contacta</h4>
               <p>Registra etapa, estado y nota antes de usar los accesos rápidos para contactar al lead.</p>
-            </div>
-            <div class="panel-quick__grid">
-              <label class="panel-quick__field">Etapa
-                <select id="selEtapa"></select>
+            </header>
+            <form class="panel-quick__form" id="leadUpdateForm" autocomplete="off" novalidate>
+              <div class="panel-quick__grid">
+                <label class="panel-quick__field">Etapa
+                  <select id="selEtapa"></select>
+                </label>
+                <label class="panel-quick__field">Estado
+                  <select id="selEstado"></select>
+                </label>
+              </div>
+              <label class="panel-quick__field panel-quick__comment">Comentario
+                <textarea id="txtComentario" class="w100" rows="3" placeholder="Captura contexto, acuerdos o próximos pasos." required></textarea>
               </label>
-              <label class="panel-quick__field">Estado
-                <select id="selEstado"></select>
-              </label>
-            </div>
-            <label class="panel-quick__field panel-quick__comment">Comentario
-              <textarea id="txtComentario" class="w100" rows="3"></textarea>
-            </label>
-            <div class="panel-quick__feedback hidden" id="panelFeedback" role="alert" aria-live="assertive">
-              <strong id="panelFeedbackTitle"></strong>
-              <p id="panelFeedbackMessage"></p>
-            </div>
-            <div class="panel-quick__actions">
-              <button class="btn primary" id="updateBtn">Guardar actualización</button>
-              <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
-                <a class="btn contact-btn contact-call" data-contact="call" href="#"><i class="bi bi-telephone"></i> Llamar</a>
-                <a class="btn contact-btn contact-wa" data-contact="whatsapp" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
-                <a class="btn contact-btn contact-mail" data-contact="email" href="#"><i class="bi bi-envelope"></i> Email</a>
+              <div class="panel-quick__feedback hidden" id="panelFeedback" role="alert" aria-live="assertive">
+                <strong id="panelFeedbackTitle"></strong>
+                <p id="panelFeedbackMessage"></p>
               </div>
-            </div>
-            <section class="quick-access" id="quickAccessPanel" aria-label="Accesos rápidos de leads">
-              <header class="quick-access__header">
-                <h4>Recientes y favoritos</h4>
-                <p>Accede a los leads clave que has abierto recientemente o marcado como favoritos.</p>
-              </header>
-              <div class="quick-access__group" id="favoriteGroup">
-                <div class="quick-access__label">Favoritos</div>
-                <div class="quick-access__list" id="favoriteLeads" role="list"></div>
-                <p class="quick-access__empty" id="favoriteEmpty">Marca un lead con la estrella para guardarlo aquí.</p>
+              <div class="panel-quick__actions">
+                <button class="btn primary" id="updateBtn" type="submit"><i class="bi bi-floppy"></i> Guardar cambios</button>
+                <div class="panel-quick__shortcuts" role="group" aria-label="Accesos rápidos de contacto">
+                  <a class="btn contact-btn contact-call" data-contact="call" href="#"><i class="bi bi-telephone"></i> Llamar</a>
+                  <a class="btn contact-btn contact-wa" data-contact="whatsapp" href="#"><i class="bi bi-whatsapp"></i> WhatsApp</a>
+                  <a class="btn contact-btn contact-mail" data-contact="email" href="#"><i class="bi bi-envelope"></i> Email</a>
+                </div>
               </div>
-              <div class="quick-access__group" id="recentGroup">
-                <div class="quick-access__label">Recientes</div>
-                <div class="quick-access__list" id="recentLeads" role="list"></div>
-                <p class="quick-access__empty" id="recentEmpty">Los leads que abras aparecerán en esta lista.</p>
+            </form>
+            <details class="quick-access" id="quickAccessPanel" aria-label="Accesos rápidos de leads">
+              <summary class="quick-access__summary">
+                <i class="bi bi-lightning-charge" aria-hidden="true"></i>
+                <span>Recientes y favoritos</span>
+              </summary>
+              <div class="quick-access__body">
+                <p class="quick-access__description">Accede a los leads clave que has abierto recientemente o marcado como favoritos.</p>
+                <div class="quick-access__group" id="favoriteGroup">
+                  <div class="quick-access__label">Favoritos</div>
+                  <div class="quick-access__list" id="favoriteLeads" role="list"></div>
+                  <p class="quick-access__empty" id="favoriteEmpty">Marca un lead con la estrella para guardarlo aquí.</p>
+                </div>
+                <div class="quick-access__group" id="recentGroup">
+                  <div class="quick-access__label">Recientes</div>
+                  <div class="quick-access__list" id="recentLeads" role="list"></div>
+                  <p class="quick-access__empty" id="recentEmpty">Los leads que abras aparecerán en esta lista.</p>
+                </div>
               </div>
-            </section>
+            </details>
             <p class="contact-scripts__status hidden" id="contactScriptStatus" role="status" aria-live="polite"></p>
           </section>
           <section class="calendar-form" data-calendar-form aria-labelledby="calendarFormTitle">
@@ -3363,6 +3383,20 @@
                     <button type="button" class="btn danger" id="teamDeleteBtn"><i class="bi bi-x-circle"></i> Desactivar</button>
                   </div>
                 </form>
+              </div>
+            </div>
+            <div class="panel-section">
+              <h3><span aria-hidden="true">⚖️</span> Balance automático</h3>
+              <p class="muted small">Identifica sobrecarga y reasigna sugerencias de manera controlada.</p>
+              <div class="panel-hint" id="autoReassignAdminHint">
+                <p>Las sugerencias se recalculan al cargar leads o cambiar la base activa.</p>
+              </div>
+              <div class="auto-reassign-wrapper hidden" id="autoReassignSection" aria-live="polite" aria-label="Reasignación automática">
+                <div class="auto-reassign-card">
+                  <p class="auto-reassign-summary" id="autoReassignSummary">Analizando distribución de leads por asesor…</p>
+                  <ul class="auto-reassign-list" id="autoReassignList"></ul>
+                  <div class="auto-reassign-pagination hidden" id="autoReassignPagination" role="group" aria-label="Paginación de sugerencias"></div>
+                </div>
               </div>
             </div>
             <div class="panel-section">
@@ -9713,6 +9747,9 @@
         throw new Error(data.message);
       }
     }catch(err){
+      if(err && err.name === 'AbortError'){
+        return [];
+      }
       if(!(err && err.code === 'UNAUTHORIZED')){
         console.error('Error al cargar leads', sheetName, err);
       }
@@ -13584,6 +13621,17 @@
       feedbackMessageEl: el('#panelFeedbackMessage')
     });
 
+    const leadUpdateFormEl = el('#leadUpdateForm');
+    if(leadUpdateFormEl){
+      leadUpdateFormEl.addEventListener('submit', event => {
+        event.preventDefault();
+        const updateButton = el('#updateBtn');
+        if(updateButton && !updateButton.disabled){
+          updateButton.click();
+        }
+      });
+    }
+
     const phone = parsePhone(basePhone);
     const phoneDigits = phone.intl || phone.digits;
     const waDigits = phone.wa || phoneDigits;
@@ -14285,7 +14333,7 @@
           const to = escapeHtml(item.toName || 'Sin asignar');
           const stageLabel = escapeHtml(stage || '—');
           const leadId = escapeHtml(String(item.leadId || ''));
-          return `<li class="auto-reassign-item" data-lead-id="${leadId}"><div><strong>${name}</strong><div class="auto-reassign-meta"><span><i class="bi bi-arrow-left-right"></i> ${from} → ${to}</span><span><i class="bi bi-kanban"></i> Etapa: ${stageLabel}</span></div></div><div class="auto-reassign-actions"><button class="btn outline" type="button" data-lead-open="${leadId}"><i class="bi bi-search"></i> Revisar lead</button></div></li>`;
+          return `<li class="auto-reassign-item" data-lead-id="${leadId}"><div><strong>${name}</strong><div class="auto-reassign-meta"><span><i class="bi bi-arrow-left-right"></i> ${from} → ${to}</span><span><i class="bi bi-kanban"></i> Etapa: ${stageLabel}</span></div></div><div class="auto-reassign-actions"><button class="btn primary" type="button" data-auto-apply="${leadId}"><i class="bi bi-check2-circle"></i> Aplicar</button><button class="btn outline" type="button" data-auto-dismiss="${leadId}"><i class="bi bi-x-lg"></i> Omitir</button><button class="btn outline" type="button" data-lead-open="${leadId}"><i class="bi bi-search"></i> Revisar lead</button></div></li>`;
         })
         .join('');
     }
@@ -14399,6 +14447,24 @@
     updateLeadDetailAssignmentDisplay(lead);
     updateAutoReassignDetail(lead);
     refresh();
+  }
+
+  function processAutoReassignAction(leadId, action){
+    const targetId = String(leadId || '');
+    if(!targetId) return;
+    const lead = leads.find(item => String(item.id || '') === targetId);
+    if(!lead) return;
+    const previousContext = detailLeadContext;
+    detailLeadContext = lead;
+    try{
+      if(action === 'apply'){
+        handleAutoReassignApply();
+      }else if(action === 'dismiss'){
+        handleAutoReassignKeep();
+      }
+    }finally{
+      detailLeadContext = previousContext;
+    }
   }
 
   function getDefaultCalendarStart(){
@@ -15788,6 +15854,18 @@
     const autoListEl = el('#autoReassignList');
     if(autoListEl){
       autoListEl.addEventListener('click', event => {
+        const applyControl = event.target.closest('[data-auto-apply]');
+        if(applyControl){
+          const leadId = applyControl.getAttribute('data-auto-apply');
+          if(leadId) processAutoReassignAction(leadId, 'apply');
+          return;
+        }
+        const dismissControl = event.target.closest('[data-auto-dismiss]');
+        if(dismissControl){
+          const leadId = dismissControl.getAttribute('data-auto-dismiss');
+          if(leadId) processAutoReassignAction(leadId, 'dismiss');
+          return;
+        }
         const button = event.target.closest('[data-lead-open]');
         if(!button) return;
         const leadId = button.getAttribute('data-lead-open');
