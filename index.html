@@ -13293,7 +13293,6 @@
       ? (phone.local.length === 10 ? `tel:+52${phone.local}` : `tel:${phone.local}`)
       : (phoneDigits ? `tel:${normalizedIntl || phoneDigits}` : '');
     const callFallbackUrl = r.callUrl || (phoneDigits && phoneDigits.length >= 10 ? `https://dashboard.aircall.io/call/${phoneDigits}` : '');
-    const waHref = r.whatsappUrl || (waDigits && waDigits.length >= 8 ? `https://wa.me/${waDigits}` : '');
     const mailtoHref = r.correo ? `mailto:${encodeURIComponent(r.correo)}` : '';
     const hasPhoneValue = Boolean(phoneDisplay);
     const hasCallLink = Boolean(e164Number || callFallbackUrl || telUrl);
@@ -13307,6 +13306,25 @@
       ? subjectLine.replace(/^\s*Asunto:\s*/i, '').trim()
       : `Seguimiento UNIDEP ${r.programa || 'tu inscripción'}`;
     const defaultEmailBody = emailLines.length > 1 ? emailLines.slice(1).join('\n').trim() : '';
+
+    const whatsappScript = (contactScripts.whatsapp || '').trim();
+    const baseWaHref = r.whatsappUrl || (waDigits && waDigits.length >= 8 ? `https://wa.me/${waDigits}` : '');
+    const waHref = baseWaHref
+      ? (!r.whatsappUrl && whatsappScript
+        ? `${baseWaHref}${baseWaHref.includes('?') ? '&' : '?'}text=${encodeURIComponent(whatsappScript)}`
+        : baseWaHref)
+      : '';
+
+    const gmailHref = r.correo ? (() => {
+      const params = new URLSearchParams({ view: 'cm', fs: '1', tf: '1', to: r.correo || '' });
+      if(defaultEmailSubject){
+        params.set('su', defaultEmailSubject);
+      }
+      if(defaultEmailBody){
+        params.set('body', defaultEmailBody);
+      }
+      return `https://mail.google.com/mail/?${params.toString()}`;
+    })() : '';
 
     const assignContactHandlers = (nodes, handler, linkOptions) => {
       nodes.forEach(anchor => {
@@ -13367,24 +13385,23 @@
 
     const whatsappHandler = hasWaLink ? event => {
       event.preventDefault();
-      showWhatsAppModal({
-        lead: r,
-        digits: waDigits,
-        defaultMessage: contactScripts.whatsapp || '',
-        onSend: () => registerContactNote('whatsapp')
-      });
+      if(!waHref) return;
+      const popup = window.open(waHref, '_blank');
+      if(popup){
+        popup.opener = null;
+      }
+      registerContactNote('whatsapp');
     } : null;
 
     const emailHandler = hasMailLink ? event => {
       event.preventDefault();
-      showEmailModal({
-        lead: r,
-        email: r.correo,
-        defaultSubject: defaultEmailSubject,
-        defaultBody: defaultEmailBody,
-        mailtoFallback: mailtoHref,
-        onSend: () => registerContactNote('email')
-      });
+      const targetUrl = gmailHref || mailtoHref;
+      if(!targetUrl) return;
+      const popup = window.open(targetUrl, '_blank');
+      if(popup){
+        popup.opener = null;
+      }
+      registerContactNote('email');
     } : null;
 
     const applyPanelContactButtons = () => {
@@ -13400,8 +13417,8 @@
           telHref: telUrl || ''
         }
       });
-      assignContactHandlers(waButtons, whatsappHandler, waHref || '#');
-      assignContactHandlers(mailButtons, emailHandler, mailtoHref || '#');
+      assignContactHandlers(waButtons, whatsappHandler, waHref ? { href: waHref, target: '_blank', rel: 'noreferrer noopener' } : '#');
+      assignContactHandlers(mailButtons, emailHandler, gmailHref ? { href: gmailHref, target: '_blank', rel: 'noreferrer noopener' } : (mailtoHref || '#'));
     };
 
     const applyDrawerContactButtons = () => {
@@ -13417,8 +13434,8 @@
           telHref: telUrl || ''
         }
       });
-      assignContactHandlers(waButtons, whatsappHandler, waHref || '#');
-      assignContactHandlers(mailButtons, emailHandler, mailtoHref || '#');
+      assignContactHandlers(waButtons, whatsappHandler, waHref ? { href: waHref, target: '_blank', rel: 'noreferrer noopener' } : '#');
+      assignContactHandlers(mailButtons, emailHandler, gmailHref ? { href: gmailHref, target: '_blank', rel: 'noreferrer noopener' } : (mailtoHref || '#'));
     };
 
     applyPanelContactButtons();
