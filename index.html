@@ -4262,10 +4262,17 @@
   }
 
   function parseIntegrationMetadataObject(value){
+    if(Array.isArray(value)){
+      return { integrationLogs: value.slice() };
+    }
     if(value && typeof value === 'object'){
       if(Array.isArray(value.integrationLogs)) return value;
-      if(typeof value.integrationLogs === 'string'){
-        const parsedLogs = tryParseJson(value.integrationLogs);
+      if(Array.isArray(value.integration_logs)){
+        return Object.assign({}, value, { integrationLogs: value.integration_logs });
+      }
+      const stringLogs = value.integrationLogs || value.integration_logs;
+      if(typeof stringLogs === 'string'){
+        const parsedLogs = tryParseJson(stringLogs);
         if(parsedLogs && Array.isArray(parsedLogs)){
           return Object.assign({}, value, { integrationLogs: parsedLogs });
         }
@@ -4276,6 +4283,9 @@
       const trimmed = value.trim();
       if(!trimmed) return { integrationLogs: [] };
       let parsed = tryParseJson(trimmed);
+      if(Array.isArray(parsed)){
+        return { integrationLogs: parsed };
+      }
       if(!parsed && trimmed.includes('{') && trimmed.includes('}')){
         const start = trimmed.indexOf('{');
         const end = trimmed.lastIndexOf('}');
@@ -4283,11 +4293,20 @@
           parsed = tryParseJson(trimmed.slice(start, end + 1));
         }
       }
-      if(!parsed && trimmed.includes('integrationLogs')){
-        const match = trimmed.match(/\{[\s\S]*"integrationLogs"[\s\S]*\}/);
-        if(match) parsed = tryParseJson(match[0]);
+      if(Array.isArray(parsed)){
+        return { integrationLogs: parsed };
+      }
+      if(!parsed && (trimmed.includes('integrationLogs') || trimmed.includes('integration_logs'))){
+        const match = trimmed.match(/\{[\s\S]*"integration[_]?Logs"[\s\S]*\}/i);
+        if(match){
+          parsed = tryParseJson(match[0]);
+        }
       }
       if(parsed && typeof parsed === 'object'){
+        if(Array.isArray(parsed.integrationLogs)) return parsed;
+        if(Array.isArray(parsed.integration_logs)){
+          return Object.assign({}, parsed, { integrationLogs: parsed.integration_logs });
+        }
         return parsed;
       }
     }
@@ -4296,8 +4315,15 @@
 
   function extractIntegrationLogsFromLead(lead){
     if(!lead) return [];
-    const metadata = parseIntegrationMetadataObject(lead.metadatos !== undefined ? lead.metadatos : '');
-    const logs = Array.isArray(metadata.integrationLogs) ? metadata.integrationLogs : [];
+    const rawMetadata = lead.metadatos !== undefined ? lead.metadatos : (lead.metadata !== undefined ? lead.metadata : '');
+    const metadata = parseIntegrationMetadataObject(rawMetadata);
+    let logs = Array.isArray(metadata.integrationLogs) ? metadata.integrationLogs : [];
+    if(!logs.length && Array.isArray(metadata.integration_logs)){
+      logs = metadata.integration_logs;
+    }
+    if(!logs.length && Array.isArray(lead.integrationLogs)){
+      logs = lead.integrationLogs;
+    }
     return logs.filter(Boolean);
   }
 
