@@ -6651,6 +6651,9 @@
   const normalizeDigits = value => String(value || '').replace(/\D/g, '');
 
   const assignmentIsUnassigned = value => !normalizeAssignmentKey(value);
+  const assignmentCache = new Map();
+  let assignmentMode = 'single';
+  let assignmentPreview = null;
 
   function setAssignmentStatus(message, tone = 'info'){
     const statusEl = el('#assignmentStatus');
